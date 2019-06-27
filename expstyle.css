@@ -1,0 +1,19 @@
+.top-left { grid-area: one; }
+.top-right { grid-area: two; }
+.bottom-left { grid-area: three; }
+.bottom-right { grid-area: four; }
+
+.grid-container {
+  display: grid;
+  grid-template-areas:'one . two''. . .''three . four';
+  grid-gap: 10px;
+  background-color: white;
+  padding: 10px;
+}
+
+.grid-container > div {
+  background-color: white;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
