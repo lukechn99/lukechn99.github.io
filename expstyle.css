@@ -17,3 +17,19 @@
   padding: 20px 0;
   font-size: 30px;
 }
+
+@keyframes one {
+  0%   {background-color: red;}
+  25%  {background-color: yellow; width: 200px; height: 200px;}
+  50%  {background-color: blue; width: 150px; height: 150px;}
+  99%  {background-color: green; width: 300px; height: 300px;}
+}
+
+/* The element to apply the animation to */
+#one.top-left {
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  animation-name: one;
+  animation-duration: 4s;
+}
