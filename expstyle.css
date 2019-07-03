@@ -18,6 +18,14 @@
   font-size: 30px;
 }
 
+.dot {
+  height: 100px;
+  width: 100px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
 @keyframes one {
   0%   {background-color: red;}
   25%  {background-color: yellow; width: 200px; height: 200px;}
