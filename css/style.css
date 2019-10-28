@@ -1,33 +1,48 @@
 body {
-  background-image: url("bubbles2.gif");
-  background-size: cover;
-
-  padding:0;
-  margin:0;
-
+	background-image: url("bubbles2.gif");
+	background-size: cover;
+	padding:0;
+	margin:0;
 }
 
 h1 {
-  bakcground-color: #E27D60;
-  text-align: center;
-  font-family: Courier New;
-
+	background-color: #E27D60;
+	text-align: center;
+	font-family: Courier New;
 }
 
 h2 {
-  background-color: #E27D60;
-  text-align: left;
-  font-family: Courier New;
+	background-color: #E27D60;
+	text-align: left;
+	font-family: Courier New;
 }
 
 p {
-  font-family: Courier New;
+	font-family: Courier New;
 }
 
 ul {
-  font-family: Courier New;
+	font-family: Courier New;
+}
+.partial_left {
+	width:50%;
+    margin-right:2%;
+    float: left;
+}
+.partial_right {
+	width:55%;
+    margin-right:2%;
+    float: right;
+}
+.padded {
+	padding-top: 120px;
 }
 
+.main {
+	margin: 500px 100px 100px; /* Same as the width of the sidebar */
+	padding: 0px 10px;
+	margin: 2%;
+}
 /* Navbar container */
 .navbar {
   overflow: hidden;
