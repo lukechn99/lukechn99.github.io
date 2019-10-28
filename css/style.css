@@ -12,7 +12,7 @@ h1 {
 
 h2 {
 	/*background-color: #E27D60;*/
-	background-image: linear-gradient(to right, #E27D60 , yellow);
+	background-image: linear-gradient(to right, #E27D60 , white);
 	text-align: left;
 	font-family: Courier New;
 	padding-left: 10px;
