@@ -1,6 +1,6 @@
 /* main elements */
 body {
-	background-image: url("bubbles2.gif");
+	/* background-image: url("images/bubbles2.gif");*/
 	background-size: cover;
 	padding:0;
 	margin:0;}
@@ -11,10 +11,13 @@ h1 {
 	font-family: Courier New;}
 
 h2 {
-	background-color: #E27D60;
+	/*background-color: #E27D60;*/
+	background-image: linear-gradient(to right, #E27D60 , yellow);
 	text-align: left;
-	font-family: Courier New;}
-
+	font-family: Courier New;
+	padding-left: 10px;
+	border-radius:15px;}
+	
 p {
 	font-family: Courier New;}
 
@@ -23,8 +26,24 @@ ul {
 	
 img {
 	padding-bottom: 20px;}
+
+a { color:black } 
+a:visited { text-decoration: none; color:black; }
+a:hover { text-decoration: none; color:blue; }
+a:focus { text-decoration: none; color:yellow; }
+a:hover, a:active { text-decoration: none; color:black }
+
+iframe {
+	margin-top: 10px;
+	margin-bottom: 20px;}
 	
 /* classes */
+.button {
+	font-family: Courier New;
+	padding: 5px;
+	background-color: #E27D60;
+	border-radius:15px;}
+	
 .partial_left {
 	width:45%;
     margin-right:2%;
@@ -57,9 +76,11 @@ img {
   overflow: hidden;
   background-color: black;
   font-family: Arial;
-  position: fixed;
+  /*position: fixed;*/
   width: 100%;
-  left: 0;}
+  left: 0;
+  padding: 10px;
+  bottom: 0;}
 
 /* Links inside the navbar */
 .navbar a {
@@ -79,20 +100,19 @@ img {
 
 /* Dropdown button */
 .dropdown .dropbtn {
-  font-size: 16px; 
-  border: none;
-  outline: none;
-  color: white;
-  padding: 14px 16px;
-  background-color: inherit;
-  font-family: inherit; /* Important for vertical align on mobile phones */
-  margin: 0; /* Important for vertical align on mobile phones */
-}
+	font-size: 16px; 
+	border: none;
+	outline: none;
+	color: white;
+	padding: 14px 16px;
+	background-color: inherit;
+	font-family: inherit; /* Important for vertical align on mobile phones */
+	margin: 0; /* Important for vertical align on mobile phones */}
 
 /* Add a red background color to navbar links on hover */
 .navbar a:hover, .dropdown:hover .dropbtn {
-  background-color: #E27D60;
-}
+	background-color: #E27D60;
+	border-radius: 25px;}
 
 /* Dropdown content (hidden by default) */
 .dropdown-content {
