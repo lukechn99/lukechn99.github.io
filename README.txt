@@ -9,7 +9,7 @@ Dull pink "C38D9E" alternate text
 Evergreen:
 
 
-GENERAL ORGANIZATION:
+GENERAL PAGE ORGANIZATION:
 Head
   links
 Body
@@ -19,3 +19,7 @@ Body
   main
   bottom navbar
 	
+TODO:
+Form submission capabilities
+Mobile friendly site
+Mandarin Chinese version
