@@ -30,5 +30,19 @@
 			<span class="dot"></span>
 			<span class="dot"></span>
 		</div>
+		
+		<div>
+			<p> interactive stock calculator: choose a stock, finds the stock and data. (But where does that data go?)
+			compare data to patterns, choose pattern of best fit, graph on desmos with dots for stock data and a curve
+			for the pattern. Give suggestion on whether to buy, hold, or sell</p>
+			<script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+			<div id="calculator" style="width: 600px; height: 400px;"></div>
+			<script>
+				var elt = document.getElementById('calculator');
+				var calculator = Desmos.GraphingCalculator(elt);
+				calculator.setExpression({id:'graph1', latex:'y=x^2'});
+				calculator.keypad() = false;
+			</script>
+		</div>
 	</body>
 </html>
