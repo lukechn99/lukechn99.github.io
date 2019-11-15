@@ -22,5 +22,7 @@ Body
 TODO:
 Form submission capabilities
 Mobile friendly site
+	Text and navbar resizing
 Mandarin Chinese version
 Experimental page
+	Interactive movement navigation
