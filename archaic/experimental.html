@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+	<head>
+		<title>luke.io</title>
+		<meta charset="UTF-8">
+		<meta name="description" content="experimental page for web design">
+		<meta name="keywords" content="Index">
+		<meta name="author" content="Luke Chen">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<link rel="stylesheet" type="text/css" href="expstyle.css">
+		<script src="expscript.js"></script>
+		
+	</head>
+	<body>
+		<div>
+			<h1>A Stack of Experiences</h1>
+		</div>
+		<p>Experimental JavaScript to be used here in the future!</p>
+		<p>look forward to cool animations and interactive elements that will be eventually implemented site-wide</p>
+		<a href="./index.html">Go back</a>
+		<div class="grid-container">
+			<div id="one" class="top-left"><a href="./csci.html">CSCI</a></div>
+			<div class="top-right">2</div>
+			<div class="bottom-left">3</div>
+			<div class="bottom-right">4</div>
+		</div>
+		<div style="text-align:center">
+			<span class="dot"><a href="./csci.html">CSCI</a></span>
+			<span class="dot"></span>
+			<span class="dot"></span>
+			<span class="dot"></span>
+		</div>
+		
+		<div>
+			<p> interactive stock calculator: choose a stock, finds the stock and data. (But where does that data go?)
+			compare data to patterns, choose pattern of best fit, graph on desmos with dots for stock data and a curve
+			for the pattern. Give suggestion on whether to buy, hold, or sell</p>
+			<script src="https://www.desmos.com/api/v1.3/calculator.js?apiKey=dcb31709b452b1cf9dc26972add0fda6"></script>
+			<div id="calculator" style="width: 600px; height: 400px;"></div>
+			<script>
+				var elt = document.getElementById('calculator');
+				var calculator = Desmos.GraphingCalculator(elt);
+				calculator.setExpression({id:'graph1', latex:'y=x^2'});
+				calculator.keypad() = false;
+			</script>
+		</div>
+	</body>
+</html>

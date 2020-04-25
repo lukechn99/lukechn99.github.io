@@ -1,0 +1,94 @@
+.top-left { grid-area: one; }
+.top-right { grid-area: two; }
+.bottom-left { grid-area: three; }
+.bottom-right { grid-area: four; }
+
+.grid-container {
+  display: grid;
+  grid-template-areas:'one . two''. . .''three . four';
+  grid-gap: 10px;
+  background-color: white;
+  padding: 10px;
+}
+
+.grid-container > div {
+  background-color: white;
+  text-align: center;
+  padding: 20px 0;
+  font-size: 30px;
+}
+
+.dot {
+  height: 100px;
+  width: 100px;
+  background-color: #bbb;
+  border-radius: 50%;
+  display: inline-block;
+}
+
+@keyframes one {
+  0%   {background-color: red;}
+  25%  {background-color: yellow; width: 200px; height: 200px;}
+  50%  {background-color: blue; width: 150px; height: 150px;}
+  99%  {background-color: green; width: 300px; height: 300px;}
+}
+
+/* The element to apply the animation to */
+#one.top-left {
+  width: 100px;
+  height: 100px;
+  background-color: red;
+  animation-name: one;
+  animation-duration: 4s;
+}
+
+body {
+  font: 14px "Century Gothic", Futura, sans-serif;
+  margin: 20px;
+}
+
+ol, ul {
+  padding-left: 30px;
+}
+
+.board-row:after {
+  clear: both;
+  content: "";
+  display: table;
+}
+
+.status {
+  margin-bottom: 10px;
+}
+
+.square {
+  background: #fff;
+  border: 1px solid #999;
+  float: left;
+  font-size: 24px;
+  font-weight: bold;
+  line-height: 34px;
+  height: 34px;
+  margin-right: -1px;
+  margin-top: -1px;
+  padding: 0;
+  text-align: center;
+  width: 34px;
+}
+
+.square:focus {
+  outline: none;
+}
+
+.kbd-navigation .square:focus {
+  background: #ddd;
+}
+
+.game {
+  display: flex;
+  flex-direction: row;
+}
+
+.game-info {
+  margin-left: 20px;
+}
