@@ -1,6 +1,6 @@
 # lukechn99.github.io
 
-##to do:
+## to do:
 * Add blog
 * page selector at the bottom
 * search bar
