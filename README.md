@@ -5,3 +5,4 @@
 * page selector at the bottom
 * search bar
 * time to read
+* likes, comments
