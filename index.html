@@ -1,93 +1,545 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <!-- Required meta tags -->
-    <meta charset="utf-8">
-    <meta name="author" content="J. Liu, L. Chen">
-    <meta name="description" content="homepage">
-    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-    <!-- Bootstrap CSS -->
-    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
-    <link rel="shortcut icon" type="image/x-icon" href="images/ioicon.ico" />
-    <style>
-        .JumboHeaderImg {
-            background-image : url("images/blue-gradient-header.jpg");
-            background-size : cover;
-            border-radius: 25px;
-        }
-    </style>
-    <!-- <script src="js/script.js"></script> custom js-->
-    <title>lukechn99.io</title>
-  </head>
-  <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="collapse navbar-collapse" id="navbarSupportedContent">
-          <ul class="navbar-nav mr-auto">
-            <li class="nav-item active">
-              <a class="nav-link" href="#">Home <span class="sr-only">(current)</span></a>
-            </li>
-            <!-- can add more items in the future -->
-          </ul>
-          <!-- <form class="form-inline my-2 my-lg-0">
-            <input class="form-control mr-sm-2" type="search" placeholder="Search" aria-label="Search">
-            <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
-          </form> -->
-          <script async src="https://cse.google.com/cse.js?cx=016301343208921941846:qr3bkthnouw"></script>
-          <div class="gcse-search"></div>
-        </div>
-      </nav>
-    
-    <!-- Background -->
-    <div class="container">
-        <!-- <div class="row"> -->
-            <div class="jumbotron jumbotron-fluid JumboHeaderImg" style="padding:20px">
-                <h3 style="padding:20px">
-                    Honors Computer Science | Java, Python, C, Web, Android | 
-                    Seeking computer vision, big data, and software engineering</h3>
-                <br>
-                <p style="padding:20px">
-                    Fascinated by the ways of engineering, everything from a bowl of wontons to 
-                    the next great AlphaGo
-                </p>
-            </div>
-        <!-- </div> -->
-    </div>
-    <!-- columns -->
-    <div class="container">
-        <div class="row">
-          <div class="col-sm">
-            <a href="./tech.html">
-                <p>The Tech Stuff</p>
-                <img src="images/Minnehack201901.jpg" alt="I'm in white!" style="width:95%; height:240px">
-            </a>
-          </div>
-          <div class="col-sm">
-            <a href="./community_engagement.html">
-                <p>Community Engagement</p>
-                <img src="images/bam.jpg" alt="bam group picture" style="width:95%; height:240px">
-            </a>
-          </div>
-          <div class="col-sm">
-            <a href="./personal_blog.html">
-                <p>Personal Blog</p>
-                <img src="images/shrimp.JPG" alt="applet screenshot" style="width:95%; height:240px">
-            </a>
-          </div>
-        </div>
-      </div>
-    <!-- footer -->
-    <footer class="footer">
-        <div class="container">
-            <span class="text-muted">
-                <a href="https://www.linkedin.com/in/chen-luke" class="button">LinkedIn</a>
-		        <a href="https://github.com/lukechn99?tab=repositories" class="button">Github</a>
-            </span>
-        </div>
-    </footer>
-    <!-- Optional JavaScript, jQuery, Popper.js, Bootstrap JS -->
-    <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-  </body>
+<!DOCTYPE HTML>
+<!--
+	Ethereal by HTML5 UP
+	html5up.net | @ajlkn
+	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
+	Image credits to Unsplash
+-->
+<html>
+
+<head>
+	<title>Luke Chen</title>
+	<meta charset="utf-8" />
+	<meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no" />
+	<link rel="stylesheet" href="assets/css/main.css" />
+	<link rel="shortcut icon" href="images/icon.ico">
+	<noscript>
+		<link rel="stylesheet" href="assets/css/noscript.css" />
+	</noscript>
+</head>
+
+<body class="is-preload">
+
+	<!-- Page Wrapper -->
+	<div id="page-wrapper">
+
+		<!-- Wrapper -->
+		<div id="wrapper">
+
+			<!-- Panel (Banner) -->
+			<section class="panel banner right">
+				<div class="content color0 span-4-75">
+					<h1 class="major">Hello, my name<br />
+						is Luke Chen</h1>
+					<p> Honors Computer Science major | Math & Chinese minor </p>
+					<p> I'm a Junior at the <a href="https://twin-cities.umn.edu/">University of Minnesota</a> preparing
+						to graduate and work in software development. Coding and engineering are some of the only things
+						I would pull all-nighters for. Some areas of software engineering that I am interested in
+						working in include AR and computer vision. Currently, I am taking classes in software
+						engineering and computer networking. Outside of class I'm working on <a
+							href="https://github.com/lukechn99/PieceMeal">Piecemeal</a>, an app that I want to bring to
+						market to solve food insecurity!
+					</p>
+					<p> Please scroll on to see some of the projects I've worked on this year. </p>
+					<ul class="actions">
+						<li><a href="#first" class="button primary color1 circle icon solid fa-angle-right">Next</a>
+						</li>
+					</ul>
+				</div>
+				<div class="image filtered span-1-75" data-position="25% 25%">
+					<img src="images/pic01.jpg" alt="" />
+				</div>
+			</section>
+
+			<!-- Panel (Spotlight) -->
+			<section class="panel spotlight large left">
+				<div class="content span-5">
+					<h2 class="major">Scriber</h2>
+					<p> Doctors handle the critical thinking in the office and on the field. We want to help them do
+						their job by taking care of the simple tasks. <strong>Scriber is the doctor's
+							assistant</strong>, helping doctors
+						convert verbal and written patient information into electronic health records (ERHs). When
+						the doctor no longer has to think about notes, they can <strong>fully focus on you</strong>.
+						This app was
+						implemented in Flutter, a cross-platform SDK that develops simultaneously for Android, iOS, and
+						web. It uses Google Firebase for camera text recognition and speech-to-text. I personally
+						integrated a text-to-speech pubdev package to the app and created the JSON store function so
+						that speech could be saved locally on the device. </p>
+					<p> This project is hosted on <a href="https://devpost.com/software/scriber">Devpost</a> and <a
+							href="https://github.com/lukechn99/sdc2020-constructionsite/tree/main/sdc-app">Github</a>
+					</p>
+				</div>
+				<div class="image filtered tinted" data-position="top right">
+					<a href="https://github.com/lukechn99/Scriber">
+						<img src="images/doctor.jpg" alt="" />
+					</a>
+				</div>
+			</section>
+
+			<!-- Panel (Spotlight) -->
+			<section class="panel spotlight large left">
+				<div class="content span-5">
+					<h2 class="major">PowerManager</h2>
+					<p>Construction site managers struggle with coordination of equipment. Popular construction company
+						Catepillar sponsored the Association of Computing Machinery's <strong>Software Development
+							Competition</strong> and tasked competitors to leverage software to help construction site
+						managers. With our Bootstrap and React project allowed managers to log in, add and manage
+						equipment, and access information and diagnostics on equipment. </p>
+					<p>Take a look at our <a
+							href="https://github.com/lukechn99/sdc2020-constructionsite/tree/main/sdc-app">project</a>
+						to learn more!</p>
+				</div>
+				<div class="image filtered tinted" data-position="top right">
+					<a href="https://github.com/lukechn99/sdc2020-constructionsite/tree/main/sdc-app">
+						<img src="images/construction.jpg" alt="" />
+					</a>
+				</div>
+			</section>
+
+			<!-- Panel (Spotlight) -->
+			<section class="panel spotlight large left">
+				<div class="content span-5">
+					<h2 class="major">NoCorona</h2>
+					<p>One in five people don’t wash their hands, and of those that do, only 30 percent use soap.
+						Further, Only about 20% of people dry their hands after washing them when damp hands are 1,000x
+						more likely to spread bacteria than dry hands. Living in a pandemic we have a better
+						understanding of the consequences in a lapse of proper hygiene. Our app aims to tackle this
+						neglect in hygiene by reminding you when you get home, to work, or any other "abode." NoCorona
+						works by using location APIs to notify you to wash your hands. It also tracks how many germs you
+						are likely to have picked up while out and includes helpful info cards to educate!</p>
+					<p> This project is hosted on <a href="https://devpost.com/software/nocorona-y7iqhw">Devpost</a> and
+						<a href="https://github.com/lukechn99/sdc2020-constructionsite/tree/main/sdc-app">Github</a>
+					</p>
+				</div>
+				<div class="image filtered tinted" data-position="top right">
+					<a href="https://github.com/lukechn99/sdc2020-constructionsite/tree/main/sdc-app">
+						<img src="images/construction.jpg" alt="" />
+					</a>
+				</div>
+			</section>
+
+			<!-- Panel (Spotlight) -->
+			<section class="panel spotlight large left">
+				<div class="content span-5">
+					<h2 class="major">Piecemeal</h2>
+					<p>Piecemeal is an app that will help our community as an anonymous, accessible, and accountable way
+						of donating money to the needy that will directly be put towards food. </p>
+					<p>Take a look at our <a href="https://github.com/lukechn99/Piecemeal">progress</a>
+						so far!</p>
+				</div>
+				<div class="image filtered tinted" data-position="top right">
+					<a href="https://github.com/lukechn99/Piecemeal">
+						<img src="images/construction.jpg" alt="" />
+					</a>
+				</div>
+			</section>
+
+			<!-- Panel -->
+			<!--
+			<section class="panel">
+				<div class="intro color2">
+					<h2 class="major">Interest Projects</h2>
+					<p>Take a look at some of the other works I produce</p>
+				</div>
+				<div class="gallery">
+					<div class="group span-3">
+						<a href="images/gallery/fulls/01.jpg" class="image filtered span-3" data-position="bottom"><img
+								src="images/gallery/thumbs/01.jpg" alt="" /></a>
+						<a href="images/gallery/fulls/02.jpg" class="image filtered span-1-5"
+							data-position="center"><img src="images/gallery/thumbs/02.jpg" alt="" /></a>
+						<a href="images/gallery/fulls/03.jpg" class="image filtered span-1-5"
+							data-position="bottom"><img src="images/gallery/thumbs/03.jpg" alt="" /></a>
+					</div>
+					<a href="images/gallery/fulls/04.jpg" class="image filtered span-2-5" data-position="top"><img
+							src="images/gallery/thumbs/04.jpg" alt="" /></a>
+					<div class="group span-4-5">
+						<a href="images/gallery/fulls/05.jpg" class="image filtered span-3" data-position="top"><img
+								src="images/gallery/thumbs/05.jpg" alt="" /></a>
+						<a href="images/gallery/fulls/06.jpg" class="image filtered span-1-5"
+							data-position="center"><img src="images/gallery/thumbs/06.jpg" alt="" /></a>
+						<a href="images/gallery/fulls/07.jpg" class="image filtered span-1-5"
+							data-position="bottom"><img src="images/gallery/thumbs/07.jpg" alt="" /></a>
+						<a href="images/gallery/fulls/08.jpg" class="image filtered span-3" data-position="top"><img
+								src="images/gallery/thumbs/08.jpg" alt="" /></a>
+					</div>
+					<a href="images/gallery/fulls/09.jpg" class="image filtered span-2-5" data-position="right"><img
+							src="images/gallery/thumbs/09.jpg" alt="" /></a>
+				</div>
+			</section>-->
+
+
+			<!-- Panel -->
+			<section class="panel color4-alt">
+				<div class="intro color4">
+					<h2 class="major">Contact</h2>
+					<p>Please email me at chen5216@umn.edu until I have the contact service up and running!</p>
+				</div>
+				<div class="inner columns divided">
+					<div class="span-3-25">
+						<form method="post" action="#">
+							<div class="fields">
+								<div class="field half">
+									<label for="name">Name</label>
+									<input type="text" name="name" id="name" />
+								</div>
+								<div class="field half">
+									<label for="email">Email</label>
+									<input type="email" name="email" id="email" />
+								</div>
+								<div class="field">
+									<label for="message">Message</label>
+									<textarea name="message" id="message" rows="4"></textarea>
+								</div>
+							</div>
+							<ul class="actions">
+								<li><input type="submit" value="Send Message" class="button primary" /></li>
+							</ul>
+						</form>
+					</div>
+					<div class="span-2-3">
+						<ul class="contact-icons color1">
+							<li class="icon brands fa-github"><a
+									href="https://github.com/lukechn99">github.com/lukechn99</a></li>
+							<li class="icon brands fa-linkedin"><a
+									href="https://www.linkedin.com/in/chen-luke/">linkedin.com/in/chen-luke</a></li>
+							<li class="icon brands fa-medium-m"><a
+									href="https://medium.com/@lukechn99">https://medium.com/@lukechn99</a></li>
+						</ul>
+					</div>
+				</div>
+			</section>
+
+			<!-- Panel (Spotlight) 
+			<section class="panel spotlight medium right" id="first">
+				<div class="content span-7">
+					<h2 class="major">Sed etiam aenean</h2>
+					<p>Mauris et ligula arcu. Proin dapibus convallis accumsan. Lorem maximus hendrerit orci, sit amet
+						elementum massa hendrerit sed. Donec et ullamcorper ligula. Suspendisse amet potenti. Ut pretium
+						libero eleifend euismod sed tristique. Quisque dictum magna risus, id ultricies justo sagittis
+						vitae. Sed id odio tempor, porttitor elit amet, gravida hendrerit fringilla lorem ipsum dolor.
+					</p>
+				</div>
+				<div class="image filtered tinted" data-position="top left">
+					<img src="images/pic02.jpg" alt="" />
+				</div>
+			</section>-->
+
+			<!-- Panel
+			<section class="panel color1">
+				<div class="intro joined">
+					<h2 class="major">Amet lorem</h2>
+					<p>Sed vel nibh libero. Mauris et lorem pharetra massa lorem turpis congue pulvinar. Vivamus sed
+						feugiat finibus. Duis amet bibendum amet sed. Duis mauris ex, dapibus sed ligula tempus volutpat
+						magna etiam.</p>
+				</div>
+				<div class="inner">
+					<ul class="grid-icons three connected">
+						<li><span class="icon fa-gem"><span class="label">Lorem</span></span></li>
+						<li><span class="icon solid fa-camera-retro"><span class="label">Ipsum</span></span></li>
+						<li><span class="icon solid fa-cog"><span class="label">Dolor</span></span></li>
+						<li><span class="icon solid fa-paper-plane"><span class="label">Sit</span></span></li>
+						<li><span class="icon solid fa-chart-bar"><span class="label">Amet</span></span></li>
+						<li><span class="icon solid fa-code"><span class="label">Nullam</span></span></li>
+					</ul>
+				</div>
+			</section>-->
+
+
+			<!-- Panel
+			<section class="panel color2-alt">
+				<div class="intro color2">
+					<h2 class="major">Elements</h2>
+					<p>Sed vel nibh libero. Mauris et lorem pharetra massa lorem turpis congue pulvinar. Vivamus sed
+						feugiat finibus. Duis amet bibendum amet sed. Duis mauris ex, dapibus sed ligula tempus volutpat
+						magna etiam. </p>
+				</div>
+				<div class="inner columns aligned">
+					<div class="span-2-75">
+
+						<h3 class="major">Text</h3>
+						<p>This is <b>bold</b> and this is <strong>strong</strong>. This is <i>italic</i> and this is
+							<em>emphasized</em>.
+							This is <sup>superscript</sup> text and this is <sub>subscript</sub> text.
+							This is <u>underlined</u> and this is code: <code>for (;;) { ... }</code>. Finally, <a
+								href="#">this is a link</a>.
+						</p>
+
+						<h1>Heading Level 1</h1>
+						<h2>Heading Level 2</h2>
+						<h3>Heading Level 3</h3>
+						<h4>Heading Level 4</h4>
+						<h5>Heading Level 5</h5>
+						<h6>Heading Level 6</h6>
+
+					</div>
+					<div class="span-3">
+
+						<h4>Blockquote</h4>
+						<blockquote>Lorem ipsum dolor sit amet. Felis sagittis eget tempus euismod. Vestibulum ante
+							ipsum primis in vestibulum. Blandit adipiscing eu iaculis volutpat ac adipiscing volutpat ac
+							adipiscing faucibus.</blockquote>
+
+						<h4>Preformatted</h4>
+						<pre><code>i = 0;
+
+while (!deck.isInOrder()) {
+    print 'Iteration ' + (i++);
+    deck.shuffle();
+}
+
+print 'It took ' + i + ' iterations to sort the deck.';</code></pre>
+
+					</div>
+					<div class="span-1-25">
+
+						<h3 class="major">Lists</h3>
+
+						<h4>Unordered</h4>
+						<ul>
+							<li>Lorem ipsum dolor sit.</li>
+							<li>Dolor pulvinar etiam.</li>
+							<li>Etiam vel felis viverra.</li>
+						</ul>
+
+						<h4>Alternate</h4>
+						<ul class="alt">
+							<li>Lorem ipsum dolor sit.</li>
+							<li>Dolor pulvinar etiam.</li>
+							<li>Etiam vel felis viverra.</li>
+							<li>Felis enim feugiat.</li>
+						</ul>
+
+					</div>
+					<div class="span-1-5">
+
+						<h4>Ordered</h4>
+						<ol>
+							<li>Lorem ipsum dolor sit.</li>
+							<li>Dolor pulvinar etiam.</li>
+							<li>Etiam vel felis viverra.</li>
+							<li>Felis enim feugiat.</li>
+							<li>Etiam vel felis lorem.</li>
+						</ol>
+
+						<h4>Actions</h4>
+						<ul class="actions">
+							<li><a href="#" class="button primary color2">Default</a></li>
+							<li><a href="#" class="button">Default</a></li>
+						</ul>
+						<ul class="actions stacked">
+							<li><a href="#" class="button primary color2">Default</a></li>
+							<li><a href="#" class="button">Default</a></li>
+						</ul>
+
+					</div>
+					<div class="span-1-25">
+
+						<h4>Icons</h4>
+						<ul class="icons">
+							<li><a href="#" class="icon brands fa-twitter"><span class="label">Twitter</span></a></li>
+							<li><a href="#" class="icon brands fa-facebook-f"><span class="label">Facebook</span></a>
+							</li>
+							<li><a href="#" class="icon brands fa-instagram"><span class="label">Instagram</span></a>
+							</li>
+							<li><a href="#" class="icon brands fa-github"><span class="label">GitHub</span></a></li>
+							<li><a href="#" class="icon brands fa-medium-m"><span class="label">Medium</span></a></li>
+						</ul>
+
+						<h4>Contact Icons</h4>
+						<ul class="contact-icons color2">
+							<li class="icon brands fa-twitter"><a href="#">Twitter</a></li>
+							<li class="icon brands fa-facebook-f"><a href="#">Facebook</a></li>
+							<li class="icon brands fa-instagram"><a href="#">Instagram</a></li>
+							<li class="icon brands fa-github"><a href="#">GitHub</a></li>
+							<li class="icon brands fa-medium-m"><a href="#">Medium</a></li>
+						</ul>
+
+					</div>
+					<div class="span-3">
+						<h3 class="major">Table</h3>
+						<h4>Default</h4>
+						<div class="table-wrapper">
+							<table>
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Description</th>
+										<th>Price</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Item One</td>
+										<td>Ante turpis integer aliquet porttitor.</td>
+										<td>29.99</td>
+									</tr>
+									<tr>
+										<td>Item Two</td>
+										<td>Vis ac commodo adipiscing arcu aliquet.</td>
+										<td>19.99</td>
+									</tr>
+									<tr>
+										<td>Item Three</td>
+										<td> Morbi faucibus arcu accumsan lorem.</td>
+										<td>29.99</td>
+									</tr>
+									<tr>
+										<td>Item Four</td>
+										<td>Vitae integer tempus condimentum.</td>
+										<td>19.99</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="2"></td>
+										<td>100.00</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+					<div class="span-3">
+						<h4>Alternate</h4>
+						<div class="table-wrapper">
+							<table class="alt">
+								<thead>
+									<tr>
+										<th>Name</th>
+										<th>Description</th>
+										<th>Price</th>
+									</tr>
+								</thead>
+								<tbody>
+									<tr>
+										<td>Item One</td>
+										<td>Ante turpis integer aliquet porttitor.</td>
+										<td>29.99</td>
+									</tr>
+									<tr>
+										<td>Item Two</td>
+										<td>Vis ac commodo adipiscing arcu aliquet.</td>
+										<td>19.99</td>
+									</tr>
+									<tr>
+										<td>Item Three</td>
+										<td> Morbi faucibus arcu accumsan lorem.</td>
+										<td>29.99</td>
+									</tr>
+									<tr>
+										<td>Item Four</td>
+										<td>Vitae integer tempus condimentum.</td>
+										<td>19.99</td>
+									</tr>
+									<tr>
+										<td>Item Five</td>
+										<td>Ante turpis integer aliquet porttitor.</td>
+										<td>29.99</td>
+									</tr>
+								</tbody>
+								<tfoot>
+									<tr>
+										<td colspan="2"></td>
+										<td>100.00</td>
+									</tr>
+								</tfoot>
+							</table>
+						</div>
+					</div>
+					<div class="span-2-25">
+						<h3 class="major">Buttons</h3>
+						<ul class="actions">
+							<li><a href="#" class="button primary color2">Primary</a></li>
+							<li><a href="#" class="button">Default</a></li>
+						</ul>
+						<ul class="actions">
+							<li><a href="#" class="button">Default</a></li>
+							<li><a href="#" class="button large">Large</a></li>
+							<li><a href="#" class="button small">Small</a></li>
+						</ul>
+						<ul class="actions">
+							<li><a href="#" class="button primary color2 icon solid fa-cog">Icon</a></li>
+							<li><a href="#" class="button icon fa-gem">Icon</a></li>
+						</ul>
+						<ul class="actions">
+							<li><span class="button primary color2 disabled">Disabled</span></li>
+							<li><span class="button disabled">Disabled</span></li>
+						</ul>
+						<ul class="actions">
+							<li><a href="#" class="button primary color2 circle icon solid fa-cog">Icon</a></li>
+							<li><a href="#" class="button circle icon fa-gem">Icon</a></li>
+						</ul>
+					</div>
+					<div class="span-4-5">
+						<h3 class="major">Form</h3>
+						<form method="post" action="#">
+							<div class="fields">
+								<div class="field third">
+									<label for="demo-name">Name</label>
+									<input type="text" name="demo-name" id="demo-name" value=""
+										placeholder="Jane Doe" />
+								</div>
+								<div class="field third">
+									<label for="demo-email">Email</label>
+									<input type="email" name="demo-email" id="demo-email" value=""
+										placeholder="jane@untitled.tld" />
+								</div>
+								<div class="field third">
+									<label for="demo-category">Category</label>
+									<div class="select-wrapper">
+										<select name="demo-category" id="demo-category">
+											<option value="">-</option>
+											<option value="1">Manufacturing</option>
+											<option value="1">Shipping</option>
+											<option value="1">Administration</option>
+											<option value="1">Human Resources</option>
+										</select>
+									</div>
+								</div>
+								<div class="field quarter">
+									<input type="radio" id="demo-priority-low" name="demo-priority" class="color2"
+										checked />
+									<label for="demo-priority-low">Low Priority</label>
+								</div>
+								<div class="field quarter">
+									<input type="radio" id="demo-priority-high" name="demo-priority" class="color2" />
+									<label for="demo-priority-high">High Priority</label>
+								</div>
+								<div class="field quarter">
+									<input type="checkbox" id="demo-copy" name="demo-copy" class="color2" />
+									<label for="demo-copy">Email a copy</label>
+								</div>
+								<div class="field quarter">
+									<input type="checkbox" id="demo-human" name="demo-human" class="color2" checked />
+									<label for="demo-human">Not a robot</label>
+								</div>
+								<div class="field">
+									<label for="demo-message">Message</label>
+									<textarea name="demo-message" id="demo-message" placeholder="Enter your message"
+										rows="2"></textarea>
+								</div>
+							</div>
+							<ul class="actions">
+								<li><input type="submit" value="Send Message" class="primary color2" /></li>
+								<li><input type="reset" value="Reset" /></li>
+							</ul>
+						</form>
+					</div>
+				</div>
+			</section> -->
+
+			<!-- Copyright -->
+			<div class="copyright">Design courtesy of: <a href="https://html5up.net">HTML5UP</a>.</div>
+
+		</div>
+
+	</div>
+
+	<!-- Scripts -->
+	<script src="assets/js/jquery.min.js"></script>
+	<script src="assets/js/browser.min.js"></script>
+	<script src="assets/js/breakpoints.min.js"></script>
+	<script src="assets/js/main.js"></script>
+
+</body>
+
 </html>
