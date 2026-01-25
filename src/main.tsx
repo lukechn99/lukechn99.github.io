@@ -6,6 +6,7 @@ import App from './App.tsx'
 import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import Works from './Works.tsx'
+import Contact from './Contact.tsx'
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
@@ -14,7 +15,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
         <Routes>
           <Route path="/" element={<App />} />
           <Route path="/works" element={<Works />} />
-          {/* <Route path="/contact" element={<Contact />} /> */}
+          <Route path="/contact" element={<Contact />} />
         </Routes>
       </HashRouter>
     </MantineProvider>

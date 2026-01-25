@@ -3,9 +3,13 @@ import { Button, Group, Box, Center, Stack, Title } from '@mantine/core';
 import { useState } from 'react';
 import { FloatingIndicator } from '@mantine/core';
 
-const data = ['Maps', 'Vue', 'Angular', 'Svelte'];
+const data = ['Maps', 'Micro-frontends', 'AWS', 'Games'];
+// Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
+// Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others
+// AWS could include architectures, learnings, best practices, etc.
+// After I finish the WebRTC games I can showcase some learnings there too. 
 
-function Works() {
+export default function Works() {
   const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
   const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
   const [active, setActive] = useState(0);
@@ -55,5 +59,3 @@ function Works() {
     </Center>
   )
 }
-
-export default Works

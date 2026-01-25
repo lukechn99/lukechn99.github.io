@@ -1,6 +1,6 @@
 import { Center, Stack, ActionIcon, Space, ThemeIcon, Title, Box } from '@mantine/core'
 import './App.css'
-import { IconCode, IconBrandGithub, IconBrandLinkedin } from '@tabler/icons-react'
+import { IconCode, IconBrandGithub, IconBrandLinkedin, IconBrandGmail } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useState } from 'react'
@@ -50,8 +50,8 @@ function App() {
       </Box>
       <Space h="md" />
       {PushingHoverIcon(
-        <ActionIcon component={Link} to="/works" variant="filled" size="xl" aria-label="Works">
-          <ThemeIcon radius="s" size="xl">
+        <ActionIcon component={Link} to="/works" variant="filled" size="xl" radius="xl" aria-label="Works">
+          <ThemeIcon radius="lg" size="xl">
             <IconCode style={{ width: '80%', height: '80%' }} />
           </ThemeIcon>
         </ActionIcon>,
@@ -60,8 +60,8 @@ function App() {
         </Box>
       )}
       {PushingHoverIcon(
-        <ActionIcon variant="filled" size="xl" aria-label="GitHub" component="a" href="https://github.com/lukechn99" target="_blank" rel="noopener noreferrer">
-          <ThemeIcon radius="s" size="xl">
+        <ActionIcon variant="filled" size="xl" radius="xl" aria-label="GitHub" component="a" href="https://github.com/lukechn99" target="_blank" rel="noopener noreferrer">
+          <ThemeIcon radius="lg" size="xl">
             <IconBrandGithub style={{ width: '80%', height: '80%' }} />
           </ThemeIcon>
         </ActionIcon>,
@@ -70,13 +70,23 @@ function App() {
         </Box>
       )}
       {PushingHoverIcon(
-        <ActionIcon variant="filled" size="xl" aria-label="LinkedIn" component="a" href="https://www.linkedin.com/in/chen-luke" target="_blank" rel="noopener noreferrer">
-          <ThemeIcon radius="s" size="xl">
+        <ActionIcon variant="filled" size="xl" radius="xl" aria-label="LinkedIn" component="a" href="https://www.linkedin.com/in/chen-luke" target="_blank" rel="noopener noreferrer">
+          <ThemeIcon radius="lg" size="xl">
             <IconBrandLinkedin style={{ width: '80%', height: '80%' }} />
           </ThemeIcon>
         </ActionIcon>,
         <Box p="xs">  
           Connect with me on LinkedIn
+        </Box>
+      )}
+      {PushingHoverIcon(
+        <ActionIcon component={Link} to="/contact" variant="filled" size="xl" radius="xl" aria-label="Works">
+          <ThemeIcon radius="lg" size="xl">
+            <IconBrandGmail style={{ width: '80%', height: '80%' }} />
+          </ThemeIcon>
+        </ActionIcon>,
+        <Box p="xs">  
+          Send me a message!
         </Box>
       )}
       <Space h="sm" />
