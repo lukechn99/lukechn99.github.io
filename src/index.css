@@ -66,3 +66,14 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 }
+
+form {
+  width: 100%;
+  max-width: 600px;
+}
+
+input[type=text], input[type=email], textarea {
+  width: 100%;
+  padding: 12px;
+  box-sizing: border-box; /* Ensures padding doesn't affect width */
+}
