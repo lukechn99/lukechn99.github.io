@@ -37,10 +37,10 @@ export default function Works() {
         bg="var(--mantine-color-body)"
         align="stretch"
         justify="flex-start"
+        
         gap="xs"
       >
-        <Title order={2}>My Works</Title>
-        <Box pos="relative">
+        <Box pos="relative" bg="var(--mantine-color-gray-1)" p="md">
           <Group ref={setRootRef} justify="center" pos="relative">
             {controls}
 

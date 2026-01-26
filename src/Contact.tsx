@@ -11,7 +11,8 @@ export default function Contact() {
 
     const onSubmit = async (event: FormEvent<HTMLFormElement>) => {
         event.preventDefault()
-        const formData = new FormData(event.currentTarget)
+        const form = event.currentTarget
+        const formData = new FormData(form)
 
         // Check metrics and configuration at https://app.web3forms.com/dashboard
         formData.append("access_key", "4f764b66-efef-4656-b7eb-1c426af6d1d7")
@@ -22,7 +23,12 @@ export default function Contact() {
         })
 
         const data = await response.json()
-        setResult(data.success ? "Success!" : "Error")
+        if (data.success) {
+            setResult("Success!")
+            form.reset()
+        } else {
+        setResult("Error")
+        }
     }
 
     return (<Stack
@@ -40,6 +46,7 @@ export default function Contact() {
                 placeholder="John Wick"
                 required={true}
                 type="text"
+                name="name" // needed for web3forms
                 autoComplete="name"
             />
             <Space h="md" />
@@ -48,6 +55,7 @@ export default function Contact() {
                 label="Email"
                 placeholder="your@email.com"
                 required={true}
+                name="email" // needed for web3forms
                 type="email"
             />
             <Space h="md" />
@@ -56,6 +64,7 @@ export default function Contact() {
                 label="Message"
                 placeholder="I'd like to offer you a job!"
                 required={true}
+                name="message" // needed for web3forms
                 type="text"
             />
             <Group justify="flex-end" mt="md">
