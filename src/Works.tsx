@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Center, FloatingIndicator, Stack, Tabs } from '@mantine/core'
 import classes from './Works.module.css'
+import Map from './Map.tsx';
 
 // Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
 // Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others
@@ -10,6 +11,7 @@ import classes from './Works.module.css'
 function MapsTab() {
     return <Stack>
         Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
+        <Map />
     </Stack>
 }
 
