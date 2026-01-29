@@ -29,7 +29,8 @@ function App() {
 
   useEffect(() => {
     const showNextMessage = async () => {
-      await sleep(5000)
+      const sleepTime = (messages[currentMessageIndex]?.length || 0) * 100 + 2000
+      await sleep(sleepTime)
       setCurrentMessageIndex(prev => (prev + 1) % messages.length)
     }
 
