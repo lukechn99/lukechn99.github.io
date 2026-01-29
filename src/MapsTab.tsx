@@ -7,13 +7,15 @@ import { Stack } from "@mantine/core"
 export default function MapsTab() {
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapInstance = useRef<L.Map | null>(null)
+    const minZoom = 4
 
     useEffect(() => {
         if (mapInstance.current || !mapContainer.current) return
 
         mapInstance.current = L.map(mapContainer.current, {
-            center: [49.2125578, 16.62662018],
-            zoom: 14,
+            center: [34.0459701, -118.5639983],
+            zoom: 10,
+            minZoom: minZoom,
         })
 
         const mtLayer = new MaptilerLayer({
