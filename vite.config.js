@@ -8,10 +8,12 @@ export default defineConfig({
   build: {
     rollupOptions: {
       output: {
-        manualChunks: {
-          vendor: ['leaflet', '@maptiler/leaflet-maptilersdk'],
-        },
-      },
-    },
-  },
+        manualChunks(id) {
+          if (id.includes('@maptiler') || id.includes('maplibre') || id.includes('leaflet')) {
+            return 'mapping-engine'; // Puts all map code in one separate file
+          }
+        }
+      }
+    }
+  }
 })

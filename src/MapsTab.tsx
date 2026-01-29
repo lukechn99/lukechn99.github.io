@@ -2,8 +2,9 @@ import React, { useEffect, useRef } from "react"
 import L from "leaflet"
 import "leaflet/dist/leaflet.css"
 import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk"
+import { Stack } from "@mantine/core"
 
-export default function Map() {
+export default function MapsTab() {
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapInstance = useRef<L.Map | null>(null)
 
@@ -29,5 +30,8 @@ export default function Map() {
         }
     }, [])
 
-    return <div ref={mapContainer} style={{ width: "100%", height: "500px" }} />
+    return <Stack>
+        Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
+        <div ref={mapContainer} style={{ width: "100%", height: "500px" }} />
+    </Stack>
 }

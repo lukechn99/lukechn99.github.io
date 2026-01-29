@@ -1,19 +1,13 @@
 import { useState } from 'react'
 import { Center, FloatingIndicator, Stack, Tabs } from '@mantine/core'
 import classes from './Works.module.css'
-import Map from './Map.tsx';
+import MapsTab from './MapsTab.tsx';
+import GamesTab from './GamesTAb.tsx';
 
 // Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
 // Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others
 // AWS could include architectures, learnings, best practices, etc.
 // After I finish the WebRTC games I can showcase some learnings there too. 
-
-function MapsTab() {
-    return <Stack>
-        Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
-        <Map />
-    </Stack>
-}
 
 export default function Works() {
     const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
@@ -61,7 +55,7 @@ export default function Works() {
                 <Tabs.Panel value="1"><MapsTab /></Tabs.Panel>
                 <Tabs.Panel value="2">Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others</Tabs.Panel>
                 <Tabs.Panel value="3">AWS could include architectures, learnings, best practices, etc.</Tabs.Panel>
-                <Tabs.Panel value="4">After I finish the WebRTC games I can showcase some learnings there too.</Tabs.Panel>
+                <Tabs.Panel value="4"><GamesTab /></Tabs.Panel>
             </Tabs>
         </Stack>
     )
