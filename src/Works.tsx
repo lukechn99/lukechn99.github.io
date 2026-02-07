@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { Suspense, lazy, useState } from 'react'
 import { FloatingIndicator, Stack, Tabs } from '@mantine/core'
 import classes from './Works.module.css'
-import MapsTab from './MapsTab.tsx';
 import GamesTab from './GamesTab.tsx';
+
+const MapsTab = lazy(() => import('./MapsTab.tsx'))
 
 // Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
 // Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others
@@ -26,7 +27,7 @@ export default function Works() {
             style={{ overflow: 'hidden' }}
             gap="xs"
         >
-            <Tabs variant="none" value={value} onChange={setValue}>
+            <Tabs variant="none" value={value} onChange={setValue} keepMounted={false}>
                 <Tabs.List 
                     ref={setRootRef} 
                     className={classes.list}
@@ -52,7 +53,11 @@ export default function Works() {
                     />
                 </Tabs.List>
 
-                <Tabs.Panel value="1"><MapsTab /></Tabs.Panel>
+                <Tabs.Panel value="1">
+                    <Suspense fallback={<div style={{ padding: '1rem' }}>Loading map...</div>}>
+                        <MapsTab />
+                    </Suspense>
+                </Tabs.Panel>
                 <Tabs.Panel value="2">Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others</Tabs.Panel>
                 <Tabs.Panel value="3">AWS could include architectures, learnings, best practices, etc.</Tabs.Panel>
                 <Tabs.Panel value="4"><GamesTab /></Tabs.Panel>

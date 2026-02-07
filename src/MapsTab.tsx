@@ -1,30 +1,66 @@
-import React, { useEffect, useRef } from "react"
-import L from "leaflet"
-import "leaflet/dist/leaflet.css"
-import { MaptilerLayer } from "@maptiler/leaflet-maptilersdk"
+import { useEffect, useRef, useState } from "react"
 import { Stack } from "@mantine/core"
+import type { Map as LeafletMap } from "leaflet"
 
 export default function MapsTab() {
     const mapContainer = useRef<HTMLDivElement>(null)
-    const mapInstance = useRef<L.Map | null>(null)
+    const mapInstance = useRef<LeafletMap | null>(null)
+    const [isLoading, setIsLoading] = useState(true)
     const minZoom = 4
 
     useEffect(() => {
-        if (mapInstance.current || !mapContainer.current) return
+        let isCancelled = false
+        let timeoutId: number | undefined
 
-        mapInstance.current = L.map(mapContainer.current, {
-            center: [34.0459701, -118.5639983],
-            zoom: 10,
-            minZoom: minZoom,
-        })
+        const loadMap = async () => {
+            if (mapInstance.current || !mapContainer.current) {
+                if (!isCancelled) {
+                    setIsLoading(false)
+                }
+                return
+            }
 
-        const mtLayer = new MaptilerLayer({
-            apiKey: "NvWSomKHnqk2ky65h9RN",
-        })
-        
-        mtLayer.addTo(mapInstance.current);
+            try {
+                const [{ default: L }, { MaptilerLayer }] = await Promise.all([
+                    import("leaflet"),
+                    import("@maptiler/leaflet-maptilersdk"),
+                    import("leaflet/dist/leaflet.css"),
+                ])
+
+                if (isCancelled || !mapContainer.current) return
+
+                const map = L.map(mapContainer.current, {
+                    center: [34.0459701, -118.5639983],
+                    zoom: 10,
+                    minZoom: minZoom,
+                })
+                mapInstance.current = map
+
+                const mtLayer = new MaptilerLayer({
+                    apiKey: "NvWSomKHnqk2ky65h9RN",
+                })
+
+                mtLayer.addTo(map)
+
+                if (!isCancelled) {
+                    setIsLoading(false)
+                }
+            } catch {
+                if (!isCancelled) {
+                    setIsLoading(false)
+                }
+            }
+        }
+
+        timeoutId = window.setTimeout(() => {
+            void loadMap()
+        }, 0)
 
         return () => {
+            isCancelled = true
+            if (timeoutId !== undefined) {
+                window.clearTimeout(timeoutId)
+            }
             if (mapInstance.current) {
                 mapInstance.current.remove()
                 mapInstance.current = null
@@ -34,6 +70,25 @@ export default function MapsTab() {
 
     return <Stack>
         Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
-        <div ref={mapContainer} style={{ width: "100%", height: "500px" }} />
+        <div style={{ position: "relative", width: "100%", height: "500px" }}>
+            <div ref={mapContainer} style={{ position: "absolute", inset: 0 }} />
+            {isLoading ? (
+                <div
+                    aria-live="polite"
+                    aria-busy="true"
+                    style={{
+                        position: "absolute",
+                        inset: 0,
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        background: "var(--mantine-color-body)",
+                        color: "var(--mantine-color-text)",
+                    }}
+                >
+                    Loading map...
+                </div>
+            ) : null}
+        </div>
     </Stack>
 }
