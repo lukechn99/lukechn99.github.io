@@ -1,5 +1,4 @@
 import { Center, Stack, ActionIcon, Space, ThemeIcon, Title, Box } from '@mantine/core'
-import './App.css'
 import { IconCode, IconBrandGithub, IconBrandLinkedin, IconBrandGmail } from '@tabler/icons-react'
 import { Link } from 'react-router-dom'
 import { useEffect } from 'react'

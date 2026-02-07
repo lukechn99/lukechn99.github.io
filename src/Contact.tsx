@@ -2,7 +2,6 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { Alert, Box, Button, Group, Space, Stack, TextInput } from '@mantine/core';
 import { IconInfoCircle, IconSend } from '@tabler/icons-react';
-import './index.css'
 
 export default function Contact() {
     const [result, setResult] = useState<string | null>(null)
