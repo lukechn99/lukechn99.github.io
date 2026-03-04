@@ -25,6 +25,7 @@ export default function MapsTab() {
                     import("leaflet"),
                     import("@maptiler/leaflet-maptilersdk"),
                     import("leaflet/dist/leaflet.css"),
+                    import("@luomus/leaflet-smooth-wheel-zoom"),
                 ])
 
                 if (isCancelled || !mapContainer.current) return
@@ -33,6 +34,9 @@ export default function MapsTab() {
                     center: [34.0459701, -118.5639983],
                     zoom: 10,
                     minZoom: minZoom,
+                    scrollWheelZoom: false,
+                    smoothWheelZoom: true,
+                    smoothSensitivity: 1,
                 })
                 mapInstance.current = map
 
