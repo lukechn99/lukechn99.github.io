@@ -33,6 +33,8 @@ export default function MapsTab() {
                     center: [34.0459701, -118.5639983],
                     zoom: 10,
                     minZoom: minZoom,
+                    zoomSnap: 0,
+                    zoomDelta: 0.25
                 })
                 mapInstance.current = map
 
