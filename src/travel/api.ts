@@ -1,23 +1,128 @@
 import type { NominatimResult, WeatherData, DailyForecast, WMOCode } from './types.ts';
 
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
+const PHOTON_BASE = 'https://photon.komoot.io';
 
-export async function searchLocations(query: string): Promise<NominatimResult[]> {
-  if (!query.trim()) return [];
+interface PhotonFeature {
+  geometry: { coordinates: [number, number] };
+  properties: {
+    osm_id?: number;
+    osm_type?: string;
+    osm_key?: string;
+    osm_value?: string;
+    name?: string;
+    street?: string;
+    housenumber?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    postcode?: string;
+    district?: string;
+    county?: string;
+    type?: string;
+  };
+}
 
+function photonToNominatim(f: PhotonFeature): NominatimResult {
+  const p = f.properties;
+  const [lon, lat] = f.geometry.coordinates;
+
+  const nameParts = [
+    p.name,
+    p.street && p.housenumber ? `${p.housenumber} ${p.street}` : p.street,
+    p.city ?? p.district,
+    p.state,
+    p.country,
+  ].filter(Boolean);
+
+  return {
+    place_id: p.osm_id ?? Math.floor(Math.random() * 1e9),
+    licence: 'Photon/OSM',
+    osm_type: (p.osm_type === 'N' ? 'node' : p.osm_type === 'W' ? 'way' : 'relation'),
+    osm_id: p.osm_id ?? 0,
+    lat: lat.toString(),
+    lon: lon.toString(),
+    display_name: nameParts.join(', '),
+    class: p.osm_key ?? '',
+    type: p.osm_value ?? p.type ?? '',
+    importance: 0.5,
+    address: {
+      ...(p.street && { road: p.street }),
+      ...(p.city && { city: p.city }),
+      ...(p.state && { state: p.state }),
+      ...(p.country && { country: p.country }),
+      ...(p.postcode && { postcode: p.postcode }),
+      ...(p.county && { county: p.county }),
+    },
+  };
+}
+
+async function searchPhoton(query: string): Promise<NominatimResult[]> {
+  const params = new URLSearchParams({ q: query, limit: '12', lang: 'en' });
+  const res = await fetch(`${PHOTON_BASE}/api?${params}`);
+  if (!res.ok) return [];
+  const data = await res.json() as { features: PhotonFeature[] };
+  return (data.features ?? []).map(photonToNominatim);
+}
+
+async function searchNominatim(query: string): Promise<NominatimResult[]> {
   const params = new URLSearchParams({
     q: query,
     format: 'json',
     addressdetails: '1',
-    limit: '8',
+    limit: '12',
   });
-
   const res = await fetch(`${NOMINATIM_BASE}/search?${params}`, {
     headers: { 'Accept-Language': 'en' },
   });
-
-  if (!res.ok) throw new Error('Location search failed');
+  if (!res.ok) return [];
   return res.json() as Promise<NominatimResult[]>;
+}
+
+function deduplicateResults(results: NominatimResult[]): NominatimResult[] {
+  const seen = new Set<string>();
+  return results.filter(r => {
+    const coordKey = `${parseFloat(r.lat).toFixed(4)},${parseFloat(r.lon).toFixed(4)}`;
+    const nameKey = r.display_name.split(',')[0]?.toLowerCase().trim();
+    const key = `${nameKey}|${coordKey}`;
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
+
+function fuzzyScore(query: string, result: NominatimResult): number {
+  const q = query.toLowerCase();
+  const name = (result.display_name.split(',')[0] ?? '').toLowerCase();
+  const full = result.display_name.toLowerCase();
+
+  if (name === q) return 100;
+  if (name.startsWith(q)) return 80;
+  if (name.includes(q)) return 60;
+  if (full.includes(q)) return 40;
+
+  let score = 0;
+  let qi = 0;
+  for (let i = 0; i < name.length && qi < q.length; i++) {
+    if (name[i] === q[qi]) { score += 3; qi++; }
+  }
+  return score;
+}
+
+export async function searchLocations(query: string): Promise<NominatimResult[]> {
+  if (!query.trim()) return [];
+
+  const [photonResults, nominatimResults] = await Promise.all([
+    searchPhoton(query).catch(() => [] as NominatimResult[]),
+    searchNominatim(query).catch(() => [] as NominatimResult[]),
+  ]);
+
+  const merged = [...photonResults, ...nominatimResults];
+  const unique = deduplicateResults(merged);
+
+  unique.sort((a, b) => fuzzyScore(query, b) - fuzzyScore(query, a));
+
+  return unique.slice(0, 15);
 }
 
 export async function reverseGeocode(lat: number, lon: number): Promise<NominatimResult> {

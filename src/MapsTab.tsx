@@ -1,11 +1,12 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import {
-    Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput,
+    Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconPlus, IconX } from "@tabler/icons-react"
+import { IconPlus, IconX, IconDownload } from "@tabler/icons-react"
 import type { Map as LeafletMap } from "leaflet"
 import type { ItineraryItem, NominatimResult } from "./travel/types.ts"
+import { isHotelLocation } from "./travel/types.ts"
 import { loadItems, saveItems, generateId } from "./travel/storage.ts"
 import { fetchWeather } from "./travel/api.ts"
 import LocationSearch from "./travel/LocationSearch.tsx"
@@ -57,6 +58,7 @@ export default function MapsTab() {
     const [pendingLocation, setPendingLocation] = useState<NominatimResult | null>(null)
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
+    const [exporting, setExporting] = useState(false)
 
     const persist = useCallback((next: ItineraryItem[]) => {
         setItems(next)
@@ -168,23 +170,57 @@ export default function MapsTab() {
         if (addr?.country) address.country = addr.country
         if (addr?.postcode) address.postcode = addr.postcode
 
-        const newItem: ItineraryItem = {
-            id: generateId(),
-            name: pendingLocation.display_name.split(',')[0] ?? pendingLocation.display_name,
-            displayName: pendingLocation.display_name,
-            lat: parseFloat(pendingLocation.lat),
-            lon: parseFloat(pendingLocation.lon),
-            address,
-            category: pendingLocation.class,
-            type: pendingLocation.type,
-            tags: [],
-            notes: '',
-            startDate,
-            endDate,
-            addedAt: new Date().toISOString(),
+        const baseName = pendingLocation.display_name.split(',')[0] ?? pendingLocation.display_name
+        const lat = parseFloat(pendingLocation.lat)
+        const lon = parseFloat(pendingLocation.lon)
+        const hotel = isHotelLocation(pendingLocation)
+
+        const newItems: ItineraryItem[] = []
+
+        if (hotel && startDate && endDate) {
+            newItems.push({
+                id: generateId(),
+                name: `Check-in: ${baseName}`,
+                displayName: pendingLocation.display_name,
+                lat, lon, address,
+                category: pendingLocation.class,
+                type: pendingLocation.type,
+                tags: ['hotel', 'check-in'],
+                notes: '',
+                startDate,
+                endDate: startDate,
+                addedAt: new Date().toISOString(),
+            })
+            newItems.push({
+                id: generateId(),
+                name: `Check-out: ${baseName}`,
+                displayName: pendingLocation.display_name,
+                lat, lon, address,
+                category: pendingLocation.class,
+                type: pendingLocation.type,
+                tags: ['hotel', 'check-out'],
+                notes: '',
+                startDate: endDate,
+                endDate,
+                addedAt: new Date().toISOString(),
+            })
+        } else {
+            newItems.push({
+                id: generateId(),
+                name: baseName,
+                displayName: pendingLocation.display_name,
+                lat, lon, address,
+                category: pendingLocation.class,
+                type: pendingLocation.type,
+                tags: [],
+                notes: '',
+                startDate,
+                endDate,
+                addedAt: new Date().toISOString(),
+            })
         }
 
-        const next = [...items, newItem]
+        const next = [...items, ...newItems]
         persist(next)
 
         setPendingLocation(null)
@@ -193,8 +229,9 @@ export default function MapsTab() {
         closeForm()
 
         try {
-            const weather = await fetchWeather(newItem.lat, newItem.lon)
-            const updated = next.map(i => i.id === newItem.id ? { ...i, weather } : i)
+            const weather = await fetchWeather(lat, lon)
+            const ids = new Set(newItems.map(i => i.id))
+            const updated = next.map(i => ids.has(i.id) ? { ...i, weather } : i)
             persist(updated)
         } catch { /* weather is best-effort */ }
     }
@@ -228,6 +265,152 @@ export default function MapsTab() {
         })
     }, [isLoading])
 
+    const fitAllMarkers = useCallback(() => {
+        const map = mapInstance.current
+        const L = leafletRef.current
+        if (!map || !L || items.length === 0) return
+
+        const bounds: [number, number][] = items.map(i => [i.lat, i.lon])
+        if (bounds.length === 1) {
+            map.setView(bounds[0] as [number, number], 11, { animate: false })
+        } else {
+            map.fitBounds(L.latLngBounds(bounds), { padding: [60, 60], maxZoom: 13, animate: false })
+        }
+    }, [items])
+
+    const handleExportPDF = useCallback(async () => {
+        if (items.length === 0 || !mapInstance.current) return
+        setExporting(true)
+
+        fitAllMarkers()
+        await new Promise(r => setTimeout(r, 800))
+
+        try {
+            const [html2canvasModule, jsPDFModule] = await Promise.all([
+                import('html2canvas-pro'),
+                import('jspdf'),
+            ])
+            const html2canvas = html2canvasModule.default
+            const { jsPDF } = jsPDFModule
+
+            const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+            const pageW = pdf.internal.pageSize.getWidth()
+            const pageH = pdf.internal.pageSize.getHeight()
+            const margin = 12
+            const contentW = pageW - margin * 2
+            let cursorY = margin
+
+            pdf.setFontSize(18)
+            pdf.setFont('helvetica', 'bold')
+            pdf.text('Travel Itinerary', margin, cursorY + 6)
+            cursorY += 12
+
+            pdf.setFontSize(9)
+            pdf.setFont('helvetica', 'normal')
+            pdf.setTextColor(120)
+            pdf.text(`${items.length} stop${items.length === 1 ? '' : 's'} — exported ${new Date().toLocaleDateString()}`, margin, cursorY)
+            pdf.setTextColor(0)
+            cursorY += 8
+
+            if (mapContainer.current) {
+                const mapCanvas = await html2canvas(mapContainer.current, {
+                    useCORS: true,
+                    allowTaint: true,
+                    scale: 2,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                })
+                const mapImg = mapCanvas.toDataURL('image/png')
+                const mapAspect = mapCanvas.height / mapCanvas.width
+                const mapH = contentW * mapAspect
+                const cappedMapH = Math.min(mapH, 100)
+                pdf.addImage(mapImg, 'PNG', margin, cursorY, contentW, cappedMapH)
+                cursorY += cappedMapH + 6
+            }
+
+            for (let i = 0; i < items.length; i++) {
+                const item = items[i]!
+                const blockH = 36 + (item.weather ? 6 : 0) + (item.notes ? 8 : 0) + (item.tags.length > 0 ? 6 : 0)
+
+                if (cursorY + blockH > pageH - margin) {
+                    pdf.addPage()
+                    cursorY = margin
+                }
+
+                pdf.setFillColor(240, 245, 255)
+                pdf.roundedRect(margin, cursorY, contentW, blockH, 2, 2, 'F')
+
+                pdf.setFontSize(11)
+                pdf.setFont('helvetica', 'bold')
+                pdf.setTextColor(51, 154, 240)
+                pdf.text(`${i + 1}`, margin + 3, cursorY + 5.5)
+                pdf.setTextColor(0)
+                pdf.text(item.name, margin + 10, cursorY + 5.5)
+
+                cursorY += 8
+
+                const addressParts = [item.address.road, item.address.city, item.address.state, item.address.country].filter(Boolean)
+                if (addressParts.length > 0) {
+                    pdf.setFontSize(8)
+                    pdf.setFont('helvetica', 'normal')
+                    pdf.setTextColor(100)
+                    pdf.text(addressParts.join(', '), margin + 10, cursorY)
+                    pdf.setTextColor(0)
+                    cursorY += 5
+                }
+
+                pdf.setFontSize(8)
+                pdf.setFont('helvetica', 'normal')
+                const dateParts: string[] = []
+                if (item.startDate) dateParts.push(`Start: ${new Date(item.startDate).toLocaleString()}`)
+                if (item.endDate) dateParts.push(`End: ${new Date(item.endDate).toLocaleString()}`)
+                if (dateParts.length > 0) {
+                    pdf.text(dateParts.join('  |  '), margin + 10, cursorY)
+                    cursorY += 5
+                }
+
+                pdf.setTextColor(120)
+                pdf.text(`${item.lat.toFixed(5)}, ${item.lon.toFixed(5)}`, margin + 10, cursorY)
+                pdf.setTextColor(0)
+                cursorY += 5
+
+                if (item.weather) {
+                    pdf.setFontSize(8)
+                    pdf.text(
+                        `Weather: ${Math.round(item.weather.temperature)}°F — ${item.weather.description}, Humidity ${item.weather.humidity}%, Wind ${Math.round(item.weather.windSpeed)} mph`,
+                        margin + 10, cursorY
+                    )
+                    cursorY += 5
+                }
+
+                if (item.tags.length > 0) {
+                    pdf.setFontSize(7)
+                    pdf.setTextColor(80)
+                    pdf.text(`Tags: ${item.tags.join(', ')}`, margin + 10, cursorY)
+                    pdf.setTextColor(0)
+                    cursorY += 5
+                }
+
+                if (item.notes) {
+                    pdf.setFontSize(8)
+                    pdf.setTextColor(60)
+                    const noteLines = pdf.splitTextToSize(`Notes: ${item.notes}`, contentW - 14)
+                    pdf.text(noteLines.slice(0, 3), margin + 10, cursorY)
+                    cursorY += Math.min(noteLines.length, 3) * 4
+                    pdf.setTextColor(0)
+                }
+
+                cursorY += 4
+            }
+
+            pdf.save('travel-itinerary.pdf')
+        } catch (err) {
+            console.error('PDF export failed:', err)
+        } finally {
+            setExporting(false)
+        }
+    }, [items, fitAllMarkers])
+
     return (
         <Stack gap="md">
             <div style={{ position: "relative", width: "100%", height: "500px", borderRadius: 12, overflow: "hidden" }}>
@@ -247,7 +430,7 @@ export default function MapsTab() {
                 )}
             </div>
 
-            <Group justify="center">
+            <Group justify="center" gap="sm">
                 <ActionIcon
                     variant={formOpen ? "filled" : "light"}
                     size="lg"
@@ -258,6 +441,19 @@ export default function MapsTab() {
                 >
                     {formOpen ? <IconX size={18} /> : <IconPlus size={18} />}
                 </ActionIcon>
+                {items.length > 0 && (
+                    <ActionIcon
+                        variant="light"
+                        size="lg"
+                        radius="xl"
+                        color="teal"
+                        onClick={() => { void handleExportPDF() }}
+                        disabled={exporting}
+                        aria-label="Export itinerary as PDF"
+                    >
+                        {exporting ? <Loader size={16} color="teal" /> : <IconDownload size={18} />}
+                    </ActionIcon>
+                )}
             </Group>
 
             <Collapse in={formOpen}>
@@ -269,9 +465,16 @@ export default function MapsTab() {
 
                         {pendingLocation && (
                             <Paper p="xs" radius="sm" withBorder bg="var(--mantine-color-blue-light)">
-                                <Text size="sm" fw={500}>
-                                    {pendingLocation.display_name.split(',')[0]}
-                                </Text>
+                                <Group gap="xs">
+                                    <Text size="sm" fw={500}>
+                                        {pendingLocation.display_name.split(',')[0]}
+                                    </Text>
+                                    {isHotelLocation(pendingLocation) && (
+                                        <Text size="xs" c="orange" fw={600}>
+                                            Hotel — will create check-in & check-out stops
+                                        </Text>
+                                    )}
+                                </Group>
                                 <Text size="xs" c="dimmed">{pendingLocation.display_name}</Text>
                             </Paper>
                         )}

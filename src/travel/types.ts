@@ -75,3 +75,19 @@ export type WMOCode =
   | 80 | 81 | 82
   | 85 | 86
   | 95 | 96 | 99;
+
+const HOTEL_TYPES = new Set([
+  'hotel', 'motel', 'hostel', 'guest_house', 'bed_and_breakfast',
+  'resort', 'apartment', 'chalet', 'camp_site',
+]);
+
+export function isHotelLocation(result: NominatimResult): boolean {
+  const type = result.type?.toLowerCase() ?? '';
+  const cls = result.class?.toLowerCase() ?? '';
+  const name = result.display_name?.toLowerCase() ?? '';
+
+  if (HOTEL_TYPES.has(type)) return true;
+  if (cls === 'tourism' && HOTEL_TYPES.has(type)) return true;
+
+  return /\b(hotel|motel|hostel|inn|resort|lodge|suites?)\b/.test(name);
+}
