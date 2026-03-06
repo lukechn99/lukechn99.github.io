@@ -1,12 +1,16 @@
-import { Card, Text, Group, Stack, ActionIcon, Textarea, Rating, Collapse, Badge } from '@mantine/core';
+import { useState } from 'react';
+import { Card, Text, Group, Stack, ActionIcon, Textarea, Rating, Collapse, Badge, TextInput, Button } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconMapPin, IconTrash, IconChevronDown, IconChevronUp,
   IconCalendar, IconSun, IconCloud, IconCloudRain, IconCloudSnow,
   IconCloudStorm, IconCloudFog, IconTemperature, IconDroplet, IconWind,
+  IconPencil,
 } from '@tabler/icons-react';
 import type { ItineraryItem } from './types.ts';
+import type { NominatimResult } from './types.ts';
 import TagInput, { colorForTag } from './TagInput.tsx';
+import LocationSearch from './LocationSearch.tsx';
 
 function weatherIcon(icon: string, size = 18) {
   const props = { size, stroke: 1.5 };
@@ -39,8 +43,81 @@ interface ItineraryItemCardProps {
   onFocus: (item: ItineraryItem) => void;
 }
 
+interface EditState {
+  name: string;
+  startDate: string;
+  endDate: string;
+  lat: number;
+  lon: number;
+  address: ItineraryItem['address'];
+  displayName: string;
+}
+
 export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onFocus }: ItineraryItemCardProps) {
-  const [expanded, { toggle }] = useDisclosure(false);
+  const [expanded, { toggle, open: openExpand }] = useDisclosure(false);
+  const [editState, setEditState] = useState<EditState | null>(null);
+  const [changingLocation, setChangingLocation] = useState(false);
+
+  const editing = editState !== null;
+
+  const startEdit = () => {
+    setEditState({
+      name: item.name,
+      startDate: item.startDate,
+      endDate: item.endDate,
+      lat: item.lat,
+      lon: item.lon,
+      address: item.address,
+      displayName: item.displayName,
+    });
+    setChangingLocation(false);
+    if (!expanded) openExpand();
+  };
+
+  const cancelEdit = () => {
+    setEditState(null);
+    setChangingLocation(false);
+  };
+
+  const saveEdit = () => {
+    if (!editState) return;
+    const locationChanged = editState.lat !== item.lat || editState.lon !== item.lon;
+    const updated: ItineraryItem = {
+      ...item,
+      name: editState.name,
+      startDate: editState.startDate,
+      endDate: editState.endDate,
+      lat: editState.lat,
+      lon: editState.lon,
+      address: editState.address,
+      displayName: editState.displayName,
+    };
+    if (locationChanged) {
+      delete updated.weather;
+    }
+    onUpdate(updated);
+    setEditState(null);
+    setChangingLocation(false);
+  };
+
+  const handleLocationSelect = (result: NominatimResult) => {
+    const addr = result.address;
+    setEditState(prev => prev ? {
+      ...prev,
+      lat: parseFloat(result.lat),
+      lon: parseFloat(result.lon),
+      displayName: result.display_name,
+      name: result.display_name.split(',')[0] ?? prev.name,
+      address: {
+        ...(addr?.road && { road: addr.road }),
+        ...((addr?.city ?? addr?.town ?? addr?.village) && { city: addr?.city ?? addr?.town ?? addr?.village }),
+        ...(addr?.state && { state: addr.state }),
+        ...(addr?.country && { country: addr.country }),
+        ...(addr?.postcode && { postcode: addr.postcode }),
+      },
+    } : prev);
+    setChangingLocation(false);
+  };
 
   const addressParts = [
     item.address.road,
@@ -70,6 +147,9 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
           </Group>
           <Group gap={4} wrap="nowrap">
             {item.weather && weatherIcon(item.weather.icon)}
+            <ActionIcon variant="subtle" size="sm" onClick={e => { e.stopPropagation(); startEdit(); }}>
+              <IconPencil size={14} />
+            </ActionIcon>
             <ActionIcon variant="subtle" size="sm" onClick={e => { e.stopPropagation(); toggle(); }}>
               {expanded ? <IconChevronUp size={14} /> : <IconChevronDown size={14} />}
             </ActionIcon>
@@ -96,75 +176,131 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
         )}
 
         <Collapse in={expanded}>
-          <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
-            {item.weather && (
-              <Card padding="xs" radius="sm" withBorder>
-                <Group justify="space-between">
-                  <Group gap="xs">
-                    {weatherIcon(item.weather.icon, 24)}
-                    <div>
-                      <Text fw={600} size="sm">{Math.round(item.weather.temperature)}°F</Text>
-                      <Text size="xs" c="dimmed">{item.weather.description}</Text>
-                    </div>
-                  </Group>
-                  <Stack gap={2} align="flex-end">
-                    <Group gap={4}>
-                      <IconTemperature size={12} />
-                      <Text size="xs">Feels {Math.round(item.weather.feelsLike)}°F</Text>
-                    </Group>
-                    <Group gap={4}>
-                      <IconDroplet size={12} />
-                      <Text size="xs">{item.weather.humidity}%</Text>
-                    </Group>
-                    <Group gap={4}>
-                      <IconWind size={12} />
-                      <Text size="xs">{Math.round(item.weather.windSpeed)} mph</Text>
-                    </Group>
-                  </Stack>
-                </Group>
-              </Card>
-            )}
-
-            <div>
-              <Text size="xs" fw={500} mb={4}>Rating</Text>
-              <Rating
-                value={item.rating ?? 0}
-                onChange={(val: number) => onUpdate({ ...item, rating: val })}
+          {editing ? (
+            <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
+              <TextInput
+                label="Name"
+                value={editState.name}
+                onChange={e => setEditState(prev => prev ? { ...prev, name: e.currentTarget.value } : prev)}
                 size="sm"
               />
-            </div>
 
-            <div>
-              <Text size="xs" fw={500} mb={4}>Notes & Review</Text>
-              <Textarea
-                value={item.notes}
-                onChange={e => onUpdate({ ...item, notes: e.currentTarget.value })}
-                placeholder="Add notes, tips, or a review..."
-                autosize
-                minRows={2}
-                maxRows={6}
-                size="xs"
-              />
-            </div>
+              <div>
+                <Text size="xs" fw={500} mb={4}>Location</Text>
+                {changingLocation ? (
+                  <Stack gap="xs">
+                    <LocationSearch onSelect={handleLocationSelect} />
+                    <Button size="xs" variant="subtle" onClick={() => setChangingLocation(false)}>
+                      Cancel
+                    </Button>
+                  </Stack>
+                ) : (
+                  <Group gap="xs">
+                    <Text size="sm" c="dimmed" style={{ flex: 1 }} truncate="end">
+                      {editState.displayName}
+                    </Text>
+                    <Button size="xs" variant="light" onClick={() => setChangingLocation(true)}>
+                      Change
+                    </Button>
+                  </Group>
+                )}
+              </div>
 
-            <div>
-              <Text size="xs" fw={500} mb={4}>Tags</Text>
-              <TagInput
-                tags={item.tags}
-                onChange={(tags: string[]) => onUpdate({ ...item, tags })}
-                placeholder="Tag this stop..."
-              />
-            </div>
+              <Group grow>
+                <TextInput
+                  label="Start"
+                  type="datetime-local"
+                  value={editState.startDate}
+                  onChange={e => setEditState(prev => prev ? { ...prev, startDate: e.currentTarget.value } : prev)}
+                  onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
+                  size="sm"
+                />
+                <TextInput
+                  label="End"
+                  type="datetime-local"
+                  value={editState.endDate}
+                  onChange={e => setEditState(prev => prev ? { ...prev, endDate: e.currentTarget.value } : prev)}
+                  onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
+                  size="sm"
+                />
+              </Group>
 
-            <Group gap="xs">
-              <Text size="xs" c="dimmed">
-                {item.lat.toFixed(4)}, {item.lon.toFixed(4)}
-              </Text>
-              {item.category && (
-                <Badge size="xs" variant="outline">{item.category} / {item.type}</Badge>
+              <Group justify="flex-end">
+                <Button size="xs" variant="light" onClick={cancelEdit}>Cancel</Button>
+                <Button size="xs" onClick={saveEdit}>Save</Button>
+              </Group>
+            </Stack>
+          ) : (
+            <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
+              {item.weather && (
+                <Card padding="xs" radius="sm" withBorder>
+                  <Group justify="space-between">
+                    <Group gap="xs">
+                      {weatherIcon(item.weather.icon, 24)}
+                      <div>
+                        <Text fw={600} size="sm">{Math.round(item.weather.temperature)}°F</Text>
+                        <Text size="xs" c="dimmed">{item.weather.description}</Text>
+                      </div>
+                    </Group>
+                    <Stack gap={2} align="flex-end">
+                      <Group gap={4}>
+                        <IconTemperature size={12} />
+                        <Text size="xs">Feels {Math.round(item.weather.feelsLike)}°F</Text>
+                      </Group>
+                      <Group gap={4}>
+                        <IconDroplet size={12} />
+                        <Text size="xs">{item.weather.humidity}%</Text>
+                      </Group>
+                      <Group gap={4}>
+                        <IconWind size={12} />
+                        <Text size="xs">{Math.round(item.weather.windSpeed)} mph</Text>
+                      </Group>
+                    </Stack>
+                  </Group>
+                </Card>
               )}
-            </Group>
-          </Stack>
+
+              <div>
+                <Text size="xs" fw={500} mb={4}>Rating</Text>
+                <Rating
+                  value={item.rating ?? 0}
+                  onChange={(val: number) => onUpdate({ ...item, rating: val })}
+                  size="sm"
+                />
+              </div>
+
+              <div>
+                <Text size="xs" fw={500} mb={4}>Notes & Review</Text>
+                <Textarea
+                  value={item.notes}
+                  onChange={e => onUpdate({ ...item, notes: e.currentTarget.value })}
+                  placeholder="Add notes, tips, or a review..."
+                  autosize
+                  minRows={2}
+                  maxRows={6}
+                  size="xs"
+                />
+              </div>
+
+              <div>
+                <Text size="xs" fw={500} mb={4}>Tags</Text>
+                <TagInput
+                  tags={item.tags}
+                  onChange={(tags: string[]) => onUpdate({ ...item, tags })}
+                  placeholder="Tag this stop..."
+                />
+              </div>
+
+              <Group gap="xs">
+                <Text size="xs" c="dimmed">
+                  {item.lat.toFixed(4)}, {item.lon.toFixed(4)}
+                </Text>
+                {item.category && (
+                  <Badge size="xs" variant="outline">{item.category} / {item.type}</Badge>
+                )}
+              </Group>
+            </Stack>
+          )}
         </Collapse>
       </Stack>
     </Card>
