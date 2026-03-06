@@ -295,9 +295,16 @@ export default function MapsTab() {
         closeForm()
 
         try {
-            const weather = await fetchWeather(lat, lon)
-            const ids = new Set(newItems.map(i => i.id))
-            const updated = next.map(i => ids.has(i.id) ? { ...i, weather } : i)
+            const weathers = await Promise.all(
+                newItems.map(i => fetchWeather(lat, lon, i.startDate).catch(() => null)),
+            )
+            const weatherById = new Map(
+                newItems.map((item, i) => [item.id, weathers[i]] as const).filter(([, w]) => w),
+            )
+            const updated = next.map(i => {
+                const w = weatherById.get(i.id)
+                return w ? { ...i, weather: w } : i
+            })
             persist(updated)
         } catch { /* weather is best-effort */ }
     }
@@ -307,10 +314,13 @@ export default function MapsTab() {
         const next = items.map(i => i.id === updated.id ? updated : i)
         persist(next)
 
-        if (current && (current.lat !== updated.lat || current.lon !== updated.lon)) {
+        const locationChanged = current && (current.lat !== updated.lat || current.lon !== updated.lon)
+        const dateChanged = current && current.startDate !== updated.startDate
+
+        if (locationChanged || dateChanged) {
             void (async () => {
                 try {
-                    const weather = await fetchWeather(updated.lat, updated.lon)
+                    const weather = await fetchWeather(updated.lat, updated.lon, updated.startDate)
                     setItems(prev => {
                         const withWeather = prev.map(i => i.id === updated.id ? { ...i, weather } : i)
                         if (activeId) saveItems(activeId, withWeather)
@@ -331,7 +341,7 @@ export default function MapsTab() {
 
     const handleWeatherRefresh = useCallback(async (item: ItineraryItem) => {
         try {
-            const weather = await fetchWeather(item.lat, item.lon)
+            const weather = await fetchWeather(item.lat, item.lon, item.startDate)
             handleUpdateItem({ ...item, weather })
         } catch { /* best-effort */ }
     }, [handleUpdateItem])

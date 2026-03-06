@@ -178,17 +178,51 @@ function decodeWMO(code: number): { description: string; icon: string } {
   return WMO_DESCRIPTIONS[code as WMOCode] ?? { description: 'Unknown', icon: 'cloud' };
 }
 
-export async function fetchWeather(lat: number, lon: number): Promise<WeatherData> {
+const MAX_FORECAST_DAYS = 16;
+const MAX_PAST_DAYS = 92;
+
+export async function fetchWeather(lat: number, lon: number, targetDate?: string): Promise<WeatherData> {
+  const todayStr = new Date().toISOString().split('T')[0]!;
+
+  let targetDateStr: string | null = null;
+  let daysFromToday = 0;
+
+  if (targetDate?.trim()) {
+    const parsed = new Date(targetDate);
+    if (!isNaN(parsed.getTime())) {
+      targetDateStr = parsed.toISOString().split('T')[0]!;
+      daysFromToday = Math.round(
+        (new Date(targetDateStr).getTime() - new Date(todayStr).getTime()) / 86_400_000,
+      );
+    }
+  }
+
+  const isToday = !targetDateStr || daysFromToday === 0;
+  const canForecast = !isToday && daysFromToday > 0 && daysFromToday < MAX_FORECAST_DAYS;
+  const canHistory = !isToday && daysFromToday < 0 && daysFromToday >= -MAX_PAST_DAYS;
+  const needsFallback = !isToday && !canForecast && !canHistory;
+
+  const forecastDays = canForecast ? Math.min(daysFromToday + 1, MAX_FORECAST_DAYS) : 7;
+  const pastDays = canHistory ? Math.abs(daysFromToday) : 0;
+
   const params = new URLSearchParams({
     latitude: lat.toString(),
     longitude: lon.toString(),
     current: 'temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m',
-    daily: 'weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max',
+    daily: [
+      'weather_code', 'temperature_2m_max', 'temperature_2m_min',
+      'apparent_temperature_max', 'apparent_temperature_min',
+      'precipitation_probability_max', 'wind_speed_10m_max',
+    ].join(','),
     temperature_unit: 'fahrenheit',
     wind_speed_unit: 'mph',
     timezone: 'auto',
-    forecast_days: '7',
+    forecast_days: forecastDays.toString(),
   });
+
+  if (pastDays > 0) {
+    params.set('past_days', pastDays.toString());
+  }
 
   const res = await fetch(`https://api.open-meteo.com/v1/forecast?${params}`);
   if (!res.ok) throw new Error('Weather fetch failed');
@@ -208,10 +242,34 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
         icon: dayWmo.icon,
         precipitationProbability: data.daily.precipitation_probability_max[i],
       };
-    }
+    },
   );
 
-  return {
+  if ((canForecast || canHistory) && targetDateStr) {
+    const matchIdx = (data.daily.time as string[]).indexOf(targetDateStr);
+
+    if (matchIdx >= 0) {
+      const dayWmo = decodeWMO(data.daily.weather_code[matchIdx]);
+      const tempMax: number = data.daily.temperature_2m_max[matchIdx];
+      const tempMin: number = data.daily.temperature_2m_min[matchIdx];
+      const feelsMax: number = data.daily.apparent_temperature_max?.[matchIdx] ?? tempMax;
+      const feelsMin: number = data.daily.apparent_temperature_min?.[matchIdx] ?? tempMin;
+      const windSpeed: number = data.daily.wind_speed_10m_max?.[matchIdx] ?? 0;
+
+      return {
+        temperature: Math.round((tempMax + tempMin) / 2),
+        feelsLike: Math.round((feelsMax + feelsMin) / 2),
+        humidity: 0,
+        windSpeed: Math.round(windSpeed),
+        description: dayWmo.description,
+        icon: dayWmo.icon,
+        daily,
+        fetchedAt: new Date().toISOString(),
+      };
+    }
+  }
+
+  const result: WeatherData = {
     temperature: current.temperature_2m,
     feelsLike: current.apparent_temperature,
     humidity: current.relative_humidity_2m,
@@ -221,6 +279,16 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
     daily,
     fetchedAt: new Date().toISOString(),
   };
+
+  if (needsFallback) {
+    result.isFallback = true;
+    result.fallbackReason =
+      daysFromToday > 0
+        ? 'Forecasts are only available up to 16 days ahead. Showing current weather instead.'
+        : 'Historical weather is only available for the past 3 months. Showing current weather instead.';
+  }
+
+  return result;
 }
 
 export async function fetchDrivingRoute(
