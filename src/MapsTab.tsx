@@ -392,8 +392,6 @@ export default function MapsTab() {
             pdf.setTextColor(0)
             cursorY += 8
 
-            let mapAdded = false
-
             try {
                 const staticUrl = buildStaticMapUrl(sortedItems, routeCoords, 800, 400)
                 const mapRes = await fetch(staticUrl)
@@ -408,28 +406,8 @@ export default function MapsTab() {
                     const cappedMapH = Math.min(contentW * 0.5, 100)
                     pdf.addImage(mapBase64, 'PNG', margin, cursorY, contentW, cappedMapH)
                     cursorY += cappedMapH + 6
-                    mapAdded = true
                 }
-            } catch { /* static map failed */ }
-
-            if (!mapAdded && mapContainer.current) {
-                try {
-                    const html2canvasModule = await import('html2canvas-pro')
-                    const html2canvas = html2canvasModule.default
-                    const mapCanvas = await html2canvas(mapContainer.current, {
-                        useCORS: true,
-                        allowTaint: true,
-                        scale: 2,
-                        logging: false,
-                        backgroundColor: '#ffffff',
-                    })
-                    const mapImg = mapCanvas.toDataURL('image/png')
-                    const mapAspect = mapCanvas.height / mapCanvas.width
-                    const cappedMapH = Math.min(contentW * mapAspect, 100)
-                    pdf.addImage(mapImg, 'PNG', margin, cursorY, contentW, cappedMapH)
-                    cursorY += cappedMapH + 6
-                } catch { /* html2canvas fallback also failed */ }
-            }
+            } catch { /* static map unavailable — PDF continues without map image */ }
 
             for (let i = 0; i < sortedItems.length; i++) {
                 const item = sortedItems[i]!
