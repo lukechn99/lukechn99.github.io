@@ -1,11 +1,11 @@
 import { useState } from 'react';
-import { Card, Text, Group, Stack, ActionIcon, Textarea, Rating, Collapse, Badge, TextInput, Button } from '@mantine/core';
+import { Card, Text, Group, Stack, ActionIcon, Textarea, Rating, Collapse, Badge, TextInput, Button, Tooltip } from '@mantine/core';
 import { useDisclosure } from '@mantine/hooks';
 import {
   IconMapPin, IconTrash, IconChevronDown, IconChevronUp,
   IconCalendar, IconSun, IconCloud, IconCloudRain, IconCloudSnow,
   IconCloudStorm, IconCloudFog, IconTemperature, IconDroplet, IconWind,
-  IconPencil,
+  IconPencil, IconInfoCircle,
 } from '@tabler/icons-react';
 import type { ItineraryItem } from './types.ts';
 import type { NominatimResult } from './types.ts';
@@ -82,6 +82,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
   const saveEdit = () => {
     if (!editState) return;
     const locationChanged = editState.lat !== item.lat || editState.lon !== item.lon;
+    const dateChanged = editState.startDate !== item.startDate;
     const updated: ItineraryItem = {
       ...item,
       name: editState.name,
@@ -92,7 +93,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
       address: editState.address,
       displayName: editState.displayName,
     };
-    if (locationChanged) {
+    if (locationChanged || dateChanged) {
       delete updated.weather;
     }
     onUpdate(updated);
@@ -146,7 +147,18 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
             </div>
           </Group>
           <Group gap={4} wrap="nowrap">
-            {item.weather && weatherIcon(item.weather.icon)}
+            {item.weather && (
+              item.weather.isFallback ? (
+                <Tooltip label={item.weather.fallbackReason} withArrow multiline w={220} fz="xs">
+                  <Group gap={2} wrap="nowrap" style={{ cursor: 'help' }}>
+                    {weatherIcon(item.weather.icon)}
+                    <IconInfoCircle size={12} color="#fab005" />
+                  </Group>
+                </Tooltip>
+              ) : (
+                weatherIcon(item.weather.icon)
+              )
+            )}
             <ActionIcon variant="subtle" size="sm" onClick={e => { e.stopPropagation(); startEdit(); }}>
               <IconPencil size={14} />
             </ActionIcon>
@@ -234,6 +246,16 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
             <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
               {item.weather && (
                 <Card padding="xs" radius="sm" withBorder>
+                  {item.weather.isFallback && (
+                    <Tooltip label={item.weather.fallbackReason} withArrow multiline w={250} fz="xs">
+                      <Badge size="xs" variant="light" color="yellow" mb={6} style={{ cursor: 'help' }}>
+                        <Group gap={4} wrap="nowrap">
+                          <IconInfoCircle size={10} />
+                          <span>Showing current weather</span>
+                        </Group>
+                      </Badge>
+                    </Tooltip>
+                  )}
                   <Group justify="space-between">
                     <Group gap="xs">
                       {weatherIcon(item.weather.icon, 24)}
@@ -247,10 +269,12 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                         <IconTemperature size={12} />
                         <Text size="xs">Feels {Math.round(item.weather.feelsLike)}°F</Text>
                       </Group>
-                      <Group gap={4}>
-                        <IconDroplet size={12} />
-                        <Text size="xs">{item.weather.humidity}%</Text>
-                      </Group>
+                      {item.weather.humidity > 0 && (
+                        <Group gap={4}>
+                          <IconDroplet size={12} />
+                          <Text size="xs">{item.weather.humidity}%</Text>
+                        </Group>
+                      )}
                       <Group gap={4}>
                         <IconWind size={12} />
                         <Text size="xs">{Math.round(item.weather.windSpeed)} mph</Text>

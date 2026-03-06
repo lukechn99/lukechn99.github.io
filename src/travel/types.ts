@@ -37,6 +37,8 @@ export interface WeatherData {
   icon: string;
   daily?: DailyForecast[];
   fetchedAt: string;
+  isFallback?: boolean;
+  fallbackReason?: string;
 }
 
 export interface DailyForecast {
