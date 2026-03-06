@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState, useCallback } from "react"
+import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import {
-    Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader, Select,
+    Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader, Select, Tooltip,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconPlus, IconX, IconDownload, IconTrash } from "@tabler/icons-react"
+import { IconPlus, IconX, IconDownload, IconTrash, IconSortAscending, IconSortDescending } from "@tabler/icons-react"
 import type { Map as LeafletMap } from "leaflet"
 import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
@@ -13,7 +13,7 @@ import {
     deleteItinerary as storageDeleteItinerary,
     loadItems, saveItems, generateId,
 } from "./travel/storage.ts"
-import { fetchWeather } from "./travel/api.ts"
+import { fetchWeather, fetchDrivingRoute, buildStaticMapUrl, MAPTILER_API_KEY } from "./travel/api.ts"
 import LocationSearch from "./travel/LocationSearch.tsx"
 import ItineraryItemCard from "./travel/ItineraryItemCard.tsx"
 
@@ -75,6 +75,24 @@ export default function MapsTab() {
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
     const [exporting, setExporting] = useState(false)
+    const [sortAsc, setSortAsc] = useState(true)
+    const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
+
+    const sortedItems = useMemo(() => {
+        const withDate = items.filter(i => i.startDate)
+        const withoutDate = items.filter(i => !i.startDate)
+        withDate.sort((a, b) => {
+            const dateA = new Date(a.startDate).getTime()
+            const dateB = new Date(b.startDate).getTime()
+            return sortAsc ? dateA - dateB : dateB - dateA
+        })
+        return [...withDate, ...withoutDate]
+    }, [items, sortAsc])
+
+    const routeKey = useMemo(() =>
+        sortedItems.map(i => `${i.lat},${i.lon}`).join('|'),
+        [sortedItems]
+    )
 
     const persist = useCallback((next: ItineraryItem[]) => {
         if (!activeId) return
@@ -113,7 +131,7 @@ export default function MapsTab() {
                 })
                 mapInstance.current = map
 
-                const mtLayer = new MaptilerLayer({ apiKey: "NvWSomKHnqk2ky65h9RN" })
+                const mtLayer = new MaptilerLayer({ apiKey: MAPTILER_API_KEY })
                 mtLayer.addTo(map)
 
                 if (!isCancelled) setIsLoading(false)
@@ -144,11 +162,11 @@ export default function MapsTab() {
         markersRef.current.forEach((m: unknown) => (m as { remove: () => void }).remove())
         markersRef.current = []
 
-        if (items.length === 0) return
+        if (sortedItems.length === 0) return
 
         const bounds: [number, number][] = []
 
-        items.forEach((item, idx) => {
+        sortedItems.forEach((item, idx) => {
             const icon = L.divIcon({
                 html: markerHtml(idx + 1, item.weather?.icon),
                 className: '',
@@ -162,7 +180,14 @@ export default function MapsTab() {
             bounds.push([item.lat, item.lon])
         })
 
-        if (items.length > 1) {
+        if (routeCoords.length > 1) {
+            const routeLine = L.polyline(routeCoords, {
+                color: '#339af0',
+                weight: 3.5,
+                opacity: 0.7,
+            }).addTo(map)
+            markersRef.current.push(routeLine)
+        } else if (sortedItems.length > 1) {
             const polyline = L.polyline(bounds, {
                 color: '#339af0',
                 weight: 2.5,
@@ -177,7 +202,25 @@ export default function MapsTab() {
         } else if (bounds.length > 1) {
             map.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 13, animate: true })
         }
-    }, [items, isLoading])
+    }, [sortedItems, routeCoords, isLoading])
+
+    /* ---- Route ---- */
+
+    useEffect(() => {
+        if (sortedItems.length < 2) {
+            setRouteCoords([])
+            return
+        }
+
+        let cancelled = false
+        const coords: [number, number][] = sortedItems.map(i => [i.lat, i.lon])
+
+        fetchDrivingRoute(coords)
+            .then(result => { if (!cancelled) setRouteCoords(result.coords) })
+            .catch(() => { if (!cancelled) setRouteCoords([]) })
+
+        return () => { cancelled = true }
+    }, [routeKey])
 
     /* ---- Item CRUD ---- */
 
@@ -260,9 +303,23 @@ export default function MapsTab() {
     }
 
     const handleUpdateItem = useCallback((updated: ItineraryItem) => {
+        const current = items.find(i => i.id === updated.id)
         const next = items.map(i => i.id === updated.id ? updated : i)
         persist(next)
-    }, [items, persist])
+
+        if (current && (current.lat !== updated.lat || current.lon !== updated.lon)) {
+            void (async () => {
+                try {
+                    const weather = await fetchWeather(updated.lat, updated.lon)
+                    setItems(prev => {
+                        const withWeather = prev.map(i => i.id === updated.id ? { ...i, weather } : i)
+                        if (activeId) saveItems(activeId, withWeather)
+                        return withWeather
+                    })
+                } catch { /* weather is best-effort */ }
+            })()
+        }
+    }, [items, persist, activeId])
 
     const handleRemoveItem = useCallback((id: string) => {
         persist(items.filter(i => i.id !== id))
@@ -293,31 +350,27 @@ export default function MapsTab() {
     const fitAllMarkers = useCallback(() => {
         const map = mapInstance.current
         const L = leafletRef.current
-        if (!map || !L || items.length === 0) return
+        if (!map || !L || sortedItems.length === 0) return
 
-        const bounds: [number, number][] = items.map(i => [i.lat, i.lon])
+        const bounds: [number, number][] = sortedItems.map(i => [i.lat, i.lon])
         if (bounds.length === 1) {
             map.setView(bounds[0] as [number, number], 11, { animate: false })
         } else {
             map.fitBounds(L.latLngBounds(bounds), { padding: [60, 60], maxZoom: 13, animate: false })
         }
-    }, [items])
+    }, [sortedItems])
 
     const activeItineraryName = itineraries.find(i => i.id === activeId)?.name ?? 'Travel Itinerary'
 
     const handleExportPDF = useCallback(async () => {
-        if (items.length === 0 || !mapInstance.current) return
+        if (sortedItems.length === 0 || !mapInstance.current) return
         setExporting(true)
 
         fitAllMarkers()
         await new Promise(r => setTimeout(r, 800))
 
         try {
-            const [html2canvasModule, jsPDFModule] = await Promise.all([
-                import('html2canvas-pro'),
-                import('jspdf'),
-            ])
-            const html2canvas = html2canvasModule.default
+            const jsPDFModule = await import('jspdf')
             const { jsPDF } = jsPDFModule
 
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
@@ -335,28 +388,29 @@ export default function MapsTab() {
             pdf.setFontSize(9)
             pdf.setFont('helvetica', 'normal')
             pdf.setTextColor(120)
-            pdf.text(`${items.length} stop${items.length === 1 ? '' : 's'} — exported ${new Date().toLocaleDateString()}`, margin, cursorY)
+            pdf.text(`${sortedItems.length} stop${sortedItems.length === 1 ? '' : 's'} — exported ${new Date().toLocaleDateString()}`, margin, cursorY)
             pdf.setTextColor(0)
             cursorY += 8
 
-            if (mapContainer.current) {
-                const mapCanvas = await html2canvas(mapContainer.current, {
-                    useCORS: true,
-                    allowTaint: true,
-                    scale: 2,
-                    logging: false,
-                    backgroundColor: '#ffffff',
-                })
-                const mapImg = mapCanvas.toDataURL('image/png')
-                const mapAspect = mapCanvas.height / mapCanvas.width
-                const mapH = contentW * mapAspect
-                const cappedMapH = Math.min(mapH, 100)
-                pdf.addImage(mapImg, 'PNG', margin, cursorY, contentW, cappedMapH)
-                cursorY += cappedMapH + 6
-            }
+            try {
+                const staticUrl = buildStaticMapUrl(sortedItems, routeCoords, 800, 400)
+                const mapRes = await fetch(staticUrl)
+                if (mapRes.ok) {
+                    const mapBlob = await mapRes.blob()
+                    const mapBase64 = await new Promise<string>((resolve, reject) => {
+                        const reader = new FileReader()
+                        reader.onload = () => resolve(reader.result as string)
+                        reader.onerror = reject
+                        reader.readAsDataURL(mapBlob)
+                    })
+                    const cappedMapH = Math.min(contentW * 0.5, 100)
+                    pdf.addImage(mapBase64, 'PNG', margin, cursorY, contentW, cappedMapH)
+                    cursorY += cappedMapH + 6
+                }
+            } catch { /* static map unavailable — PDF continues without map image */ }
 
-            for (let i = 0; i < items.length; i++) {
-                const item = items[i]!
+            for (let i = 0; i < sortedItems.length; i++) {
+                const item = sortedItems[i]!
                 const blockH = 36 + (item.weather ? 6 : 0) + (item.notes ? 8 : 0) + (item.tags.length > 0 ? 6 : 0)
 
                 if (cursorY + blockH > pageH - margin) {
@@ -436,7 +490,7 @@ export default function MapsTab() {
         } finally {
             setExporting(false)
         }
-    }, [items, fitAllMarkers, activeItineraryName])
+    }, [sortedItems, routeCoords, fitAllMarkers, activeItineraryName])
 
     /* ---- Itinerary CRUD ---- */
 
@@ -577,17 +631,31 @@ export default function MapsTab() {
                         {formOpen ? <IconX size={18} /> : <IconPlus size={18} />}
                     </ActionIcon>
                     {items.length > 0 && (
-                        <ActionIcon
-                            variant="light"
-                            size="lg"
-                            radius="xl"
-                            color="teal"
-                            onClick={() => { void handleExportPDF() }}
-                            disabled={exporting}
-                            aria-label="Export itinerary as PDF"
-                        >
-                            {exporting ? <Loader size={16} color="teal" /> : <IconDownload size={18} />}
-                        </ActionIcon>
+                        <>
+                            <Tooltip label={sortAsc ? "Sorted: earliest first" : "Sorted: latest first"} withArrow>
+                                <ActionIcon
+                                    variant="light"
+                                    size="lg"
+                                    radius="xl"
+                                    color="orange"
+                                    onClick={() => setSortAsc(prev => !prev)}
+                                    aria-label={sortAsc ? "Sort latest first" : "Sort earliest first"}
+                                >
+                                    {sortAsc ? <IconSortAscending size={18} /> : <IconSortDescending size={18} />}
+                                </ActionIcon>
+                            </Tooltip>
+                            <ActionIcon
+                                variant="light"
+                                size="lg"
+                                radius="xl"
+                                color="teal"
+                                onClick={() => { void handleExportPDF() }}
+                                disabled={exporting}
+                                aria-label="Export itinerary as PDF"
+                            >
+                                {exporting ? <Loader size={16} color="teal" /> : <IconDownload size={18} />}
+                            </ActionIcon>
+                        </>
                     )}
                 </Group>
             )}
@@ -622,6 +690,7 @@ export default function MapsTab() {
                                     type="datetime-local"
                                     value={startDate}
                                     onChange={e => setStartDate(e.currentTarget.value)}
+                                    onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                                     size="sm"
                                 />
                                 <TextInput
@@ -629,6 +698,7 @@ export default function MapsTab() {
                                     type="datetime-local"
                                     value={endDate}
                                     onChange={e => setEndDate(e.currentTarget.value)}
+                                    onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                                     size="sm"
                                 />
                             </Group>
@@ -659,7 +729,7 @@ export default function MapsTab() {
                     <Text fw={600} size="sm" c="dimmed">
                         {activeItineraryName} — {items.length} {items.length === 1 ? 'stop' : 'stops'}
                     </Text>
-                    {items.map((item, idx) => (
+                    {sortedItems.map((item, idx) => (
                         <ItineraryItemCard
                             key={item.id}
                             item={item}

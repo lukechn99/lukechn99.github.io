@@ -1,5 +1,7 @@
 import type { NominatimResult, WeatherData, DailyForecast, WMOCode } from './types.ts';
 
+export const MAPTILER_API_KEY = 'NvWSomKHnqk2ky65h9RN';
+
 const NOMINATIM_BASE = 'https://nominatim.openstreetmap.org';
 const PHOTON_BASE = 'https://photon.komoot.io';
 
@@ -219,4 +221,72 @@ export async function fetchWeather(lat: number, lon: number): Promise<WeatherDat
     daily,
     fetchedAt: new Date().toISOString(),
   };
+}
+
+export async function fetchDrivingRoute(
+  coordinates: [number, number][],
+): Promise<{ coords: [number, number][]; distance: number; duration: number }> {
+  if (coordinates.length < 2)
+    return { coords: [], distance: 0, duration: 0 };
+
+  const coordStr = coordinates.map(([lat, lon]) => `${lon},${lat}`).join(';');
+  const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`;
+  const res = await fetch(url);
+  if (!res.ok) return { coords: [], distance: 0, duration: 0 };
+
+  const data = await res.json();
+  if (data.code !== 'Ok') return { coords: [], distance: 0, duration: 0 };
+
+  const route = data.routes?.[0];
+  if (!route?.geometry?.coordinates) return { coords: [], distance: 0, duration: 0 };
+
+  const coords: [number, number][] = route.geometry.coordinates.map(
+    ([lon, lat]: [number, number]) => [lat, lon] as [number, number],
+  );
+
+  return {
+    coords,
+    distance: route.distance ?? 0,
+    duration: route.duration ?? 0,
+  };
+}
+
+function downsampleCoords(
+  coords: [number, number][],
+  maxPoints: number,
+): [number, number][] {
+  if (coords.length <= maxPoints) return coords;
+  const step = (coords.length - 1) / (maxPoints - 1);
+  const result: [number, number][] = [];
+  for (let i = 0; i < maxPoints; i++) {
+    result.push(coords[Math.round(i * step)]!);
+  }
+  return result;
+}
+
+export function buildStaticMapUrl(
+  items: { lat: number; lon: number }[],
+  routeCoords: [number, number][],
+  width: number,
+  height: number,
+): string {
+  const parts: string[] = [`key=${MAPTILER_API_KEY}`, 'padding=50'];
+
+  if (items.length > 0) {
+    const markerStr = items.map((i) => `${i.lon},${i.lat}`).join('|');
+    parts.push(`markers=${markerStr}`);
+  }
+
+  if (routeCoords.length > 1) {
+    const simplified = downsampleCoords(routeCoords, 60);
+    const pathCoords = simplified
+      .map(([lat, lon]) => `${lon},${lat}`)
+      .join('|');
+    parts.push(`path=stroke:%23339af0|width:3|fill:none|${pathCoords}`);
+  } else if (items.length > 1) {
+    const pathCoords = items.map((i) => `${i.lon},${i.lat}`).join('|');
+    parts.push(`path=stroke:%23339af0|width:2|fill:none|${pathCoords}`);
+  }
+
+  return `https://api.maptiler.com/maps/streets-v2/static/auto/${width}x${height}@2x.png?${parts.join('&')}`;
 }
