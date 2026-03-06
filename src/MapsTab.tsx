@@ -1,13 +1,18 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import {
-    Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader,
+    Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader, Select,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconPlus, IconX, IconDownload } from "@tabler/icons-react"
+import { IconPlus, IconX, IconDownload, IconTrash } from "@tabler/icons-react"
 import type { Map as LeafletMap } from "leaflet"
-import type { ItineraryItem, NominatimResult } from "./travel/types.ts"
+import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
-import { loadItems, saveItems, generateId } from "./travel/storage.ts"
+import {
+    migrateOldStorage, loadItineraries, setActiveItinerary,
+    createItinerary as storageCreateItinerary,
+    deleteItinerary as storageDeleteItinerary,
+    loadItems, saveItems, generateId,
+} from "./travel/storage.ts"
 import { fetchWeather } from "./travel/api.ts"
 import LocationSearch from "./travel/LocationSearch.tsx"
 import ItineraryItemCard from "./travel/ItineraryItemCard.tsx"
@@ -53,7 +58,18 @@ export default function MapsTab() {
     const markersRef = useRef<unknown[]>([])
     const [isLoading, setIsLoading] = useState(true)
 
-    const [items, setItems] = useState<ItineraryItem[]>(() => loadItems())
+    const [storeInit] = useState(() => {
+        migrateOldStorage()
+        return loadItineraries()
+    })
+    const [itineraries, setItineraries] = useState<ItineraryMeta[]>(storeInit.list)
+    const [activeId, setActiveIdState] = useState<string | null>(storeInit.activeId)
+    const [items, setItems] = useState<ItineraryItem[]>(() =>
+        storeInit.activeId ? loadItems(storeInit.activeId) : []
+    )
+    const [creatingNew, setCreatingNew] = useState(false)
+    const [newItineraryName, setNewItineraryName] = useState("")
+
     const [formOpen, { toggle: toggleForm, close: closeForm }] = useDisclosure(false)
     const [pendingLocation, setPendingLocation] = useState<NominatimResult | null>(null)
     const [startDate, setStartDate] = useState("")
@@ -61,9 +77,12 @@ export default function MapsTab() {
     const [exporting, setExporting] = useState(false)
 
     const persist = useCallback((next: ItineraryItem[]) => {
+        if (!activeId) return
         setItems(next)
-        saveItems(next)
-    }, [])
+        saveItems(activeId, next)
+    }, [activeId])
+
+    /* ---- Map lifecycle ---- */
 
     useEffect(() => {
         let isCancelled = false
@@ -115,6 +134,8 @@ export default function MapsTab() {
         }
     }, [])
 
+    /* ---- Markers ---- */
+
     useEffect(() => {
         const map = mapInstance.current
         const L = leafletRef.current
@@ -158,8 +179,10 @@ export default function MapsTab() {
         }
     }, [items, isLoading])
 
+    /* ---- Item CRUD ---- */
+
     const handleAddItem = async () => {
-        if (!pendingLocation) return
+        if (!pendingLocation || !activeId) return
 
         const addr = pendingLocation.address
         const address: ItineraryItem['address'] = {}
@@ -265,6 +288,8 @@ export default function MapsTab() {
         })
     }, [isLoading])
 
+    /* ---- Fit / Export ---- */
+
     const fitAllMarkers = useCallback(() => {
         const map = mapInstance.current
         const L = leafletRef.current
@@ -277,6 +302,8 @@ export default function MapsTab() {
             map.fitBounds(L.latLngBounds(bounds), { padding: [60, 60], maxZoom: 13, animate: false })
         }
     }, [items])
+
+    const activeItineraryName = itineraries.find(i => i.id === activeId)?.name ?? 'Travel Itinerary'
 
     const handleExportPDF = useCallback(async () => {
         if (items.length === 0 || !mapInstance.current) return
@@ -302,7 +329,7 @@ export default function MapsTab() {
 
             pdf.setFontSize(18)
             pdf.setFont('helvetica', 'bold')
-            pdf.text('Travel Itinerary', margin, cursorY + 6)
+            pdf.text(activeItineraryName, margin, cursorY + 6)
             cursorY += 12
 
             pdf.setFontSize(9)
@@ -409,7 +436,41 @@ export default function MapsTab() {
         } finally {
             setExporting(false)
         }
-    }, [items, fitAllMarkers])
+    }, [items, fitAllMarkers, activeItineraryName])
+
+    /* ---- Itinerary CRUD ---- */
+
+    const handleSelectItinerary = useCallback((id: string | null) => {
+        if (!id) return
+        setActiveIdState(id)
+        setActiveItinerary(id)
+        setItems(loadItems(id))
+        closeForm()
+    }, [closeForm])
+
+    const handleCreateItinerary = useCallback(() => {
+        const trimmed = newItineraryName.trim()
+        if (!trimmed) return
+        const entry = storageCreateItinerary(trimmed)
+        setItineraries(prev => [...prev, entry])
+        setActiveIdState(entry.id)
+        setItems([])
+        setNewItineraryName("")
+        setCreatingNew(false)
+        closeForm()
+    }, [newItineraryName, closeForm])
+
+    const handleDeleteItinerary = useCallback(() => {
+        if (!activeId) return
+        const newActiveId = storageDeleteItinerary(activeId)
+        const { list } = loadItineraries()
+        setItineraries(list)
+        setActiveIdState(newActiveId)
+        setItems(newActiveId ? loadItems(newActiveId) : [])
+        closeForm()
+    }, [activeId, closeForm])
+
+    /* ---- Render ---- */
 
     return (
         <Stack gap="md">
@@ -430,96 +491,173 @@ export default function MapsTab() {
                 )}
             </div>
 
-            <Group justify="center" gap="sm">
-                <ActionIcon
-                    variant={formOpen ? "filled" : "light"}
-                    size="lg"
-                    radius="xl"
-                    color="blue"
-                    onClick={toggleForm}
-                    aria-label={formOpen ? "Close add form" : "Add itinerary item"}
-                >
-                    {formOpen ? <IconX size={18} /> : <IconPlus size={18} />}
-                </ActionIcon>
-                {items.length > 0 && (
+            {/* Itinerary selector */}
+            {itineraries.length > 0 && !creatingNew && (
+                <Group gap="sm">
+                    <Select
+                        data={itineraries.map(i => ({ value: i.id, label: i.name }))}
+                        value={activeId}
+                        onChange={handleSelectItinerary}
+                        placeholder="Select itinerary"
+                        size="sm"
+                        style={{ flex: 1, maxWidth: 280 }}
+                        allowDeselect={false}
+                    />
+                    <Button
+                        variant="light"
+                        size="sm"
+                        leftSection={<IconPlus size={14} />}
+                        onClick={() => setCreatingNew(true)}
+                    >
+                        New
+                    </Button>
                     <ActionIcon
                         variant="light"
                         size="lg"
-                        radius="xl"
-                        color="teal"
-                        onClick={() => { void handleExportPDF() }}
-                        disabled={exporting}
-                        aria-label="Export itinerary as PDF"
+                        color="red"
+                        onClick={handleDeleteItinerary}
+                        disabled={!activeId}
+                        aria-label="Delete itinerary"
                     >
-                        {exporting ? <Loader size={16} color="teal" /> : <IconDownload size={18} />}
+                        <IconTrash size={16} />
                     </ActionIcon>
-                )}
-            </Group>
+                </Group>
+            )}
 
-            <Collapse in={formOpen}>
+            {/* Create itinerary form */}
+            {(itineraries.length === 0 || creatingNew) && (
                 <Paper p="md" radius="md" withBorder>
                     <Stack gap="sm">
-                        <Text fw={600} size="sm">Add a stop to your itinerary</Text>
-
-                        <LocationSearch onSelect={setPendingLocation} />
-
-                        {pendingLocation && (
-                            <Paper p="xs" radius="sm" withBorder bg="var(--mantine-color-blue-light)">
-                                <Group gap="xs">
-                                    <Text size="sm" fw={500}>
-                                        {pendingLocation.display_name.split(',')[0]}
-                                    </Text>
-                                    {isHotelLocation(pendingLocation) && (
-                                        <Text size="xs" c="orange" fw={600}>
-                                            Hotel — will create check-in & check-out stops
-                                        </Text>
-                                    )}
-                                </Group>
-                                <Text size="xs" c="dimmed">{pendingLocation.display_name}</Text>
-                            </Paper>
-                        )}
-
-                        <Group grow>
+                        <Text fw={600} size="sm">
+                            {itineraries.length === 0
+                                ? "Create your first itinerary to get started"
+                                : "Create a new itinerary"}
+                        </Text>
+                        <Group>
                             <TextInput
-                                label="Start"
-                                type="datetime-local"
-                                value={startDate}
-                                onChange={e => setStartDate(e.currentTarget.value)}
+                                placeholder="e.g. Japan 2025, Europe Road Trip"
+                                value={newItineraryName}
+                                onChange={e => setNewItineraryName(e.currentTarget.value)}
                                 size="sm"
+                                style={{ flex: 1 }}
+                                onKeyDown={e => { if (e.key === 'Enter') handleCreateItinerary() }}
                             />
-                            <TextInput
-                                label="End"
-                                type="datetime-local"
-                                value={endDate}
-                                onChange={e => setEndDate(e.currentTarget.value)}
-                                size="sm"
-                            />
-                        </Group>
-
-                        <Group justify="flex-end">
-                            <Button
-                                variant="light"
-                                size="sm"
-                                onClick={() => { closeForm(); setPendingLocation(null); setStartDate(""); setEndDate(""); }}
-                            >
-                                Cancel
-                            </Button>
                             <Button
                                 size="sm"
-                                disabled={!pendingLocation}
-                                onClick={() => { void handleAddItem() }}
+                                disabled={!newItineraryName.trim()}
+                                onClick={handleCreateItinerary}
                             >
-                                Add to Itinerary
+                                Create
                             </Button>
+                            {itineraries.length > 0 && (
+                                <Button
+                                    variant="subtle"
+                                    size="sm"
+                                    onClick={() => { setCreatingNew(false); setNewItineraryName("") }}
+                                >
+                                    Cancel
+                                </Button>
+                            )}
                         </Group>
                     </Stack>
                 </Paper>
-            </Collapse>
+            )}
 
-            {items.length > 0 && (
+            {/* Action buttons — only when an itinerary is active */}
+            {activeId && !creatingNew && (
+                <Group justify="center" gap="sm">
+                    <ActionIcon
+                        variant={formOpen ? "filled" : "light"}
+                        size="lg"
+                        radius="xl"
+                        color="blue"
+                        onClick={toggleForm}
+                        aria-label={formOpen ? "Close add form" : "Add itinerary item"}
+                    >
+                        {formOpen ? <IconX size={18} /> : <IconPlus size={18} />}
+                    </ActionIcon>
+                    {items.length > 0 && (
+                        <ActionIcon
+                            variant="light"
+                            size="lg"
+                            radius="xl"
+                            color="teal"
+                            onClick={() => { void handleExportPDF() }}
+                            disabled={exporting}
+                            aria-label="Export itinerary as PDF"
+                        >
+                            {exporting ? <Loader size={16} color="teal" /> : <IconDownload size={18} />}
+                        </ActionIcon>
+                    )}
+                </Group>
+            )}
+
+            {activeId && (
+                <Collapse in={formOpen}>
+                    <Paper p="md" radius="md" withBorder>
+                        <Stack gap="sm">
+                            <Text fw={600} size="sm">Add a stop to your itinerary</Text>
+
+                            <LocationSearch onSelect={setPendingLocation} />
+
+                            {pendingLocation && (
+                                <Paper p="xs" radius="sm" withBorder bg="var(--mantine-color-blue-light)">
+                                    <Group gap="xs">
+                                        <Text size="sm" fw={500}>
+                                            {pendingLocation.display_name.split(',')[0]}
+                                        </Text>
+                                        {isHotelLocation(pendingLocation) && (
+                                            <Text size="xs" c="orange" fw={600}>
+                                                Hotel — will create check-in & check-out stops
+                                            </Text>
+                                        )}
+                                    </Group>
+                                    <Text size="xs" c="dimmed">{pendingLocation.display_name}</Text>
+                                </Paper>
+                            )}
+
+                            <Group grow>
+                                <TextInput
+                                    label="Start"
+                                    type="datetime-local"
+                                    value={startDate}
+                                    onChange={e => setStartDate(e.currentTarget.value)}
+                                    size="sm"
+                                />
+                                <TextInput
+                                    label="End"
+                                    type="datetime-local"
+                                    value={endDate}
+                                    onChange={e => setEndDate(e.currentTarget.value)}
+                                    size="sm"
+                                />
+                            </Group>
+
+                            <Group justify="flex-end">
+                                <Button
+                                    variant="light"
+                                    size="sm"
+                                    onClick={() => { closeForm(); setPendingLocation(null); setStartDate(""); setEndDate(""); }}
+                                >
+                                    Cancel
+                                </Button>
+                                <Button
+                                    size="sm"
+                                    disabled={!pendingLocation}
+                                    onClick={() => { void handleAddItem() }}
+                                >
+                                    Add to Itinerary
+                                </Button>
+                            </Group>
+                        </Stack>
+                    </Paper>
+                </Collapse>
+            )}
+
+            {activeId && items.length > 0 && (
                 <Stack gap="xs">
                     <Text fw={600} size="sm" c="dimmed">
-                        Itinerary — {items.length} {items.length === 1 ? 'stop' : 'stops'}
+                        {activeItineraryName} — {items.length} {items.length === 1 ? 'stop' : 'stops'}
                     </Text>
                     {items.map((item, idx) => (
                         <ItineraryItemCard
@@ -534,7 +672,7 @@ export default function MapsTab() {
                 </Stack>
             )}
 
-            {items.length === 0 && !formOpen && (
+            {activeId && items.length === 0 && !formOpen && (
                 <Text ta="center" c="dimmed" size="sm" py="lg">
                     No stops yet. Tap the + button to start building your itinerary.
                 </Text>
