@@ -1,5 +1,7 @@
 import { Suspense, lazy, useState } from 'react'
-import { FloatingIndicator, Stack, Tabs } from '@mantine/core'
+import { ActionIcon, FloatingIndicator, Stack, Tabs } from '@mantine/core'
+import { IconChevronLeft } from '@tabler/icons-react'
+import { useNavigate } from 'react-router-dom'
 import classes from './Works.module.css'
 import GamesTab from './GamesTab.tsx';
 
@@ -11,6 +13,7 @@ const MapsTab = lazy(() => import('./MapsTab.tsx'))
 // After I finish the WebRTC games I can showcase some learnings there too. 
 
 export default function Works() {
+    const navigate = useNavigate()
     const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
     const [value, setValue] = useState<string | null>('1');
     const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
@@ -27,6 +30,16 @@ export default function Works() {
             style={{ overflow: 'hidden' }}
             gap="xs"
         >
+            <ActionIcon
+                variant="subtle"
+                size="lg"
+                radius="xl"
+                onClick={() => navigate('/')}
+                aria-label="Back to home"
+                style={{ alignSelf: 'flex-start' }}
+            >
+                <IconChevronLeft size={22} />
+            </ActionIcon>
             <Tabs variant="none" value={value} onChange={setValue} keepMounted={false}>
                 <Tabs.List 
                     ref={setRootRef} 

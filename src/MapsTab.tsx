@@ -126,10 +126,41 @@ export default function MapsTab() {
                     center: [34.0459701, -118.5639983],
                     zoom: 10,
                     minZoom: 2,
+                    maxZoom: 18,
                     zoomSnap: 0,
                     zoomDelta: 0.25,
+                    scrollWheelZoom: false,
+                    zoomAnimation: true,
                 })
                 mapInstance.current = map
+
+                let targetZoom = map.getZoom()
+                let animating = false
+
+                const smoothZoom = () => {
+                    const cur = map.getZoom()
+                    const diff = targetZoom - cur
+                    if (Math.abs(diff) < 0.005) {
+                        map.setZoom(targetZoom, { animate: false })
+                        animating = false
+                        return
+                    }
+                    map.setZoom(cur + diff * 0.3, { animate: false })
+                    requestAnimationFrame(smoothZoom)
+                }
+
+                map.getContainer().addEventListener('wheel', (e: WheelEvent) => {
+                    e.preventDefault()
+                    const delta = -e.deltaY * 0.002
+                    targetZoom = Math.max(
+                        map.getMinZoom(),
+                        Math.min(map.getMaxZoom(), targetZoom + delta),
+                    )
+                    if (!animating) {
+                        animating = true
+                        requestAnimationFrame(smoothZoom)
+                    }
+                }, { passive: false })
 
                 const mtLayer = new MaptilerLayer({ apiKey: MAPTILER_API_KEY })
                 mtLayer.addTo(map)

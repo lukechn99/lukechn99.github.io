@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
-import { Alert, Box, Button, Group, Space, Stack, TextInput } from '@mantine/core';
-import { IconInfoCircle, IconSend } from '@tabler/icons-react';
+import { ActionIcon, Alert, Box, Button, Group, Space, Stack, TextInput } from '@mantine/core';
+import { IconChevronLeft, IconInfoCircle, IconSend } from '@tabler/icons-react';
+import { useNavigate } from 'react-router-dom';
 
 export default function Contact() {
+    const navigate = useNavigate()
     const [result, setResult] = useState<string | null>(null)
 
     const icon = <IconInfoCircle />
@@ -37,6 +39,16 @@ export default function Contact() {
         mx="auto"
         align="center"
     >
+        <ActionIcon
+            variant="subtle"
+            size="lg"
+            radius="xl"
+            onClick={() => navigate('/')}
+            aria-label="Back to home"
+            style={{ alignSelf: 'flex-start' }}
+        >
+            <IconChevronLeft size={22} />
+        </ActionIcon>
         {result && <Alert variant="light" color="blue" withCloseButton title={result} icon={icon} onClose={() => setResult(null)}></Alert>}
         <Box component="form" onSubmit={onSubmit} w="100%" style={{ textAlign: 'left' }}>
             <TextInput

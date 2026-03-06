@@ -156,7 +156,11 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                   </Group>
                 </Tooltip>
               ) : (
-                weatherIcon(item.weather.icon)
+                <Tooltip label="Weather for this date at this location" withArrow fz="xs">
+                  <Group gap={0} wrap="nowrap" style={{ cursor: 'help' }}>
+                    {weatherIcon(item.weather.icon)}
+                  </Group>
+                </Tooltip>
               )
             )}
             <ActionIcon variant="subtle" size="sm" onClick={e => { e.stopPropagation(); startEdit(); }}>
@@ -246,12 +250,21 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
             <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
               {item.weather && (
                 <Card padding="xs" radius="sm" withBorder>
-                  {item.weather.isFallback && (
+                  {item.weather.isFallback ? (
                     <Tooltip label={item.weather.fallbackReason} withArrow multiline w={250} fz="xs">
                       <Badge size="xs" variant="light" color="yellow" mb={6} style={{ cursor: 'help' }}>
                         <Group gap={4} wrap="nowrap">
                           <IconInfoCircle size={10} />
                           <span>Showing current weather</span>
+                        </Group>
+                      </Badge>
+                    </Tooltip>
+                  ) : (
+                    <Tooltip label="This is the weather for the scheduled date at this location" withArrow multiline w={250} fz="xs">
+                      <Badge size="xs" variant="light" color="teal" mb={6} style={{ cursor: 'help' }}>
+                        <Group gap={4} wrap="nowrap">
+                          <IconInfoCircle size={10} />
+                          <span>Weather for this date &amp; place</span>
                         </Group>
                       </Badge>
                     </Tooltip>
