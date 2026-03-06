@@ -1,7 +1,8 @@
 import { useState, useRef } from 'react';
-import { TextInput, Loader, Paper, Text, Group, Stack, UnstyledButton } from '@mantine/core';
-import { IconSearch, IconMapPin } from '@tabler/icons-react';
+import { TextInput, Loader, Paper, Text, Group, Stack, UnstyledButton, Badge } from '@mantine/core';
+import { IconSearch, IconMapPin, IconBed } from '@tabler/icons-react';
 import { searchLocations } from './api.ts';
+import { isHotelLocation } from './types.ts';
 import type { NominatimResult } from './types.ts';
 
 interface LocationSearchProps {
@@ -36,7 +37,7 @@ export default function LocationSearch({ onSelect }: LocationSearchProps) {
       } finally {
         setLoading(false);
       }
-    }, 400);
+    }, 350);
   };
 
   const handleSelect = (result: NominatimResult) => {
@@ -69,35 +70,49 @@ export default function LocationSearch({ onSelect }: LocationSearchProps) {
             left: 0,
             right: 0,
             zIndex: 1000,
-            maxHeight: 320,
+            maxHeight: 400,
             overflowY: 'auto',
           }}
           mt={4}
         >
           <Stack gap={0}>
-            {results.map(r => (
-              <UnstyledButton
-                key={r.place_id}
-                onClick={() => handleSelect(r)}
-                p="sm"
-                style={(theme) => ({
-                  borderBottom: `1px solid ${theme.colors?.gray?.[2] ?? '#e9ecef'}`,
-                  '&:hover': { backgroundColor: theme.colors?.gray?.[0] ?? '#f8f9fa' },
-                })}
-              >
-                <Group gap="xs" wrap="nowrap">
-                  <IconMapPin size={16} style={{ flexShrink: 0, color: '#868e96' }} />
-                  <div style={{ minWidth: 0 }}>
-                    <Text size="sm" fw={500} truncate="end">
-                      {r.display_name.split(',')[0]}
-                    </Text>
-                    <Text size="xs" c="dimmed" truncate="end">
-                      {r.display_name}
-                    </Text>
-                  </div>
-                </Group>
-              </UnstyledButton>
-            ))}
+            {results.map((r, i) => {
+              const hotel = isHotelLocation(r);
+              return (
+                <UnstyledButton
+                  key={`${r.place_id}-${i}`}
+                  onClick={() => handleSelect(r)}
+                  p="sm"
+                  style={(theme) => ({
+                    borderBottom: `1px solid ${theme.colors?.gray?.[2] ?? '#e9ecef'}`,
+                    '&:hover': { backgroundColor: theme.colors?.gray?.[0] ?? '#f8f9fa' },
+                  })}
+                >
+                  <Group gap="xs" wrap="nowrap">
+                    {hotel
+                      ? <IconBed size={16} style={{ flexShrink: 0, color: '#e67700' }} />
+                      : <IconMapPin size={16} style={{ flexShrink: 0, color: '#868e96' }} />
+                    }
+                    <div style={{ minWidth: 0, flex: 1 }}>
+                      <Group gap={6} wrap="nowrap">
+                        <Text size="sm" fw={500} truncate="end">
+                          {r.display_name.split(',')[0]}
+                        </Text>
+                        {hotel && (
+                          <Badge size="xs" variant="light" color="orange" style={{ flexShrink: 0 }}>Hotel</Badge>
+                        )}
+                        {r.type && !hotel && (
+                          <Badge size="xs" variant="light" color="gray" style={{ flexShrink: 0 }}>{r.type}</Badge>
+                        )}
+                      </Group>
+                      <Text size="xs" c="dimmed" truncate="end">
+                        {r.display_name}
+                      </Text>
+                    </div>
+                  </Group>
+                </UnstyledButton>
+              );
+            })}
           </Stack>
         </Paper>
       )}
