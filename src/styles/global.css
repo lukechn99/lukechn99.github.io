@@ -89,5 +89,18 @@ input[type='email'],
 textarea {
   width: 100%;
   padding: 12px;
-  box-sizing: border-box; /* Ensures padding doesn't affect width */
+  box-sizing: border-box;
+}
+
+input[type='datetime-local'] {
+  min-width: 0;
+  max-width: 100%;
+  box-sizing: border-box;
+  font-size: inherit;
+}
+
+@media (max-width: 480px) {
+  input[type='datetime-local'] {
+    font-size: 12px;
+  }
 }
