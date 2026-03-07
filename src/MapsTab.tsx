@@ -3,7 +3,7 @@ import {
     Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader, Select, Tooltip,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconPlus, IconX, IconDownload, IconTrash, IconSortAscending, IconSortDescending } from "@tabler/icons-react"
+import { IconPlus, IconX, IconDownload, IconTrash, IconSortAscending, IconSortDescending, IconArrowDown, IconAlertTriangle, IconCar } from "@tabler/icons-react"
 import type { Map as LeafletMap } from "leaflet"
 import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
@@ -13,7 +13,7 @@ import {
     deleteItinerary as storageDeleteItinerary,
     loadItems, saveItems, generateId,
 } from "./travel/storage.ts"
-import { fetchWeather, fetchDrivingRoute, buildStaticMapUrl, MAPTILER_API_KEY } from "./travel/api.ts"
+import { fetchWeather, fetchDrivingRoute, MAPTILER_API_KEY, type RouteLeg } from "./travel/api.ts"
 import LocationSearch from "./travel/LocationSearch.tsx"
 import ItineraryItemCard from "./travel/ItineraryItemCard.tsx"
 
@@ -51,6 +51,19 @@ function markerHtml(index: number, weatherIcon?: string): string {
     `
 }
 
+function formatDuration(seconds: number): string {
+    const h = Math.floor(seconds / 3600)
+    const m = Math.round((seconds % 3600) / 60)
+    if (h > 0 && m > 0) return `${h}h ${m}m`
+    if (h > 0) return `${h}h`
+    return `${m}m`
+}
+
+function formatDistance(meters: number): string {
+    const mi = meters / 1609.344
+    return mi >= 100 ? `${Math.round(mi)} mi` : `${mi.toFixed(1)} mi`
+}
+
 export default function MapsTab() {
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapInstance = useRef<LeafletMap | null>(null)
@@ -77,6 +90,7 @@ export default function MapsTab() {
     const [exporting, setExporting] = useState(false)
     const [sortAsc, setSortAsc] = useState(true)
     const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
+    const [routeLegs, setRouteLegs] = useState<RouteLeg[]>([])
 
     const sortedItems = useMemo(() => {
         const withDate = items.filter(i => i.startDate)
@@ -240,6 +254,7 @@ export default function MapsTab() {
     useEffect(() => {
         if (sortedItems.length < 2) {
             setRouteCoords([])
+            setRouteLegs([])
             return
         }
 
@@ -247,8 +262,18 @@ export default function MapsTab() {
         const coords: [number, number][] = sortedItems.map(i => [i.lat, i.lon])
 
         fetchDrivingRoute(coords)
-            .then(result => { if (!cancelled) setRouteCoords(result.coords) })
-            .catch(() => { if (!cancelled) setRouteCoords([]) })
+            .then(result => {
+                if (!cancelled) {
+                    setRouteCoords(result.coords)
+                    setRouteLegs(result.legs)
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setRouteCoords([])
+                    setRouteLegs([])
+                }
+            })
 
         return () => { cancelled = true }
     }, [routeKey])
@@ -408,11 +433,15 @@ export default function MapsTab() {
         setExporting(true)
 
         fitAllMarkers()
-        await new Promise(r => setTimeout(r, 800))
+        await new Promise(r => setTimeout(r, 1200))
 
         try {
-            const jsPDFModule = await import('jspdf')
+            const [jsPDFModule, html2canvasModule] = await Promise.all([
+                import('jspdf'),
+                import('html2canvas-pro'),
+            ])
             const { jsPDF } = jsPDFModule
+            const html2canvas = html2canvasModule.default
 
             const pdf = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
             const pageW = pdf.internal.pageSize.getWidth()
@@ -434,21 +463,23 @@ export default function MapsTab() {
             cursorY += 8
 
             try {
-                const staticUrl = buildStaticMapUrl(sortedItems, routeCoords, 800, 400)
-                const mapRes = await fetch(staticUrl)
-                if (mapRes.ok) {
-                    const mapBlob = await mapRes.blob()
-                    const mapBase64 = await new Promise<string>((resolve, reject) => {
-                        const reader = new FileReader()
-                        reader.onload = () => resolve(reader.result as string)
-                        reader.onerror = reject
-                        reader.readAsDataURL(mapBlob)
+                const mapEl = mapContainer.current
+                if (mapEl) {
+                    const canvas = await html2canvas(mapEl, {
+                        useCORS: true,
+                        allowTaint: true,
+                        scale: 2,
+                        logging: false,
+                        backgroundColor: '#ffffff',
                     })
-                    const cappedMapH = Math.min(contentW * 0.5, 100)
-                    pdf.addImage(mapBase64, 'PNG', margin, cursorY, contentW, cappedMapH)
-                    cursorY += cappedMapH + 6
+                    const mapDataUrl = canvas.toDataURL('image/png')
+                    const aspectRatio = canvas.height / canvas.width
+                    const mapW = contentW
+                    const mapH = Math.min(mapW * aspectRatio, 100)
+                    pdf.addImage(mapDataUrl, 'PNG', margin, cursorY, mapW, mapH)
+                    cursorY += mapH + 6
                 }
-            } catch { /* static map unavailable — PDF continues without map image */ }
+            } catch { /* map capture unavailable — PDF continues without map image */ }
 
             for (let i = 0; i < sortedItems.length; i++) {
                 const item = sortedItems[i]!
@@ -531,7 +562,7 @@ export default function MapsTab() {
         } finally {
             setExporting(false)
         }
-    }, [sortedItems, routeCoords, fitAllMarkers, activeItineraryName])
+    }, [sortedItems, fitAllMarkers, activeItineraryName])
 
     /* ---- Itinerary CRUD ---- */
 
@@ -725,7 +756,7 @@ export default function MapsTab() {
                                 </Paper>
                             )}
 
-                            <Group grow>
+                            <Group grow wrap="wrap" style={{ gap: 8 }}>
                                 <TextInput
                                     label="Start"
                                     type="datetime-local"
@@ -733,6 +764,7 @@ export default function MapsTab() {
                                     onChange={e => setStartDate(e.currentTarget.value)}
                                     onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                                     size="sm"
+                                    style={{ minWidth: 0, flex: '1 1 140px' }}
                                 />
                                 <TextInput
                                     label="End"
@@ -741,6 +773,7 @@ export default function MapsTab() {
                                     onChange={e => setEndDate(e.currentTarget.value)}
                                     onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                                     size="sm"
+                                    style={{ minWidth: 0, flex: '1 1 140px' }}
                                 />
                             </Group>
 
@@ -766,20 +799,82 @@ export default function MapsTab() {
             )}
 
             {activeId && items.length > 0 && (
-                <Stack gap="xs">
-                    <Text fw={600} size="sm" c="dimmed">
+                <Stack gap={0}>
+                    <Text fw={600} size="sm" c="dimmed" mb="xs">
                         {activeItineraryName} — {items.length} {items.length === 1 ? 'stop' : 'stops'}
                     </Text>
-                    {sortedItems.map((item, idx) => (
-                        <ItineraryItemCard
-                            key={item.id}
-                            item={item}
-                            index={idx}
-                            onUpdate={handleUpdateItem}
-                            onRemove={handleRemoveItem}
-                            onFocus={handleFocusItem}
-                        />
-                    ))}
+                    {sortedItems.map((item, idx) => {
+                        const prev = idx > 0 ? sortedItems[idx - 1] : null
+                        let transitEl: React.ReactNode = null
+
+                        if (prev) {
+                            const leg = routeLegs[idx - 1]
+                            const prevEnd = prev.endDate || prev.startDate
+                            const curStart = item.startDate
+                            const hasGap = prevEnd && curStart
+                            const gapMs = hasGap
+                                ? new Date(curStart).getTime() - new Date(prevEnd).getTime()
+                                : null
+                            const gapSec = gapMs != null ? gapMs / 1000 : null
+                            const driveSec = leg?.duration ?? null
+                            const isTight = gapSec != null && driveSec != null && gapSec < driveSec
+                            const isNegative = gapSec != null && gapSec < 0
+
+                            transitEl = (
+                                <Group
+                                    justify="center"
+                                    gap={6}
+                                    py={4}
+                                    style={{ opacity: 0.85 }}
+                                >
+                                    <IconArrowDown size={14} color="var(--mantine-color-dimmed)" />
+                                    {driveSec != null && driveSec > 0 && (
+                                        <Group gap={4} wrap="nowrap">
+                                            <IconCar size={13} color="var(--mantine-color-dimmed)" />
+                                            <Text size="xs" c="dimmed">
+                                                {formatDuration(driveSec)}
+                                                {leg?.distance ? ` · ${formatDistance(leg.distance)}` : ''}
+                                            </Text>
+                                        </Group>
+                                    )}
+                                    {hasGap && (
+                                        <Text
+                                            size="xs"
+                                            fw={isTight || isNegative ? 600 : 400}
+                                            c={isNegative ? 'red' : isTight ? 'orange' : 'dimmed'}
+                                        >
+                                            {isNegative ? (
+                                                <Group gap={3} wrap="nowrap" component="span" display="inline-flex">
+                                                    <IconAlertTriangle size={12} />
+                                                    Overlapping by {formatDuration(Math.abs(gapSec!))}
+                                                </Group>
+                                            ) : isTight ? (
+                                                <Group gap={3} wrap="nowrap" component="span" display="inline-flex">
+                                                    <IconAlertTriangle size={12} />
+                                                    Only {formatDuration(gapSec!)} gap
+                                                </Group>
+                                            ) : gapSec! > 0 ? (
+                                                `${formatDuration(gapSec!)} gap`
+                                            ) : null}
+                                        </Text>
+                                    )}
+                                </Group>
+                            )
+                        }
+
+                        return (
+                            <div key={item.id}>
+                                {transitEl}
+                                <ItineraryItemCard
+                                    item={item}
+                                    index={idx}
+                                    onUpdate={handleUpdateItem}
+                                    onRemove={handleRemoveItem}
+                                    onFocus={handleFocusItem}
+                                />
+                            </div>
+                        )
+                    })}
                 </Stack>
             )}
 

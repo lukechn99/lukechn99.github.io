@@ -147,8 +147,10 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
             </div>
           </Group>
           <Group gap={4} wrap="nowrap">
-            {item.weather && (
-              item.weather.isFallback ? (
+            {item.weather && (() => {
+              const locationLabel = item.address.city ?? item.address.state ?? item.name;
+              const dateLabel = item.startDate ? formatDateTime(item.startDate) : 'now';
+              return item.weather.isFallback ? (
                 <Tooltip label={item.weather.fallbackReason} withArrow multiline w={220} fz="xs">
                   <Group gap={2} wrap="nowrap" style={{ cursor: 'help' }}>
                     {weatherIcon(item.weather.icon)}
@@ -156,13 +158,13 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                   </Group>
                 </Tooltip>
               ) : (
-                <Tooltip label="Weather for this date at this location" withArrow fz="xs">
+                <Tooltip label={`${Math.round(item.weather.temperature)}°F ${item.weather.description} — ${dateLabel}, ${locationLabel}`} withArrow multiline w={240} fz="xs">
                   <Group gap={0} wrap="nowrap" style={{ cursor: 'help' }}>
                     {weatherIcon(item.weather.icon)}
                   </Group>
                 </Tooltip>
-              )
-            )}
+              );
+            })()}
             <ActionIcon variant="subtle" size="sm" onClick={e => { e.stopPropagation(); startEdit(); }}>
               <IconPencil size={14} />
             </ActionIcon>
@@ -197,7 +199,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
               <TextInput
                 label="Name"
                 value={editState.name}
-                onChange={e => setEditState(prev => prev ? { ...prev, name: e.currentTarget.value } : prev)}
+                onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, name: v } : prev); }}
                 size="sm"
               />
 
@@ -222,22 +224,24 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                 )}
               </div>
 
-              <Group grow>
+              <Group grow wrap="wrap" style={{ gap: 8 }}>
                 <TextInput
                   label="Start"
                   type="datetime-local"
                   value={editState.startDate}
-                  onChange={e => setEditState(prev => prev ? { ...prev, startDate: e.currentTarget.value } : prev)}
+                  onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, startDate: v } : prev); }}
                   onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                   size="sm"
+                  style={{ minWidth: 0, flex: '1 1 140px' }}
                 />
                 <TextInput
                   label="End"
                   type="datetime-local"
                   value={editState.endDate}
-                  onChange={e => setEditState(prev => prev ? { ...prev, endDate: e.currentTarget.value } : prev)}
+                  onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, endDate: v } : prev); }}
                   onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                   size="sm"
+                  style={{ minWidth: 0, flex: '1 1 140px' }}
                 />
               </Group>
 
@@ -248,7 +252,10 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
             </Stack>
           ) : (
             <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
-              {item.weather && (
+              {item.weather && (() => {
+                const locationLabel = item.address.city ?? item.address.state ?? item.name;
+                const dateLabel = item.startDate ? formatDateTime(item.startDate) : 'now';
+                return (
                 <Card padding="xs" radius="sm" withBorder>
                   {item.weather.isFallback ? (
                     <Tooltip label={item.weather.fallbackReason} withArrow multiline w={250} fz="xs">
@@ -260,11 +267,11 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                       </Badge>
                     </Tooltip>
                   ) : (
-                    <Tooltip label="This is the weather for the scheduled date at this location" withArrow multiline w={250} fz="xs">
+                    <Tooltip label={`Forecast for ${dateLabel} at ${locationLabel}`} withArrow multiline w={250} fz="xs">
                       <Badge size="xs" variant="light" color="teal" mb={6} style={{ cursor: 'help' }}>
                         <Group gap={4} wrap="nowrap">
                           <IconInfoCircle size={10} />
-                          <span>Weather for this date &amp; place</span>
+                          <span>{dateLabel} — {locationLabel}</span>
                         </Group>
                       </Badge>
                     </Tooltip>
@@ -295,7 +302,8 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                     </Stack>
                   </Group>
                 </Card>
-              )}
+                );
+              })()}
 
               <div>
                 <Text size="xs" fw={500} mb={4}>Rating</Text>
