@@ -4,6 +4,7 @@ import { IconChevronLeft } from '@tabler/icons-react'
 import { useNavigate } from 'react-router-dom'
 import classes from './Works.module.css'
 import GamesTab from './GamesTab.tsx';
+import PickMeUpTab from './PickMeUpTab.tsx';
 
 const MapsTab = lazy(() => import('./MapsTab.tsx'))
 
@@ -58,6 +59,9 @@ export default function Works() {
                     <Tabs.Tab value="4" ref={setControlRef('4')} className={classes.tab}>
                         Games
                     </Tabs.Tab>
+                    <Tabs.Tab value="5" ref={setControlRef('5')} className={classes.tab}>
+                        Pick Me Up
+                    </Tabs.Tab>
 
                     <FloatingIndicator
                         target={value ? controlsRefs[value] : null}
@@ -74,6 +78,7 @@ export default function Works() {
                 <Tabs.Panel value="2">Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others</Tabs.Panel>
                 <Tabs.Panel value="3">AWS could include architectures, learnings, best practices, etc.</Tabs.Panel>
                 <Tabs.Panel value="4"><GamesTab /></Tabs.Panel>
+                <Tabs.Panel value="5"><PickMeUpTab /></Tabs.Panel>
             </Tabs>
         </Stack>
     )
