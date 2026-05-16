@@ -3,7 +3,18 @@ import {
     Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader, Select, Tooltip,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconPlus, IconX, IconDownload, IconTrash, IconSortAscending, IconSortDescending } from "@tabler/icons-react"
+import {
+    IconPlus, IconX, IconDownload, IconTrash, IconSortAscending, IconSortDescending,
+    IconGripVertical, IconChevronLeft, IconChevronRight,
+} from "@tabler/icons-react"
+import {
+    DndContext, closestCenter, PointerSensor, KeyboardSensor, useSensor, useSensors,
+} from "@dnd-kit/core"
+import type { DragEndEvent } from "@dnd-kit/core"
+import {
+    SortableContext, verticalListSortingStrategy, useSortable, arrayMove, sortableKeyboardCoordinates,
+} from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
 import type { Map as LeafletMap } from "leaflet"
 import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
@@ -14,8 +25,12 @@ import {
     loadItems, saveItems, generateId,
 } from "./travel/storage.ts"
 import { fetchWeather, fetchDrivingRoute, buildStaticMapUrl, MAPTILER_API_KEY } from "./travel/api.ts"
+import type { RouteLeg } from "./travel/api.ts"
 import LocationSearch from "./travel/LocationSearch.tsx"
 import ItineraryItemCard from "./travel/ItineraryItemCard.tsx"
+import TransitConnector from "./travel/TransitConnector.tsx"
+
+type SortMode = 'manual' | 'date-asc' | 'date-desc'
 
 const WEATHER_EMOJI: Record<string, string> = {
     'sun': '☀️',
@@ -27,28 +42,59 @@ const WEATHER_EMOJI: Record<string, string> = {
     'cloud-storm': '⛈️',
 }
 
-function markerHtml(index: number, weatherIcon?: string): string {
+function markerHtml(index: number, weatherIcon?: string, isActive = false): string {
     const emoji = weatherIcon ? (WEATHER_EMOJI[weatherIcon] ?? '📍') : '📍'
+    const borderColor = isActive ? '#fd7e14' : '#339af0'
+    const badgeBg = isActive ? '#fd7e14' : '#339af0'
     return `
-      <div style="
-        position:relative; width:42px; height:42px;
-      ">
+      <div style="position:relative;width:42px;height:42px;">
         <div style="
-          width:42px; height:42px; border-radius:50%;
-          background:white; border:2.5px solid #339af0;
-          display:flex; align-items:center; justify-content:center;
-          font-size:20px; box-shadow:0 2px 8px rgba(0,0,0,0.22);
+          width:42px;height:42px;border-radius:50%;
+          background:white;border:2.5px solid ${borderColor};
+          display:flex;align-items:center;justify-content:center;
+          font-size:20px;box-shadow:0 2px 8px rgba(0,0,0,0.22);
         ">${emoji}</div>
         <div style="
-          position:absolute; top:-5px; right:-5px;
-          width:20px; height:20px; border-radius:50%;
-          background:#339af0; color:white;
-          font-size:11px; font-weight:700;
-          display:flex; align-items:center; justify-content:center;
-          border:2px solid white; box-shadow:0 1px 3px rgba(0,0,0,0.2);
+          position:absolute;top:-5px;right:-5px;
+          width:20px;height:20px;border-radius:50%;
+          background:${badgeBg};color:white;
+          font-size:11px;font-weight:700;
+          display:flex;align-items:center;justify-content:center;
+          border:2px solid white;box-shadow:0 1px 3px rgba(0,0,0,0.2);
         ">${index}</div>
       </div>
     `
+}
+
+interface SortableItemProps {
+    item: ItineraryItem
+    index: number
+    isDragMode: boolean
+    onUpdate: (item: ItineraryItem) => void
+    onRemove: (id: string) => void
+    onFocus: (item: ItineraryItem) => void
+}
+
+function SortableItem({ item, index, isDragMode, onUpdate, onRemove, onFocus }: SortableItemProps) {
+    const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id: item.id })
+    const style = {
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+    }
+    return (
+        <div ref={setNodeRef} style={style}>
+            <ItineraryItemCard
+                item={item}
+                index={index}
+                onUpdate={onUpdate}
+                onRemove={onRemove}
+                onFocus={onFocus}
+                isDragMode={isDragMode}
+                dragHandleProps={isDragMode ? { ...attributes, ...listeners } : undefined}
+            />
+        </div>
+    )
 }
 
 export default function MapsTab() {
@@ -75,19 +121,26 @@ export default function MapsTab() {
     const [startDate, setStartDate] = useState("")
     const [endDate, setEndDate] = useState("")
     const [exporting, setExporting] = useState(false)
-    const [sortAsc, setSortAsc] = useState(true)
+    const [sortMode, setSortMode] = useState<SortMode>('manual')
     const [routeCoords, setRouteCoords] = useState<[number, number][]>([])
+    const [transitLegs, setTransitLegs] = useState<RouteLeg[]>([])
+    const [activeSegment, setActiveSegment] = useState<number | null>(null)
+
+    const sensors = useSensors(
+        useSensor(PointerSensor, { activationConstraint: { distance: 8 } }),
+        useSensor(KeyboardSensor, { coordinateGetter: sortableKeyboardCoordinates }),
+    )
 
     const sortedItems = useMemo(() => {
+        if (sortMode === 'manual') return items
         const withDate = items.filter(i => i.startDate)
         const withoutDate = items.filter(i => !i.startDate)
         withDate.sort((a, b) => {
-            const dateA = new Date(a.startDate).getTime()
-            const dateB = new Date(b.startDate).getTime()
-            return sortAsc ? dateA - dateB : dateB - dateA
+            const diff = new Date(a.startDate).getTime() - new Date(b.startDate).getTime()
+            return sortMode === 'date-asc' ? diff : -diff
         })
         return [...withDate, ...withoutDate]
-    }, [items, sortAsc])
+    }, [items, sortMode])
 
     const routeKey = useMemo(() =>
         sortedItems.map(i => `${i.lat},${i.lon}`).join('|'),
@@ -165,6 +218,12 @@ export default function MapsTab() {
                 const mtLayer = new MaptilerLayer({ apiKey: MAPTILER_API_KEY })
                 mtLayer.addTo(map)
 
+                // Recalculate map size when container resizes (fixes wide-window off-center)
+                const resizeObserver = new ResizeObserver(() => {
+                    map.invalidateSize()
+                })
+                resizeObserver.observe(mapContainer.current!)
+
                 if (!isCancelled) setIsLoading(false)
             } catch {
                 if (!isCancelled) setIsLoading(false)
@@ -183,7 +242,7 @@ export default function MapsTab() {
         }
     }, [])
 
-    /* ---- Markers ---- */
+    /* ---- Markers & route drawing ---- */
 
     useEffect(() => {
         const map = mapInstance.current
@@ -197,9 +256,14 @@ export default function MapsTab() {
 
         const bounds: [number, number][] = []
 
+        // Determine which stop indices are part of the active segment
+        const activeFrom = activeSegment !== null ? activeSegment : -1
+        const activeTo = activeSegment !== null ? activeSegment + 1 : -1
+
         sortedItems.forEach((item, idx) => {
+            const isActive = idx === activeFrom || idx === activeTo
             const icon = L.divIcon({
-                html: markerHtml(idx + 1, item.weather?.icon),
+                html: markerHtml(idx + 1, item.weather?.icon, isActive),
                 className: '',
                 iconSize: [42, 42],
                 iconAnchor: [21, 21],
@@ -211,18 +275,29 @@ export default function MapsTab() {
             bounds.push([item.lat, item.lon])
         })
 
+        // Full route — translucent light blue
         if (routeCoords.length > 1) {
-            const routeLine = L.polyline(routeCoords, {
+            const fullLine = L.polyline(routeCoords, {
                 color: '#339af0',
                 weight: 3.5,
-                opacity: 0.7,
+                opacity: activeSegment !== null ? 0.2 : 0.5,
             }).addTo(map)
-            markersRef.current.push(routeLine)
+            markersRef.current.push(fullLine)
+
+            // Active segment — orange
+            if (activeSegment !== null && transitLegs[activeSegment]?.coords.length) {
+                const segLine = L.polyline(transitLegs[activeSegment].coords, {
+                    color: '#fd7e14',
+                    weight: 5,
+                    opacity: 0.85,
+                }).addTo(map)
+                markersRef.current.push(segLine)
+            }
         } else if (sortedItems.length > 1) {
             const polyline = L.polyline(bounds, {
                 color: '#339af0',
                 weight: 2.5,
-                opacity: 0.5,
+                opacity: 0.4,
                 dashArray: '8, 8',
             }).addTo(map)
             markersRef.current.push(polyline)
@@ -231,15 +306,25 @@ export default function MapsTab() {
         if (bounds.length === 1) {
             map.setView(bounds[0] as [number, number], 11, { animate: true })
         } else if (bounds.length > 1) {
-            map.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 13, animate: true })
+            if (activeSegment !== null) {
+                // Fit just the active segment
+                const segBounds: [number, number][] = [bounds[activeSegment]!, bounds[activeSegment + 1]!].filter(Boolean)
+                if (segBounds.length === 2) {
+                    map.fitBounds(L.latLngBounds(segBounds), { padding: [80, 80], maxZoom: 14, animate: true })
+                }
+            } else {
+                map.fitBounds(L.latLngBounds(bounds), { padding: [50, 50], maxZoom: 13, animate: true })
+            }
         }
-    }, [sortedItems, routeCoords, isLoading])
+    }, [sortedItems, routeCoords, transitLegs, activeSegment, isLoading])
 
     /* ---- Route ---- */
 
     useEffect(() => {
         if (sortedItems.length < 2) {
             setRouteCoords([])
+            setTransitLegs([])
+            setActiveSegment(null)
             return
         }
 
@@ -247,8 +332,18 @@ export default function MapsTab() {
         const coords: [number, number][] = sortedItems.map(i => [i.lat, i.lon])
 
         fetchDrivingRoute(coords)
-            .then(result => { if (!cancelled) setRouteCoords(result.coords) })
-            .catch(() => { if (!cancelled) setRouteCoords([]) })
+            .then(result => {
+                if (!cancelled) {
+                    setRouteCoords(result.coords)
+                    setTransitLegs(result.legs)
+                }
+            })
+            .catch(() => {
+                if (!cancelled) {
+                    setRouteCoords([])
+                    setTransitLegs([])
+                }
+            })
 
         return () => { cancelled = true }
     }, [routeKey])
@@ -386,6 +481,31 @@ export default function MapsTab() {
         })
     }, [isLoading])
 
+    /* ---- Drag & drop ---- */
+
+    const handleDragEnd = useCallback((event: DragEndEvent) => {
+        if (sortMode !== 'manual') return
+        const { active, over } = event
+        if (!over || active.id === over.id) return
+        setItems(prev => {
+            const oldIndex = prev.findIndex(i => i.id === active.id)
+            const newIndex = prev.findIndex(i => i.id === over.id)
+            const next = arrayMove(prev, oldIndex, newIndex)
+            if (activeId) saveItems(activeId, next)
+            return next
+        })
+    }, [sortMode, activeId])
+
+    /* ---- Sort mode ---- */
+
+    const cycleSortMode = useCallback(() => {
+        setSortMode(prev => {
+            if (prev === 'manual') return 'date-asc'
+            if (prev === 'date-asc') return 'date-desc'
+            return 'manual'
+        })
+    }, [])
+
     /* ---- Fit / Export ---- */
 
     const fitAllMarkers = useCallback(() => {
@@ -448,7 +568,7 @@ export default function MapsTab() {
                     pdf.addImage(mapBase64, 'PNG', margin, cursorY, contentW, cappedMapH)
                     cursorY += cappedMapH + 6
                 }
-            } catch { /* static map unavailable — PDF continues without map image */ }
+            } catch { /* static map unavailable */ }
 
             for (let i = 0; i < sortedItems.length; i++) {
                 const item = sortedItems[i]!
@@ -499,7 +619,7 @@ export default function MapsTab() {
                 if (item.weather) {
                     pdf.setFontSize(8)
                     pdf.text(
-                        `Weather: ${Math.round(item.weather.temperature)}°F — ${item.weather.description}, Humidity ${item.weather.humidity}%, Wind ${Math.round(item.weather.windSpeed)} mph`,
+                        `Weather: ${Math.round(item.weather.temperature)}°F — ${item.weather.description}`,
                         margin + 10, cursorY
                     )
                     cursorY += 5
@@ -565,10 +685,40 @@ export default function MapsTab() {
         closeForm()
     }, [activeId, closeForm])
 
+    /* ---- Segment controls ---- */
+
+    const segmentCount = transitLegs.length
+    const canStepSegments = segmentCount > 0
+
+    const stepSegment = useCallback((dir: 1 | -1) => {
+        setActiveSegment(prev => {
+            if (prev === null) return dir === 1 ? 0 : segmentCount - 1
+            const next = prev + dir
+            if (next < 0) return null
+            if (next >= segmentCount) return null
+            return next
+        })
+    }, [segmentCount])
+
+    /* ---- Sort icon helper ---- */
+
+    const sortIcon = sortMode === 'date-asc'
+        ? <IconSortAscending size={18} />
+        : sortMode === 'date-desc'
+            ? <IconSortDescending size={18} />
+            : <IconGripVertical size={18} />
+
+    const sortTooltip = sortMode === 'manual'
+        ? 'Manual order (drag to reorder) — click to sort by date'
+        : sortMode === 'date-asc'
+            ? 'Sorted earliest first — click for latest first'
+            : 'Sorted latest first — click for manual order'
+
     /* ---- Render ---- */
 
     return (
         <Stack gap="md">
+            {/* Map */}
             <div style={{ position: "relative", width: "100%", height: "500px", borderRadius: 12, overflow: "hidden" }}>
                 <div ref={mapContainer} style={{ position: "absolute", inset: 0 }} />
                 {isLoading && (
@@ -582,6 +732,39 @@ export default function MapsTab() {
                         }}
                     >
                         Loading map...
+                    </div>
+                )}
+
+                {/* Segment stepper overlay */}
+                {canStepSegments && (
+                    <div style={{
+                        position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
+                        zIndex: 1000, display: 'flex', alignItems: 'center', gap: 6,
+                        background: 'rgba(255,255,255,0.92)',
+                        backdropFilter: 'blur(6px)',
+                        borderRadius: 99, padding: '4px 8px',
+                        boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                        pointerEvents: 'all',
+                    }}>
+                        <ActionIcon
+                            size="sm" variant="subtle"
+                            onClick={() => stepSegment(-1)}
+                            disabled={activeSegment === null || activeSegment === 0}
+                        >
+                            <IconChevronLeft size={14} />
+                        </ActionIcon>
+                        <Text size="xs" fw={500} style={{ whiteSpace: 'nowrap', minWidth: 90, textAlign: 'center' }}>
+                            {activeSegment === null
+                                ? 'Full route'
+                                : `Leg ${activeSegment + 1} of ${segmentCount}`}
+                        </Text>
+                        <ActionIcon
+                            size="sm" variant="subtle"
+                            onClick={() => stepSegment(1)}
+                            disabled={activeSegment === segmentCount - 1}
+                        >
+                            <IconChevronRight size={14} />
+                        </ActionIcon>
                     </div>
                 )}
             </div>
@@ -658,7 +841,7 @@ export default function MapsTab() {
                 </Paper>
             )}
 
-            {/* Action buttons — only when an itinerary is active */}
+            {/* Action buttons */}
             {activeId && !creatingNew && (
                 <Group justify="center" gap="sm">
                     <ActionIcon
@@ -673,16 +856,16 @@ export default function MapsTab() {
                     </ActionIcon>
                     {items.length > 0 && (
                         <>
-                            <Tooltip label={sortAsc ? "Sorted: earliest first" : "Sorted: latest first"} withArrow>
+                            <Tooltip label={sortTooltip} withArrow multiline w={220}>
                                 <ActionIcon
                                     variant="light"
                                     size="lg"
                                     radius="xl"
-                                    color="orange"
-                                    onClick={() => setSortAsc(prev => !prev)}
-                                    aria-label={sortAsc ? "Sort latest first" : "Sort earliest first"}
+                                    color={sortMode === 'manual' ? 'gray' : 'orange'}
+                                    onClick={cycleSortMode}
+                                    aria-label="Change sort order"
                                 >
-                                    {sortAsc ? <IconSortAscending size={18} /> : <IconSortDescending size={18} />}
+                                    {sortIcon}
                                 </ActionIcon>
                             </Tooltip>
                             <ActionIcon
@@ -701,11 +884,12 @@ export default function MapsTab() {
                 </Group>
             )}
 
+            {/* Add item form */}
             {activeId && (
                 <Collapse in={formOpen}>
                     <Paper p="md" radius="md" withBorder>
                         <Stack gap="sm">
-                            <Text fw={600} size="sm">Add a stop to your itinerary</Text>
+                            <Text fw={600} size="sm">Add a stop</Text>
 
                             <LocationSearch onSelect={setPendingLocation} />
 
@@ -727,7 +911,7 @@ export default function MapsTab() {
 
                             <Group grow>
                                 <TextInput
-                                    label="Start"
+                                    label={<Text size="xs" fw={500}>Start <Text span size="xs" c="dimmed">(optional)</Text></Text>}
                                     type="datetime-local"
                                     value={startDate}
                                     onChange={e => setStartDate(e.currentTarget.value)}
@@ -735,7 +919,7 @@ export default function MapsTab() {
                                     size="sm"
                                 />
                                 <TextInput
-                                    label="End"
+                                    label={<Text size="xs" fw={500}>End <Text span size="xs" c="dimmed">(optional)</Text></Text>}
                                     type="datetime-local"
                                     value={endDate}
                                     onChange={e => setEndDate(e.currentTarget.value)}
@@ -765,21 +949,46 @@ export default function MapsTab() {
                 </Collapse>
             )}
 
+            {/* Items list */}
             {activeId && items.length > 0 && (
-                <Stack gap="xs">
-                    <Text fw={600} size="sm" c="dimmed">
+                <Stack gap={0}>
+                    <Text fw={600} size="sm" c="dimmed" mb="xs">
                         {activeItineraryName} — {items.length} {items.length === 1 ? 'stop' : 'stops'}
+                        {sortMode === 'manual' && (
+                            <Text span size="xs" c="dimmed"> · drag to reorder</Text>
+                        )}
                     </Text>
-                    {sortedItems.map((item, idx) => (
-                        <ItineraryItemCard
-                            key={item.id}
-                            item={item}
-                            index={idx}
-                            onUpdate={handleUpdateItem}
-                            onRemove={handleRemoveItem}
-                            onFocus={handleFocusItem}
-                        />
-                    ))}
+                    <DndContext
+                        sensors={sensors}
+                        collisionDetection={closestCenter}
+                        onDragEnd={handleDragEnd}
+                    >
+                        <SortableContext
+                            items={sortedItems.map(i => i.id)}
+                            strategy={verticalListSortingStrategy}
+                        >
+                            <Stack gap="xs">
+                                {sortedItems.map((item, idx) => (
+                                    <div key={item.id}>
+                                        <SortableItem
+                                            item={item}
+                                            index={idx}
+                                            isDragMode={sortMode === 'manual'}
+                                            onUpdate={handleUpdateItem}
+                                            onRemove={handleRemoveItem}
+                                            onFocus={handleFocusItem}
+                                        />
+                                        {idx < sortedItems.length - 1 && transitLegs[idx] && (
+                                            <TransitConnector
+                                                distance={transitLegs[idx].distance}
+                                                duration={transitLegs[idx].duration}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </Stack>
+                        </SortableContext>
+                    </DndContext>
                 </Stack>
             )}
 

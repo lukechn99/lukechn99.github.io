@@ -5,7 +5,7 @@ import {
   IconMapPin, IconTrash, IconChevronDown, IconChevronUp,
   IconCalendar, IconSun, IconCloud, IconCloudRain, IconCloudSnow,
   IconCloudStorm, IconCloudFog, IconTemperature, IconDroplet, IconWind,
-  IconPencil, IconInfoCircle,
+  IconPencil, IconInfoCircle, IconGripVertical,
 } from '@tabler/icons-react';
 import type { ItineraryItem } from './types.ts';
 import type { NominatimResult } from './types.ts';
@@ -41,6 +41,8 @@ interface ItineraryItemCardProps {
   onUpdate: (item: ItineraryItem) => void;
   onRemove: (id: string) => void;
   onFocus: (item: ItineraryItem) => void;
+  isDragMode?: boolean;
+  dragHandleProps?: Record<string, unknown>;
 }
 
 interface EditState {
@@ -53,7 +55,7 @@ interface EditState {
   displayName: string;
 }
 
-export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onFocus }: ItineraryItemCardProps) {
+export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onFocus, isDragMode, dragHandleProps }: ItineraryItemCardProps) {
   const [expanded, { toggle, open: openExpand }] = useDisclosure(false);
   const [editState, setEditState] = useState<EditState | null>(null);
   const [changingLocation, setChangingLocation] = useState(false);
@@ -132,6 +134,19 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
       <Stack gap="xs">
         <Group justify="space-between" wrap="nowrap">
           <Group gap="xs" wrap="nowrap" style={{ minWidth: 0 }}>
+            {isDragMode && (
+              <ActionIcon
+                variant="subtle"
+                size="sm"
+                color="gray"
+                style={{ cursor: 'grab', touchAction: 'none', flexShrink: 0 }}
+                aria-label="Drag to reorder"
+                {...(dragHandleProps as object)}
+                onClick={e => e.stopPropagation()}
+              >
+                <IconGripVertical size={14} />
+              </ActionIcon>
+            )}
             <div style={{
               width: 28, height: 28, borderRadius: '50%',
               background: '#339af0', color: 'white',

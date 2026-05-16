@@ -23,6 +23,17 @@ export default function Works() {
     }
 
     return (
+        <>
+        <ActionIcon
+            variant="subtle"
+            size="lg"
+            radius="xl"
+            onClick={() => navigate('/')}
+            aria-label="Back to home"
+            style={{ position: 'fixed', top: 16, left: 16, zIndex: 1000 }}
+        >
+            <IconChevronLeft size={22} />
+        </ActionIcon>
         <Stack
             align="stretch"
             w="80vw"
@@ -30,16 +41,6 @@ export default function Works() {
             style={{ overflow: 'hidden' }}
             gap="xs"
         >
-            <ActionIcon
-                variant="subtle"
-                size="lg"
-                radius="xl"
-                onClick={() => navigate('/')}
-                aria-label="Back to home"
-                style={{ alignSelf: 'flex-start' }}
-            >
-                <IconChevronLeft size={22} />
-            </ActionIcon>
             <Tabs variant="none" value={value} onChange={setValue} keepMounted={false}>
                 <Tabs.List 
                     ref={setRootRef} 
@@ -76,5 +77,6 @@ export default function Works() {
                 <Tabs.Panel value="4"><GamesTab /></Tabs.Panel>
             </Tabs>
         </Stack>
+        </>
     )
 }
