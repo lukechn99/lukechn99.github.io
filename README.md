@@ -34,5 +34,8 @@ npm run deploy     # build + push to gh-pages branch (deploys to GitHub Pages)
 - [ ] AWS tab — architectures, learnings, best practices
 - [ ] Games tab — WebRTC game showcase and learnings
 
+### Build / Performance
+- [ ] **Fix large chunk warnings** — `mapping-engine` (1,454 kB) and `jspdf` (386 kB) exceed the 500 kB threshold. Use `build.rollupOptions.output.manualChunks` to split heavy deps (MapTiler, jsPDF, html2canvas) into separate chunks, and audit any remaining dynamic `import()` opportunities.
+
 ### General
 - [ ] Add more content to the Works page tabs (Micro-frontends, AWS)
