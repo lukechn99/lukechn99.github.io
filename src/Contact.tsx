@@ -32,23 +32,24 @@ export default function Contact() {
         }
     }
 
-    return (<Stack
-        bg="var(--mantine-color-body)"
-        p="md" gap="md"
-        w="80vw"
-        mx="auto"
-        align="center"
-    >
+    return (<>
         <ActionIcon
             variant="subtle"
             size="lg"
             radius="xl"
             onClick={() => navigate('/')}
             aria-label="Back to home"
-            style={{ alignSelf: 'flex-start' }}
+            style={{ position: 'fixed', top: 16, left: 16, zIndex: 1000 }}
         >
             <IconChevronLeft size={22} />
         </ActionIcon>
+        <Stack
+        bg="var(--mantine-color-body)"
+        p="md" gap="md"
+        w="80vw"
+        mx="auto"
+        align="center"
+    >
         {result && <Alert variant="light" color="blue" withCloseButton title={result} icon={icon} onClose={() => setResult(null)}></Alert>}
         <Box component="form" onSubmit={onSubmit} w="100%" style={{ textAlign: 'left' }}>
             <TextInput
@@ -82,5 +83,5 @@ export default function Contact() {
                 <Button type="submit">Submit {<Space />} {<IconSend />}</Button>
             </Group>
         </Box>
-    </Stack>)
+    </Stack></>)
 }

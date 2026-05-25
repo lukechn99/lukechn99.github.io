@@ -60,7 +60,7 @@ function photonToNominatim(f: PhotonFeature): NominatimResult {
 }
 
 async function searchPhoton(query: string): Promise<NominatimResult[]> {
-  const params = new URLSearchParams({ q: query, limit: '12', lang: 'en' });
+  const params = new URLSearchParams({ q: query, limit: '20', lang: 'en' });
   const res = await fetch(`${PHOTON_BASE}/api?${params}`);
   if (!res.ok) return [];
   const data = await res.json() as { features: PhotonFeature[] };
@@ -124,7 +124,7 @@ export async function searchLocations(query: string): Promise<NominatimResult[]>
 
   unique.sort((a, b) => fuzzyScore(query, b) - fuzzyScore(query, a));
 
-  return unique.slice(0, 15);
+  return unique.slice(0, 20);
 }
 
 export async function reverseGeocode(lat: number, lon: number): Promise<NominatimResult> {
@@ -291,31 +291,50 @@ export async function fetchWeather(lat: number, lon: number, targetDate?: string
   return result;
 }
 
+export interface RouteLeg {
+  distance: number;
+  duration: number;
+  coords: [number, number][];
+}
+
 export async function fetchDrivingRoute(
   coordinates: [number, number][],
-): Promise<{ coords: [number, number][]; distance: number; duration: number }> {
+): Promise<{ coords: [number, number][]; distance: number; duration: number; legs: RouteLeg[] }> {
   if (coordinates.length < 2)
-    return { coords: [], distance: 0, duration: 0 };
+    return { coords: [], distance: 0, duration: 0, legs: [] };
 
   const coordStr = coordinates.map(([lat, lon]) => `${lon},${lat}`).join(';');
-  const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson`;
+  const url = `https://router.project-osrm.org/route/v1/driving/${coordStr}?overview=full&geometries=geojson&steps=true`;
   const res = await fetch(url);
-  if (!res.ok) return { coords: [], distance: 0, duration: 0 };
+  if (!res.ok) return { coords: [], distance: 0, duration: 0, legs: [] };
 
   const data = await res.json();
-  if (data.code !== 'Ok') return { coords: [], distance: 0, duration: 0 };
+  if (data.code !== 'Ok') return { coords: [], distance: 0, duration: 0, legs: [] };
 
   const route = data.routes?.[0];
-  if (!route?.geometry?.coordinates) return { coords: [], distance: 0, duration: 0 };
+  if (!route?.geometry?.coordinates) return { coords: [], distance: 0, duration: 0, legs: [] };
 
   const coords: [number, number][] = route.geometry.coordinates.map(
     ([lon, lat]: [number, number]) => [lat, lon] as [number, number],
   );
 
+  const legs: RouteLeg[] = (route.legs ?? []).map((leg: { distance: number; duration: number; steps: { geometry: { coordinates: [number, number][] } }[] }) => {
+    const legCoords: [number, number][] = (leg.steps ?? []).flatMap(
+      (step: { geometry: { coordinates: [number, number][] } }) =>
+        (step.geometry?.coordinates ?? []).map(([lon, lat]: [number, number]) => [lat, lon] as [number, number]),
+    );
+    return {
+      distance: leg.distance ?? 0,
+      duration: leg.duration ?? 0,
+      coords: legCoords,
+    };
+  });
+
   return {
     coords,
     distance: route.distance ?? 0,
     duration: route.duration ?? 0,
+    legs,
   };
 }
 
