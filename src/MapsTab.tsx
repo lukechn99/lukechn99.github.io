@@ -158,6 +158,7 @@ export default function MapsTab() {
     useEffect(() => {
         let isCancelled = false
         let timeoutId: number | undefined
+        let resizeObserver: ResizeObserver | undefined
 
         const loadMap = async () => {
             if (mapInstance.current || !mapContainer.current) {
@@ -219,10 +220,11 @@ export default function MapsTab() {
                 mtLayer.addTo(map)
 
                 // Recalculate map size when container resizes (fixes wide-window off-center)
-                const resizeObserver = new ResizeObserver(() => {
+                resizeObserver = new ResizeObserver(() => {
+                    if (mapInstance.current !== map) return
                     map.invalidateSize()
                 })
-                resizeObserver.observe(mapContainer.current!)
+                resizeObserver.observe(mapContainer.current)
 
                 if (!isCancelled) setIsLoading(false)
             } catch {
@@ -235,6 +237,8 @@ export default function MapsTab() {
         return () => {
             isCancelled = true
             if (timeoutId !== undefined) window.clearTimeout(timeoutId)
+            resizeObserver?.disconnect()
+            resizeObserver = undefined
             if (mapInstance.current) {
                 mapInstance.current.remove()
                 mapInstance.current = null

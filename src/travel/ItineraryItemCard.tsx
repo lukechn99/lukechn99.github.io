@@ -212,7 +212,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
               <TextInput
                 label="Name"
                 value={editState.name}
-                onChange={e => setEditState(prev => prev ? { ...prev, name: e.currentTarget.value } : prev)}
+                onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, name: v } : prev) }}
                 size="sm"
               />
 
@@ -242,7 +242,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                   label="Start"
                   type="datetime-local"
                   value={editState.startDate}
-                  onChange={e => setEditState(prev => prev ? { ...prev, startDate: e.currentTarget.value } : prev)}
+                  onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, startDate: v } : prev) }}
                   onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                   size="sm"
                 />
@@ -250,7 +250,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                   label="End"
                   type="datetime-local"
                   value={editState.endDate}
-                  onChange={e => setEditState(prev => prev ? { ...prev, endDate: e.currentTarget.value } : prev)}
+                  onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, endDate: v } : prev) }}
                   onClick={e => { try { (e.target as HTMLInputElement).showPicker?.() } catch {} }}
                   size="sm"
                 />

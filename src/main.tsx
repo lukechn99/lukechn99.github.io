@@ -7,17 +7,20 @@ import { MantineProvider } from '@mantine/core'
 import '@mantine/core/styles.css'
 import Works from './Works.tsx'
 import Contact from './Contact.tsx'
+import ErrorBoundary from './components/ErrorBoundary.tsx'
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
-    <MantineProvider>
-      <HashRouter>
-        <Routes>
-          <Route path="/" element={<App />} />
-          <Route path="/works" element={<Works />} />
-          <Route path="/contact" element={<Contact />} />
-        </Routes>
-      </HashRouter>
-    </MantineProvider>
+    <ErrorBoundary>
+      <MantineProvider>
+        <HashRouter>
+          <Routes>
+            <Route path="/" element={<App />} />
+            <Route path="/works" element={<Works />} />
+            <Route path="/contact" element={<Contact />} />
+          </Routes>
+        </HashRouter>
+      </MantineProvider>
+    </ErrorBoundary>
   </StrictMode>
 )
