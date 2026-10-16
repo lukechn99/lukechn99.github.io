@@ -16,12 +16,29 @@ npm run deploy     # build + push to gh-pages branch (deploys to GitHub Pages)
 - **React 19** + **TypeScript** via Vite
 - **Mantine** — UI component library
 - **Leaflet** + **MapTiler** — interactive maps
+- **TopoJSON** + **Natural Earth** — people-groups map regions (`topojson-client` in the browser, `mapshaper` at build time)
 - **@dnd-kit** — drag-and-drop
 - **OSRM** — driving route calculation
 - **Open-Meteo** — weather forecasts
 - **Photon / Nominatim** — location search
 - **jsPDF** — itinerary PDF export
 - **React Router** (HashRouter for GitHub Pages compatibility)
+
+## People Groups Map
+
+The **Peoples** tab (Works → Peoples) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes; clicking a region opens its profile (language, religion, food, name origin, history) at the bottom of the page and reveals its subgroups.
+
+- `src/peoples/data/*.ts` — the tree and the text for every group
+- `scripts/peoples/assignments.mjs` — which people group is the majority in each Natural Earth province/state
+- `public/peoples/leaves.topo.json` — generated region shapes (one per leaf group)
+
+To regenerate the shapes after editing the tree or assignments:
+
+```bash
+curl -L -o scripts/peoples/ne_admin1.geojson \
+  https://raw.githubusercontent.com/nvkelso/natural-earth-vector/master/geojson/ne_10m_admin_1_states_provinces.geojson
+npm run build:peoples
+```
 
 ## Todo
 

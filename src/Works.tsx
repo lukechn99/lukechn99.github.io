@@ -6,6 +6,7 @@ import classes from './Works.module.css'
 import GamesTab from './GamesTab.tsx';
 
 const MapsTab = lazy(() => import('./MapsTab.tsx'))
+const PeopleMapTab = lazy(() => import('./PeopleMapTab.tsx'))
 
 // Maps will include map tiles, routing, scrubbing, jumping to locations, travel pins, flights, etc.
 // Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others
@@ -50,6 +51,9 @@ export default function Works() {
                     <Tabs.Tab value="1" ref={setControlRef('1')} className={classes.tab}>
                         Maps
                     </Tabs.Tab>
+                    <Tabs.Tab value="peoples" ref={setControlRef('peoples')} className={classes.tab}>
+                        Peoples
+                    </Tabs.Tab>
                     <Tabs.Tab value="2" ref={setControlRef('2')} className={classes.tab}>
                         Micro-frontends
                     </Tabs.Tab>
@@ -70,6 +74,11 @@ export default function Works() {
                 <Tabs.Panel value="1">
                     <Suspense fallback={<div style={{ padding: '1rem' }}>Loading map...</div>}>
                         <MapsTab />
+                    </Suspense>
+                </Tabs.Panel>
+                <Tabs.Panel value="peoples">
+                    <Suspense fallback={<div style={{ padding: '1rem' }}>Loading map...</div>}>
+                        <PeopleMapTab />
                     </Suspense>
                 </Tabs.Panel>
                 <Tabs.Panel value="2">Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others</Tabs.Panel>
