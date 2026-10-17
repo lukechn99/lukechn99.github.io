@@ -111,6 +111,7 @@ const zh: Resources = {
             history: '历史',
         },
         relations: '与邻近民族的关系',
+        literature: '文学',
         subgroups: '下属群体（{{count}}）',
         upOneLevel: '返回上一级',
         closeToWorld: '关闭并返回世界全图',

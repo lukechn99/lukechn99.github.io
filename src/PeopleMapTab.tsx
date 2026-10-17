@@ -3,6 +3,7 @@ import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, SimpleGri
 import { useTranslation } from "react-i18next"
 import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
 import { relationsOf } from "./peoples/relations/index.ts"
+import { LITERATURE } from "./peoples/literature.ts"
 import { localName, shortName } from "./peoples/names/index.ts"
 import { EVENT_BY_ID, linkEvents, type EventKind, type LatLng, type PeopleEvent } from "./peoples/events/index.ts"
 import { localEventName } from "./peoples/events/names/index.ts"
@@ -799,6 +800,12 @@ export default function PeopleMapTab() {
         <Stack gap="sm" style={{ textAlign: 'left' }}>
             <style>{`
                 .peoples-label { display:flex; justify-content:center; pointer-events:none; }
+                .peoples-lit-quote {
+                    margin-top: 8px; padding: 8px 14px; white-space: pre-line;
+                    border-left: 3px solid var(--mantine-color-default-border);
+                    background: var(--mantine-color-default-hover); border-radius: 0 8px 8px 0;
+                }
+                .peoples-lit-original { font-family: Georgia, "Noto Serif", "Times New Roman", serif; line-height: 1.45; text-align: start; }
                 .peoples-event-label { display:flex; justify-content:center; pointer-events:none; }
                 .peoples-event-label span {
                     font: 700 12.5px/1.2 system-ui, sans-serif; text-align:center; white-space: normal; max-width: 180px;
@@ -905,6 +912,31 @@ export default function PeopleMapTab() {
                                 </div>
                             ))}
                         </SimpleGrid>
+                        {selected && LITERATURE[selected.id] && (() => {
+                            const lit = LITERATURE[selected.id]!
+                            const quote = lit.original ?? lit.romanized ?? lit.translation
+                            return (
+                                <div>
+                                    {sectionLabel(t('people.literature'))}
+                                    <Text size="sm" fw={600}>
+                                        {lit.title}
+                                        <Text span size="xs" c="dimmed" fw={400}>{'  ·  '}{[lit.by, lit.date].filter(Boolean).join(' · ')}</Text>
+                                    </Text>
+                                    {quote && (
+                                        <div className="peoples-lit-quote">
+                                            {lit.original && <Text size="md" lang={lit.lang} dir="auto" className="peoples-lit-original">{lit.original}</Text>}
+                                            {lit.romanized && <Text size="sm" fs="italic" c="dimmed" mt={lit.original ? 4 : 0}>{lit.romanized}</Text>}
+                                            {lit.translation && (
+                                                <Text size="sm" mt={lit.original || lit.romanized ? 6 : 0} fs={lit.original || lit.romanized ? undefined : 'italic'}>
+                                                    {lit.original || lit.romanized ? `“${lit.translation}”` : lit.translation}
+                                                </Text>
+                                            )}
+                                        </div>
+                                    )}
+                                    <Text size="sm" mt={6}>{lit.note}</Text>
+                                </div>
+                            )
+                        })()}
                         {relations.length > 0 && (
                             <div>
                                 {sectionLabel(t('people.relations'))}

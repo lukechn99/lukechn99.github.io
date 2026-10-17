@@ -26,3 +26,21 @@ export interface PeopleNode {
     name: string
     info: PeopleInfo
 }
+
+/** A formative piece of a group's literature or oral tradition. */
+export interface Literature {
+    title: string
+    /** Author or source. */
+    by?: string
+    date: string
+    /** BCP-47 tag of the original, so browsers pick the right font and shaping. */
+    lang?: string
+    /** The passage in its original language and script (line breaks as \n). */
+    original?: string
+    /** Romanization, for non-Latin scripts or when the original script isn't given. */
+    romanized?: string
+    /** English translation (own rendering unless noted). Omitted when the original is English. */
+    translation?: string
+    /** Why it matters to the group. */
+    note: string
+}

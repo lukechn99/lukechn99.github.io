@@ -111,6 +111,7 @@ const es: Resources = {
             history: 'Historia',
         },
         relations: 'Relaciones con sus vecinos',
+        literature: 'Literatura',
         subgroups: 'Subgrupos ({{count}})',
         upOneLevel: 'Subir un nivel',
         closeToWorld: 'Cerrar y volver al mundo',

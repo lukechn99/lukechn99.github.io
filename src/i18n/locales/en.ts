@@ -109,6 +109,7 @@ const en = {
             history: 'History',
         },
         relations: 'Relations with neighbours',
+        literature: 'Literature',
         subgroups: 'Subgroups ({{count}})',
         upOneLevel: 'Up one level',
         closeToWorld: 'Close and return to the world',

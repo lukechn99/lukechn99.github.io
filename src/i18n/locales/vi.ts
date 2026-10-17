@@ -111,6 +111,7 @@ const vi: Resources = {
             history: 'Lịch sử',
         },
         relations: 'Quan hệ với các dân tộc láng giềng',
+        literature: 'Văn học',
         subgroups: 'Nhóm con ({{count}})',
         upOneLevel: 'Lên một cấp',
         closeToWorld: 'Đóng và quay về toàn thế giới',
