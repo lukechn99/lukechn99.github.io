@@ -114,6 +114,14 @@ const en = {
         closeToWorld: 'Close and return to the world',
         backTo: 'Back to {{name}}',
         subgroupsTooltip: '{{count}} subgroups · click to explore',
+        showOnMap: 'Show on map',
+        hideEvent: 'Remove from map',
+        eventKinds: {
+            conflict: 'Conflict',
+            treaty: 'Treaty',
+            migration: 'Movement',
+            place: 'Place',
+        },
     },
 }
 

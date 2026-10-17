@@ -1,9 +1,11 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, SimpleGrid, Stack, Text, Title, Tooltip, useComputedColorScheme } from "@mantine/core"
 import { useTranslation } from "react-i18next"
 import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
 import { relationsOf } from "./peoples/relations/index.ts"
 import { localName, shortName } from "./peoples/names/index.ts"
+import { EVENT_BY_ID, linkEvents, type EventKind, type LatLng, type PeopleEvent } from "./peoples/events/index.ts"
+import { localEventName } from "./peoples/events/names/index.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
 import type { GeometryCollection, MultiPolygon as TopoMultiPolygon, Polygon as TopoPolygon, Topology } from "topojson-specification"
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, Path } from "leaflet"
@@ -267,6 +269,34 @@ function labelAnchors(geom: Polygon | MultiPolygon, max = 4): LabelPoint[] {
 /** Rough rendered width of label text: CJK glyphs are about twice as wide as Latin ones. */
 const textPx = (s: string) => [...s].reduce((w, ch) => w + (/[\u2e80-\u9fff\uff00-\uffef]/.test(ch) ? 12.5 : 6.5), 0)
 
+/** Event colours by kind; the same in both themes so the card swatch matches the map. */
+const EVENT_COLORS: Record<EventKind, string> = {
+    conflict: '#e03131',
+    treaty: '#1c7ed6',
+    migration: '#e8590c',
+    place: '#7048e8',
+}
+
+/** Where an event's name label goes, and the box that frames it. */
+function eventGeometry(e: PeopleEvent): { anchor: LatLng, bounds: [LatLng, LatLng] } {
+    const pts: LatLng[] = []
+    for (const sh of e.shapes) {
+        if ('point' in sh) pts.push(sh.point)
+        else if ('line' in sh) pts.push(...sh.line)
+        else {
+            const dLat = sh.km / 111
+            const dLng = sh.km / (111 * Math.max(0.2, Math.cos(sh.area[0] * Math.PI / 180)))
+            pts.push([sh.area[0] - dLat, sh.area[1] - dLng], [sh.area[0] + dLat, sh.area[1] + dLng])
+        }
+    }
+    const lats = pts.map(p => p[0]), lngs = pts.map(p => p[1])
+    const first = e.shapes[0]!
+    const anchor: LatLng = 'point' in first ? first.point
+        : 'area' in first ? first.area
+        : first.line[Math.floor(first.line.length / 2)]!
+    return { anchor, bounds: [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]] }
+}
+
 const INFO_FIELDS = ['language', 'religion', 'food', 'etymology', 'homeland', 'history'] as const
 
 export default function PeopleMapTab() {
@@ -310,6 +340,10 @@ export default function PeopleMapTab() {
     const [error, setError] = useState<string | null>(null)
     const [zDepth, setZDepth] = useState(1)
     const [selectedId, setSelectedId] = useState<string | null>(null)
+    /** The event shown on the map, and which note it was opened from. Tied to the focused region. */
+    const [activeEvent, setActiveEvent] = useState<{ id: string, note: number } | null>(null)
+    const eventLayer = useRef<Layer | null>(null)
+    useEffect(() => { setActiveEvent(null) }, [selectedId])
     const [viewTick, setViewTick] = useState(0)
     /** Previously explored groups, for the panel's close (back) button. */
     const history = useRef<(string | null)[]>([])
@@ -447,6 +481,9 @@ export default function PeopleMapTab() {
                 map.getPane('peoples-focus')!.style.pointerEvents = 'none'
                 map.createPane('peoples-labels').style.zIndex = '450'
                 map.getPane('peoples-labels')!.style.pointerEvents = 'none'
+                // Events linked from the notes draw above the region labels.
+                map.createPane('peoples-events').style.zIndex = '460'
+                map.getPane('peoples-events')!.style.pointerEvents = 'none'
 
                 // React hears about the view only once it settles: the detail level and the
                 // labels update after zooming stops, so nothing heavy runs mid-gesture.
@@ -667,6 +704,72 @@ export default function PeopleMapTab() {
         labelLayer.current = group
     }, [ready, visible, featureFor, viewTick, nameOf])
 
+    /* ---- The event opened from a note ---- */
+    const activeEventId = activeEvent?.id ?? null
+    useEffect(() => {
+        const map = mapRef.current
+        const L = leafletRef.current
+        eventLayer.current?.remove()
+        eventLayer.current = null
+        const ev = activeEventId ? EVENT_BY_ID.get(activeEventId) : undefined
+        if (!ready || !map || !L || !ev) return
+        const color = EVENT_COLORS[ev.kind]
+        const halo = isDark ? '#1a1b1e' : '#ffffff'
+        // Canvas, like the regions, so shapes stay put while zooming.
+        const renderer = L.canvas({ pane: 'peoples-events', padding: 0.5 })
+        const common = { pane: 'peoples-events', renderer, interactive: false }
+        const group = L.layerGroup()
+        const label = (at: LatLng, text: string, main: boolean) => L.marker(at, {
+            pane: 'peoples-events', interactive: false,
+            icon: L.divIcon({
+                className: main ? 'peoples-event-label' : 'peoples-event-label peoples-event-sublabel',
+                html: `<span>${text}</span>`,
+                iconSize: [180, 0],
+            }),
+        }).addTo(group)
+        for (const sh of ev.shapes) {
+            if ('area' in sh) {
+                L.circle(sh.area, { ...common, radius: sh.km * 1000, color, weight: 2, dashArray: '6 5', fillColor: color, fillOpacity: 0.14 }).addTo(group)
+            } else if ('line' in sh) {
+                L.polyline(sh.line, { ...common, color: halo, weight: 7, opacity: 0.85, lineJoin: 'round', lineCap: 'round' }).addTo(group)
+                L.polyline(sh.line, { ...common, color, weight: 3.5, dashArray: '9 6', lineJoin: 'round', lineCap: 'round' }).addTo(group)
+            }
+        }
+        // Pins on top of lines and areas.
+        for (const sh of ev.shapes) {
+            if (!('point' in sh)) continue
+            L.circleMarker(sh.point, { ...common, radius: 13, stroke: false, fillColor: color, fillOpacity: 0.22 }).addTo(group)
+            L.circleMarker(sh.point, { ...common, radius: 6.5, color: halo, weight: 2.5, fillColor: color, fillOpacity: 1 }).addTo(group)
+            if (sh.label) label(sh.point, sh.label, false)
+        }
+        label(eventGeometry(ev).anchor, localEventName(ev, lang), true)
+        group.addTo(map)
+        eventLayer.current = group
+    }, [ready, activeEventId, isDark, lang])
+
+    // Bring the event into view alongside the focused region (or alone, if they are far apart).
+    useEffect(() => {
+        const map = mapRef.current
+        const L = leafletRef.current
+        const ev = activeEventId ? EVENT_BY_ID.get(activeEventId) : undefined
+        if (!ready || !map || !L || !ev) return
+        const box = L.latLngBounds(eventGeometry(ev).bounds)
+        const feature = selectedId ? featureFor(selectedId) : null
+        const region = feature ? focusBounds(feature.geometry) : null
+        let target = box
+        if (region) {
+            const both = L.latLngBounds(region).extend(box)
+            if (both.getEast() - both.getWest() < 160 && both.getNorth() - both.getSouth() < 90) target = both
+        }
+        map.flyToBounds(target, { padding: L.point(56, 56), maxZoom: 6, duration: 0.8 })
+        // Framing follows the event only; region changes clear it and frame themselves.
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [ready, activeEventId])
+
+    const toggleEvent = useCallback((id: string, note: number) => {
+        setActiveEvent(cur => (cur?.id === id && cur.note === note ? null : { id, note }))
+    }, [])
+
     /* ---- Info panel ---- */
     const path = selected ? pathTo(selected.id) : []
     const subgroups = selected ? childrenOf(selected.id) : []
@@ -683,6 +786,20 @@ export default function PeopleMapTab() {
         <Stack gap="sm" style={{ textAlign: 'left' }}>
             <style>{`
                 .peoples-label { display:flex; justify-content:center; pointer-events:none; }
+                .peoples-event-label { display:flex; justify-content:center; pointer-events:none; }
+                .peoples-event-label span {
+                    font: 700 12.5px/1.2 system-ui, sans-serif; text-align:center; white-space: normal; max-width: 180px;
+                    color: var(--peoples-label-color); text-shadow: var(--peoples-label-halo);
+                    transform: translateY(calc(-100% - 14px));
+                }
+                .peoples-event-sublabel span { font-weight: 600; font-size: 11px; transform: translateY(12px); opacity: .85; }
+                .peoples-event-link {
+                    font: inherit; color: inherit; padding: 0; background: none; border: 0; cursor: pointer;
+                    text-decoration: underline dotted var(--event-color); text-decoration-thickness: 2px; text-underline-offset: 3px;
+                }
+                .peoples-event-link:hover, .peoples-event-link[aria-pressed="true"] {
+                    text-decoration-style: solid; color: var(--event-color);
+                }
                 .peoples-label span {
                     font: 600 11px/1.15 system-ui, sans-serif; text-align:center;
                     color: var(--peoples-label-color); text-shadow: var(--peoples-label-halo);
@@ -782,12 +899,48 @@ export default function PeopleMapTab() {
                                     {relations.map((r, i) => {
                                         const other = r.with ? NODE_BY_ID.get(r.with) : undefined
                                         return (
-                                            <Text key={i} size="sm">
+                                            <div key={i}>
+                                            <Text size="sm">
                                                 {other
                                                     ? <Anchor fw={600} onClick={() => explore(other.id)}>{shortName(nameOf(other))}</Anchor>
                                                     : <Text span fw={600}>{r.label}</Text>}
-                                                {': '}{r.text}
+                                                {': '}
+                                                {linkEvents(r.text).map((part, j) => typeof part === 'string'
+                                                    ? part
+                                                    : (
+                                                        <Anchor
+                                                            key={j} component="button" type="button"
+                                                            onClick={() => toggleEvent(part.eventId, i)}
+                                                            className="peoples-event-link"
+                                                            style={{ '--event-color': EVENT_COLORS[EVENT_BY_ID.get(part.eventId)!.kind] } as CSSProperties}
+                                                            aria-pressed={activeEvent?.id === part.eventId && activeEvent.note === i}
+                                                            title={t('people.showOnMap')}
+                                                        >
+                                                            {part.text}
+                                                        </Anchor>
+                                                    ))}
                                             </Text>
+                                                {activeEvent?.note === i && (() => {
+                                                    const ev = EVENT_BY_ID.get(activeEvent.id)
+                                                    return ev ? (
+                                                        <Paper
+                                                            withBorder radius="md" p="xs" mt={6}
+                                                            style={{ borderLeft: `4px solid ${EVENT_COLORS[ev.kind]}` }}
+                                                        >
+                                                            <Group justify="space-between" wrap="nowrap" align="flex-start" gap="xs">
+                                                                <span>
+                                                                    <Text span fw={700} size="sm">{localEventName(ev, lang)}</Text>
+                                                                    <Text span size="xs" c="dimmed">{'  ·  '}{t(`people.eventKinds.${ev.kind}`)} · {ev.date}</Text>
+                                                                </span>
+                                                                <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => setActiveEvent(null)} aria-label={t('people.hideEvent')}>
+                                                                    <IconX size={14} />
+                                                                </ActionIcon>
+                                                            </Group>
+                                                            <Text size="sm" mt={2}>{ev.summary}</Text>
+                                                        </Paper>
+                                                    ) : null
+                                                })()}
+                                            </div>
                                         )
                                     })}
                                 </Stack>

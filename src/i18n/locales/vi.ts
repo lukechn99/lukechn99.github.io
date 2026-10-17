@@ -116,6 +116,14 @@ const vi: Resources = {
         closeToWorld: 'Đóng và quay về toàn thế giới',
         backTo: 'Quay lại {{name}}',
         subgroupsTooltip: '{{count}} nhóm con · nhấn để khám phá',
+        showOnMap: 'Hiển thị trên bản đồ',
+        hideEvent: 'Gỡ khỏi bản đồ',
+        eventKinds: {
+            conflict: 'Xung đột',
+            treaty: 'Hiệp ước',
+            migration: 'Di cư',
+            place: 'Địa danh',
+        },
     },
 }
 

@@ -116,6 +116,14 @@ const es: Resources = {
         closeToWorld: 'Cerrar y volver al mundo',
         backTo: 'Volver a {{name}}',
         subgroupsTooltip: '{{count}} subgrupos · haz clic para explorar',
+        showOnMap: 'Mostrar en el mapa',
+        hideEvent: 'Quitar del mapa',
+        eventKinds: {
+            conflict: 'Conflicto',
+            treaty: 'Tratado',
+            migration: 'Desplazamiento',
+            place: 'Lugar',
+        },
     },
 }
 

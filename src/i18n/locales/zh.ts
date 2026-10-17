@@ -116,6 +116,14 @@ const zh: Resources = {
         closeToWorld: '关闭并返回世界全图',
         backTo: '返回 {{name}}',
         subgroupsTooltip: '{{count}} 个下属群体 · 点击探索',
+        showOnMap: '在地图上显示',
+        hideEvent: '从地图上移除',
+        eventKinds: {
+            conflict: '冲突',
+            treaty: '条约',
+            migration: '迁徙',
+            place: '地点',
+        },
     },
 }
 

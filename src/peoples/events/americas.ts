@@ -1,0 +1,170 @@
+import type { PeopleEvent } from './types.ts'
+
+/** The Americas. */
+export const americasEvents: PeopleEvent[] = [
+    {
+        id: 'trail-of-tears', name: 'Trail of Tears', date: '1830–50', kind: 'migration',
+        summary: 'Under the Indian Removal Act, the Cherokee, Muscogee, Choctaw, Chickasaw and Seminole were forced west to Indian Territory; thousands died on the way. Shown: the Cherokee northern route of 1838–39.',
+        match: ['the Trail of Tears', 'leading to Removal in the 1830s', 'Removal from the Southeast'],
+        shapes: [
+            { line: [[34.54, -84.9], [35.05, -85.31], [36.16, -86.78], [36.87, -87.49], [37.37, -88.49], [37.3, -89.52], [37.21, -93.29], [36.06, -94.16], [35.92, -94.97]] },
+            { point: [35.92, -94.97], label: 'Tahlequah' },
+        ],
+    },
+    {
+        id: 'pueblo-revolt', name: 'Pueblo Revolt', date: '1680', kind: 'conflict',
+        summary: 'Led by Popé, the Pueblos rose together, killed about 400 colonists and drove the Spanish from Santa Fe for twelve years.',
+        match: ['the Pueblo Revolt'],
+        shapes: [{ point: [35.687, -105.938], label: 'Santa Fe' }],
+    },
+    {
+        id: 'dakota-war', name: 'US–Dakota War and Mankato hanging', date: '1862', kind: 'conflict',
+        summary: 'Starving after the US withheld treaty payments, Dakota fighters attacked settlers in Minnesota; 38 Dakota men were hanged at Mankato that December and the Dakota were expelled from the state.',
+        match: ['38 Dakota men were hanged at Mankato', 'mass hanging at Mankato', 'The 1862 US–Dakota War'],
+        shapes: [{ point: [44.16, -94.0], label: 'Mankato' }],
+    },
+    {
+        id: 'pyramid-lake-war', name: 'Pyramid Lake War', date: '1860', kind: 'conflict',
+        summary: 'A conflict between the Northern Paiute and miners after the Comstock silver rush; the Paiute won the first battle but lost much of their land.',
+        match: ['The 1860 Pyramid Lake War'],
+        shapes: [{ point: [39.95, -119.6] }],
+    },
+    {
+        id: 'land-runs', name: 'Oklahoma land runs', date: '1889', kind: 'migration',
+        summary: 'On 22 April 1889 about 50,000 settlers raced to claim “Unassigned Lands” in Indian Territory; Guthrie went from empty prairie to a city in a day.',
+        match: ['the 1889 land runs'],
+        shapes: [{ point: [35.88, -97.43], label: 'Guthrie' }],
+    },
+    {
+        id: 'tulsa-1921', name: 'Tulsa race massacre', date: '1921', kind: 'conflict',
+        summary: 'A white mob destroyed Greenwood, Tulsa’s prosperous Black district; up to 300 people were killed and about 10,000 left homeless.',
+        match: ['the 1921 Tulsa massacre'],
+        shapes: [{ point: [36.16, -95.99], label: 'Greenwood' }],
+    },
+    {
+        id: 'philadelphia-1844', name: 'Philadelphia nativist riots', date: '1844', kind: 'conflict',
+        summary: 'Anti-Catholic mobs burned Irish homes and two churches in Kensington and Southwark; the militia fired on rioters.',
+        match: ['anti-Irish riots hit Philadelphia in 1844'],
+        shapes: [{ point: [39.97, -75.13] }],
+    },
+    {
+        id: 'draft-riots', name: 'New York draft riots', date: '1863', kind: 'conflict',
+        summary: 'Mostly Irish working-class mobs protesting the Civil War draft attacked Black New Yorkers and burned an orphanage; over 100 people died.',
+        match: ['the 1863 New York draft riots'],
+        shapes: [{ point: [40.758, -73.99] }],
+    },
+    {
+        id: 'manzanar', name: 'Manzanar and Japanese American internment', date: '1942–45', kind: 'conflict',
+        summary: 'About 120,000 Japanese Americans were forced into camps like Manzanar; the US apologized and paid reparations in 1988.',
+        match: ['Japanese internment'],
+        shapes: [{ point: [36.728, -118.154] }],
+    },
+    {
+        id: 'hayes-pond', name: 'Battle of Hayes Pond', date: '1958', kind: 'conflict',
+        summary: 'Hundreds of armed Lumbee broke up a Ku Klux Klan rally near Maxton, North Carolina; the Klansmen fled and their leader was later jailed.',
+        match: ['routed a Klan rally at Hayes Pond in 1958'],
+        shapes: [{ point: [34.73, -79.35] }],
+    },
+    {
+        id: 'black-hills', name: 'Black Hills', date: 'since 1877', kind: 'place',
+        summary: 'Sacred to the Lakota and guaranteed by the 1868 Fort Laramie Treaty, then seized after gold was found; the tribes refuse the 1980 court award as payment.',
+        match: ['The Black Hills claim'],
+        shapes: [{ area: [44.0, -103.75], km: 70 }],
+    },
+    {
+        id: 'standing-rock', name: 'Standing Rock protests', date: '2016–17', kind: 'conflict',
+        summary: 'Thousands camped to stop the Dakota Access Pipeline crossing near the reservation’s water supply; the pipeline was completed in 2017.',
+        match: ['the 2016 Standing Rock pipeline protests'],
+        shapes: [{ point: [46.25, -100.62] }],
+    },
+    {
+        id: 'mexican-cession', name: 'Mexican–American War and the 1848 cession', date: '1846–48', kind: 'treaty',
+        summary: 'The Treaty of Guadalupe Hidalgo transferred about half of Mexico’s territory to the US, from California to New Mexico, after Texas had already broken away.',
+        match: ['The US took half of Mexico in 1848', 'Lost Texas and the Southwest in 1836–48', 'Anglo settlers took Texas and the Southwest'],
+        shapes: [{ area: [37.0, -112.0], km: 750 }, { point: [19.48, -99.12], label: 'Guadalupe Hidalgo' }],
+    },
+    {
+        id: 'oka', name: 'Oka crisis', date: '1990', kind: 'conflict',
+        summary: 'Mohawk protesters blocked a golf course expansion onto a burial ground; a 78-day armed standoff with police and the army followed.',
+        match: ['the 1990 Oka crisis'],
+        shapes: [{ point: [45.47, -74.09] }],
+    },
+    {
+        id: 'james-bay', name: 'James Bay Agreement', date: '1975', kind: 'treaty',
+        summary: 'Canada’s first modern land claims deal: the Cree and Inuit of northern Quebec gave up title for money, hunting rights and self-government, clearing the way for huge dams.',
+        match: ['the James Bay Agreement of 1975'],
+        shapes: [{ area: [53.0, -76.0], km: 300 }],
+    },
+    {
+        id: 'high-arctic-relocation', name: 'High Arctic relocation', date: '1953–55', kind: 'migration',
+        summary: 'Canada moved Inuit families from northern Quebec 2,000 km north to Grise Fiord and Resolute, partly to assert sovereignty; Canada apologized in 2010.',
+        match: ['the High Arctic relocation'],
+        shapes: [{ point: [76.42, -82.9], label: 'Grise Fiord' }, { point: [74.69, -94.83], label: 'Resolute' }],
+    },
+    {
+        id: 'zapatista', name: 'Zapatista uprising', date: '1994', kind: 'conflict',
+        summary: 'On the day NAFTA took effect, the mostly Maya EZLN seized San Cristóbal and other towns in Chiapas; after brief fighting it built autonomous communities.',
+        match: ['The 1994 Zapatista uprising in Chiapas', 'The 1994 Zapatista rebellion in Chiapas'],
+        shapes: [{ point: [16.737, -92.638], label: 'San Cristóbal' }],
+    },
+    {
+        id: 'caste-war', name: 'Caste War of Yucatán', date: '1847–1901', kind: 'conflict',
+        summary: 'Maya rebels nearly drove the creole elite out of Yucatán and kept an independent state centred on Chan Santa Cruz for half a century.',
+        match: ['the 19th-century Caste War of Yucatán'],
+        shapes: [{ point: [19.58, -88.05], label: 'Chan Santa Cruz' }],
+    },
+    {
+        id: 'guatemala-genocide', name: 'Guatemalan genocide', date: '1981–83', kind: 'conflict',
+        summary: 'In the civil war’s worst years the army razed hundreds of Maya villages, especially in the Ixil region; a truth commission found acts of genocide.',
+        match: ["the civil war's army massacres", 'committed genocide against the Maya in the early 1980s'],
+        shapes: [{ point: [15.405, -91.15], label: 'Nebaj' }],
+    },
+    {
+        id: 'parsley-massacre', name: 'Parsley Massacre', date: '1937', kind: 'conflict',
+        summary: 'Trujillo’s soldiers killed thousands of Haitians along the Dominican border, reportedly picking out victims by how they said “perejil” (parsley).',
+        match: ['the 1937 Parsley Massacre'],
+        shapes: [{ line: [[19.7, -71.75], [19.5, -71.7], [19.2, -71.72], [18.95, -71.78]] }],
+    },
+    {
+        id: 'cajamarca', name: 'Pizarro at Cajamarca', date: '1532', kind: 'conflict',
+        summary: 'Francisco Pizarro’s small force ambushed and captured the Inca emperor Atahualpa, took a room full of gold as ransom and executed him anyway.',
+        match: ["Pizarro's conquest of the Inca"],
+        shapes: [{ point: [-7.16, -78.51] }],
+    },
+    {
+        id: 'potosi', name: 'Potosí silver mines', date: 'from 1545', kind: 'place',
+        summary: 'The Cerro Rico financed the Spanish Empire; Indigenous men were drafted through the mita labor system, and many died in the mines.',
+        match: ['forced labor at the Potosí silver mines'],
+        shapes: [{ point: [-19.62, -65.75] }],
+    },
+    {
+        id: 'war-of-the-pacific', name: 'War of the Pacific', date: '1879–84', kind: 'conflict',
+        summary: 'Chile defeated Peru and Bolivia over the nitrate-rich Atacama; Bolivia lost its coast and Peru lost Tarapacá.',
+        match: ['War of the Pacific'],
+        shapes: [{ area: [-22.0, -69.6], km: 330 }],
+    },
+    {
+        id: 'triple-alliance', name: 'War of the Triple Alliance', date: '1864–70', kind: 'conflict',
+        summary: 'Paraguay fought Brazil, Argentina and Uruguay; the fortress of Humaitá held for years, but the war killed a large share of Paraguay’s population.',
+        match: ['devastated Paraguay in the 1864–70 war', 'The War of the Triple Alliance'],
+        shapes: [{ point: [-27.07, -58.5], label: 'Humaitá' }],
+    },
+    {
+        id: 'chaco-war', name: 'Chaco War', date: '1932–35', kind: 'conflict',
+        summary: 'Bolivia and Paraguay fought over the arid Gran Chaco, partly over rumoured oil; about 100,000 died and Paraguay won most of the territory.',
+        match: ['the Chaco War (1932–35)'],
+        shapes: [{ area: [-21.0, -60.5], km: 300 }],
+    },
+    {
+        id: 'beagle-channel', name: 'Beagle Channel crisis', date: '1978', kind: 'conflict',
+        summary: 'Argentina and Chile came within hours of war over three islands; papal mediation produced a 1984 treaty.',
+        match: ['over the Beagle Channel in 1978'],
+        shapes: [{ point: [-54.88, -68.0] }],
+    },
+    {
+        id: 'falklands', name: 'Falklands (Malvinas) War', date: '1982', kind: 'conflict',
+        summary: 'Argentina occupied the islands; Britain retook them in ten weeks. 649 Argentine and 255 British servicemen died.',
+        match: ['the 1982 Falklands (Malvinas) War'],
+        shapes: [{ point: [-51.69, -57.86], label: 'Stanley' }],
+    },
+]

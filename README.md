@@ -27,10 +27,12 @@ npm run deploy     # build + push to gh-pages branch (deploys to GitHub Pages)
 
 ## People Groups Map
 
-The **People groups map** tab (Works → People groups map) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes. Clicking a region focuses it (only its subgroups stay drawn), opens its profile (language, religion, food, name origin, history, relations with neighbours) at the bottom of the page; the panel's close button steps back to the previous group, and clicking empty map returns to the world view.
+The **People groups map** tab (Works → People groups map) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes. Clicking a region focuses it (only its subgroups stay drawn), opens its profile (language, religion, food, name origin, history, relations with neighbours) at the bottom of the page; the panel's close button steps back to the previous group, and clicking empty map shows every region again without moving the view. Pivotal events and landmarks mentioned in the neighbour notes (battles, treaties, routes like the Silk Road) are links: clicking one draws it on the map and opens a short card, and it disappears when you leave that region.
 
 - `src/peoples/data/*.ts` — the tree and the text for every group
 - `src/peoples/relations/*.ts` — "Relations with neighbours" notes for every group
+- `src/peoples/events/*.ts` — linked events and landmarks: shape (point, line or area), date, summary, and the exact note phrases that link to each
+- `src/peoples/names/`, `src/peoples/events/names/` — group and event names in Spanish, Vietnamese and Chinese
 - `scripts/peoples/assignments.mjs` — which people group is the majority in each Natural Earth province/state
 - `scripts/peoples/us-county-plurality.txt` — largest ancestry/origin group in each US county (ACS 2020–2024 5-year, via Census Reporter); US counties come from `us-atlas`
 - `public/peoples/leaves.topo.json` — generated region shapes (one per leaf group)
