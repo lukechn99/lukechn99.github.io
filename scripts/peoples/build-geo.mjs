@@ -1,5 +1,5 @@
 // Builds public/peoples/leaves.topo.json: one polygon per leaf people group,
-// made by dissolving Natural Earth admin-1 units, sharing arcs so parent
+// made by dissolving Natural Earth admin-1 units (US: Census counties), sharing arcs so parent
 // groups can be merged cheaply in the browser with topojson-client.
 //
 // Usage (needs ~45 MB download once):
@@ -12,6 +12,7 @@ import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 import mapshaper from 'mapshaper'
 import { COUNTRY_DEFAULT, OVERRIDES, fieldRule } from './assignments.mjs'
+import { usCountyFeatures } from './usCounties.mjs'
 import { PEOPLE_NODES, childrenOf } from '../../src/peoples/index.ts'
 
 const here = path.dirname(fileURLToPath(import.meta.url))
@@ -31,6 +32,7 @@ const features = []
 for (const f of src.features) {
     const p = f.properties
     const a3 = p.adm0_a3
+    if (a3 === 'USA') continue // replaced by county-level data below
     let leaf = fieldRule(p)
     const ov = OVERRIDES[a3]
     if (ov && Object.prototype.hasOwnProperty.call(ov, p.name)) {
@@ -46,6 +48,12 @@ for (const f of src.features) {
     if (!leafIds.has(leaf)) { badLeaves.add(leaf); continue }
     usedLeaves.add(leaf)
     features.push({ type: 'Feature', properties: { leaf }, geometry: f.geometry })
+}
+
+for (const f of usCountyFeatures(here)) {
+    if (!leafIds.has(f.properties.leaf)) { badLeaves.add(f.properties.leaf); continue }
+    usedLeaves.add(f.properties.leaf)
+    features.push(f)
 }
 
 if (badLeaves.size) throw new Error(`Assignments reference unknown or non-leaf ids: ${[...badLeaves].join(', ')}`)

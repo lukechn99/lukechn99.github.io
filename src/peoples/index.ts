@@ -3,6 +3,7 @@ import { indoEuropean } from './data/indoEuropean.ts'
 import { asia } from './data/asia.ts'
 import { africaMiddleEast } from './data/africaMiddleEast.ts'
 import { pacificAmericas } from './data/pacificAmericas.ts'
+import { unitedStates } from './data/unitedStates.ts'
 
 export type { PeopleNode, PeopleInfo } from './types.ts'
 
@@ -11,6 +12,7 @@ export const PEOPLE_NODES: PeopleNode[] = [
     ...asia,
     ...africaMiddleEast,
     ...pacificAmericas,
+    ...unitedStates,
 ]
 
 export const NODE_BY_ID: Map<string, PeopleNode> = new Map(PEOPLE_NODES.map(n => [n.id, n]))

@@ -74,7 +74,7 @@ export const COUNTRY_DEFAULT = {
     ZWE: 'shona', ZMB: 'savanna-bantu', MWI: 'savanna-bantu', MOZ: 'savanna-bantu',
 
     // North America
-    USA: 'americans', CAN: 'anglo-canadians', GRL: 'inuit', BMU: 'anglo-caribbeans',
+    CAN: 'anglo-canadians', GRL: 'inuit', BMU: 'anglo-caribbeans',
     MEX: 'mexicans',
 
     // Central America and Caribbean

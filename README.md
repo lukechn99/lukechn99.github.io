@@ -26,10 +26,12 @@ npm run deploy     # build + push to gh-pages branch (deploys to GitHub Pages)
 
 ## People Groups Map
 
-The **Peoples** tab (Works → Peoples) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes; clicking a region opens its profile (language, religion, food, name origin, history) at the bottom of the page and reveals its subgroups.
+The **Peoples** tab (Works → Peoples) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes. Clicking a region focuses it (only its subgroups stay drawn), opens its profile (language, religion, food, name origin, history, relations with neighbours) at the bottom of the page; the panel's close button steps back to the previous group, and clicking empty map returns to the world view.
 
 - `src/peoples/data/*.ts` — the tree and the text for every group
+- `src/peoples/relations/*.ts` — "Relations with neighbours" notes for every group
 - `scripts/peoples/assignments.mjs` — which people group is the majority in each Natural Earth province/state
+- `scripts/peoples/us-county-plurality.txt` — largest ancestry/origin group in each US county (ACS 2020–2024 5-year, via Census Reporter); US counties come from `us-atlas`
 - `public/peoples/leaves.topo.json` — generated region shapes (one per leaf group)
 
 To regenerate the shapes after editing the tree or assignments:

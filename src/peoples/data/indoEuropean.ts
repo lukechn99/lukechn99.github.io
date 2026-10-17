@@ -346,7 +346,7 @@ export const indoEuropean: PeopleNode[] = [
     {
         id: 'americans', parent: 'anglosphere', name: 'Americans (United States)',
         info: {
-            summary: 'A nation formed by successive waves of settlement and immigration rather than common descent; about 58% are non-Hispanic white, 19% Hispanic, 12% Black and 6% Asian.',
+            summary: 'A nation formed by successive waves of settlement and immigration rather than common descent; about 58% are non-Hispanic white, 19% Hispanic, 12% Black and 6% Asian. Its subgroups show the largest heritage group in each county (ACS 2020–2024), so a German-plurality county may be only a fifth German.',
             population: '≈ 340 million',
             homeland: 'The United States',
             language: 'English; Spanish is spoken at home by over 40 million people.',

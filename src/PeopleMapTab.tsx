@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, ScrollArea, SimpleGrid, Stack, Text, Title, Tooltip } from "@mantine/core"
 import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
+import { relationsOf } from "./peoples/relations/index.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
 import type { GeometryCollection, MultiPolygon as TopoMultiPolygon, Polygon as TopoPolygon, Topology } from "topojson-specification"
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, Path } from "leaflet"
@@ -23,22 +24,27 @@ function zoomDepth(zoom: number): number {
 }
 
 /**
- * Which nodes to draw. Inside the selected node's subtree we show exactly its
- * children (so clicking walks the tree one level at a time). Everywhere else the
- * zoom level decides how deep to go.
+ * Which nodes to draw.
+ * - Nothing selected: the zoom level decides how deep to go everywhere.
+ * - A group selected ("focus"): only that group's subtree is drawn, at least one
+ *   level below it (deeper if the zoom asks for it). Everything else is left as base map.
  */
 function visibleNodes(selectedId: string | null, zDepth: number): PeopleNode[] {
-    const selectedPath = new Set(selectedId ? pathTo(selectedId).map(n => n.id) : [])
     const out: PeopleNode[] = []
-    const walk = (node: PeopleNode, depth: number, insideSelection: boolean) => {
+    const walk = (node: PeopleNode, depth: number, minDepth: number) => {
         const kids = childrenOf(node.id)
-        const onPath = selectedPath.has(node.id)
-        const inside = insideSelection || node.id === selectedId
-        const expand = kids.length > 0 && (onPath || (!inside && depth < zDepth))
-        if (expand) kids.forEach(k => walk(k, depth + 1, inside))
+        if (kids.length > 0 && depth < Math.max(zDepth, minDepth)) kids.forEach(k => walk(k, depth + 1, minDepth))
         else out.push(node)
     }
-    ROOTS.forEach(r => walk(r, 1, false))
+    if (selectedId) {
+        const node = NODE_BY_ID.get(selectedId)
+        if (node) {
+            const d = depthOf(selectedId)
+            walk(node, d, d + 1)
+            return out
+        }
+    }
+    ROOTS.forEach(r => walk(r, 1, 1))
     return out
 }
 
@@ -129,6 +135,13 @@ function assignColors(ids: string[], adjacency: Map<string, Set<string>>): Map<s
 /* Geometry helpers                                                    */
 /* ------------------------------------------------------------------ */
 
+/** Leaflet's private view-change hooks (the ones flyTo uses). */
+interface LeafletMoveInternals {
+    _moveStart(zoomChanged: boolean, noMoveStart: boolean): unknown
+    _move(center: import("leaflet").LatLng, zoom: number): unknown
+    _moveEnd(zoomChanged: boolean): unknown
+}
+
 type LeafTopology = Topology<{ leaves: GeometryCollection<{ leaf: string }> }>
 type LeafGeometry = TopoPolygon<{ leaf: string }> | TopoMultiPolygon<{ leaf: string }>
 
@@ -165,7 +178,9 @@ function signedDistance(x: number, y: number, ring: Position[]): number {
 interface LabelPoint { lat: number, lng: number, radius: number }
 
 /** Approximate pole of inaccessibility of a ring: the interior point farthest from any edge. */
-function poleOf(ring: Position[]): LabelPoint | null {
+function poleOf(fullRing: Position[]): LabelPoint | null {
+    const stride = Math.ceil(fullRing.length / 400)
+    const ring = stride > 1 ? fullRing.filter((_, i) => i % stride === 0) : fullRing
     let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
     for (const [x = 0, y = 0] of ring) {
         minX = Math.min(minX, x); maxX = Math.max(maxX, x)
@@ -232,11 +247,13 @@ export default function PeopleMapTab() {
 
     const [ready, setReady] = useState(false)
     const [error, setError] = useState<string | null>(null)
-    const [zoom, setZoom] = useState(2)
+    const [zDepth, setZDepth] = useState(1)
     const [selectedId, setSelectedId] = useState<string | null>(null)
     const [viewTick, setViewTick] = useState(0)
-
-    const zDepth = zoomDepth(zoom)
+    /** Previously explored groups, for the panel's close (back) button. */
+    const history = useRef<(string | null)[]>([])
+    /** Set when a region handled a click, so the map's own click handler ignores it. */
+    const regionClickAt = useRef(0)
     const visible = useMemo(() => visibleNodes(selectedId, zDepth), [selectedId, zDepth])
     const selected = selectedId ? NODE_BY_ID.get(selectedId) ?? null : null
 
@@ -279,6 +296,7 @@ export default function PeopleMapTab() {
     useEffect(() => {
         let cancelled = false
         let resizeObserver: ResizeObserver | undefined
+        let wheelHandler: ((e: WheelEvent) => void) | undefined
 
         const load = async () => {
             try {
@@ -311,31 +329,86 @@ export default function PeopleMapTab() {
                     zoom: 2,
                     minZoom: 2,
                     maxZoom: 7,
-                    zoomSnap: 0.25,
+                    zoomSnap: 0,
                     zoomDelta: 0.5,
-                    wheelPxPerZoomLevel: 120,
+                    scrollWheelZoom: false, // replaced by the eased wheel zoom below
                     worldCopyJump: true,
                     preferCanvas: true,
                 })
                 mapRef.current = map
+
+                // Smooth wheel zoom. Each frame moves the view the way Leaflet's own flyTo does
+                // (_move), so vector layers are CSS-scaled while moving and redrawn once at the end
+                // (_moveEnd) instead of being re-projected every frame.
+                const internals = map as unknown as LeafletMoveInternals
+                let targetZoom = map.getZoom()
+                let anchor = map.getSize().divideBy(2)
+                let raf = 0
+                let moving = false
+                const step = () => {
+                    const cur = map.getZoom()
+                    const diff = targetZoom - cur
+                    const z = Math.abs(diff) < 0.004 ? targetZoom : cur + diff * 0.22
+                    const viewHalf = map.getSize().divideBy(2)
+                    const offset = anchor.subtract(viewHalf).multiplyBy(1 - 1 / map.getZoomScale(z, cur))
+                    internals._move(map.containerPointToLatLng(viewHalf.add(offset)), z)
+                    if (z === targetZoom) {
+                        raf = 0
+                        moving = false
+                        internals._moveEnd(true)
+                        return
+                    }
+                    raf = requestAnimationFrame(step)
+                }
+                wheelHandler = (e: WheelEvent) => {
+                    e.preventDefault()
+                    const lineScale = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? 400 : 1
+                    const delta = Math.max(-120, Math.min(120, e.deltaY * lineScale))
+                    if (!raf) targetZoom = map.getZoom()
+                    targetZoom = Math.max(map.getMinZoom(), Math.min(map.getMaxZoom(), targetZoom - delta * 0.004))
+                    const rect = map.getContainer().getBoundingClientRect()
+                    anchor = L.point(e.clientX - rect.left, e.clientY - rect.top)
+                    if (!moving) {
+                        map.stop()
+                        internals._moveStart(true, false)
+                        moving = true
+                    }
+                    if (!raf) raf = requestAnimationFrame(step)
+                }
+                map.getContainer().addEventListener('wheel', wheelHandler, { passive: false })
 
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
                     maxZoom: 16,
                     attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ · Regions from <a href="https://www.naturalearthdata.com/">Natural Earth</a> provinces',
                 }).addTo(map)
 
-                map.createPane('peoples-labels')
-                const labelsPane = map.getPane('peoples-labels')!
-                labelsPane.style.zIndex = '650'
-                labelsPane.style.pointerEvents = 'none'
+                // Focus outline sits above the regions; labels above that but below tooltips (650).
+                map.createPane('peoples-focus').style.zIndex = '420'
+                map.getPane('peoples-focus')!.style.pointerEvents = 'none'
+                map.createPane('peoples-labels').style.zIndex = '450'
+                map.getPane('peoples-labels')!.style.pointerEvents = 'none'
 
-                map.on('zoomend', () => setZoom(map.getZoom()))
-                map.on('moveend', () => setViewTick(t => t + 1))
+                // React hears about the view only once it settles: the detail level and the
+                // labels update after zooming stops, so nothing heavy runs mid-gesture.
+                let settle = 0
+                map.on('moveend zoomend', () => {
+                    window.clearTimeout(settle)
+                    settle = window.setTimeout(() => {
+                        setZDepth(zoomDepth(map.getZoom()))
+                        setViewTick(t => t + 1)
+                    }, 120)
+                })
+
+                // A click on empty map (not on a region) goes back to the world view.
+                map.on('click', () => {
+                    if (Date.now() - regionClickAt.current < 300) return
+                    resetRef.current()
+                })
 
                 resizeObserver = new ResizeObserver(() => map.invalidateSize())
                 resizeObserver.observe(mapContainer.current)
 
-                setZoom(map.getZoom())
+                setZDepth(zoomDepth(map.getZoom()))
                 setReady(true)
             } catch (e) {
                 if (!cancelled) setError(e instanceof Error ? e.message : String(e))
@@ -346,30 +419,51 @@ export default function PeopleMapTab() {
         return () => {
             cancelled = true
             resizeObserver?.disconnect()
+            if (wheelHandler) mapRef.current?.getContainer().removeEventListener('wheel', wheelHandler)
             mapRef.current?.remove()
             mapRef.current = null
         }
     }, [])
 
-    /* ---- Selecting a node: update state and frame it ---- */
-    const select = useCallback((id: string | null, fly = true) => {
-        setSelectedId(id)
+    /* ---- Navigation: select a group and frame it ---- */
+    const frame = useCallback((id: string | null) => {
         const map = mapRef.current
         const L = leafletRef.current
-        if (!map || !L || !fly) return
-        if (id === null) {
+        if (!map || !L) return
+        const feature = id ? featureFor(id) : null
+        const bounds = feature ? L.geoJSON(feature).getBounds() : null
+        // The world view, and groups that span most of the globe (e.g. Indo-European).
+        if (!bounds || bounds.getEast() - bounds.getWest() > 200) {
             map.flyTo([25, 20], 2, { duration: 0.8 })
             return
         }
-        const feature = featureFor(id)
-        if (!feature) return
-        const bounds = L.geoJSON(feature).getBounds()
-        // Skip framing groups that span most of the globe (e.g. Indo-European).
-        if (bounds.getEast() - bounds.getWest() > 200) return
         const target = map.getBoundsZoom(bounds, false, L.point(40, 40))
-        const z = Math.max(map.getZoom(), Math.min(target, 6.5))
-        map.flyTo(bounds.getCenter(), z, { duration: 0.8 })
+        map.flyTo(bounds.getCenter(), Math.max(2, Math.min(target, 6)), { duration: 0.8 })
     }, [featureFor])
+
+    /** Explore a group, remembering where we came from. */
+    const explore = useCallback((id: string) => {
+        setSelectedId(prev => {
+            if (prev !== id) history.current.push(prev)
+            return id
+        })
+        frame(id)
+    }, [frame])
+
+    /** Close the panel: return to the previously explored group, or the world. */
+    const goBack = useCallback(() => {
+        const prev = history.current.pop() ?? null
+        setSelectedId(prev)
+        frame(prev)
+    }, [frame])
+
+    const resetToWorld = useCallback(() => {
+        history.current = []
+        setSelectedId(null)
+        frame(null)
+    }, [frame])
+    const resetRef = useRef(resetToWorld)
+    useEffect(() => { resetRef.current = resetToWorld }, [resetToWorld])
 
     /* ---- Draw the visible regions ---- */
     useEffect(() => {
@@ -401,13 +495,16 @@ export default function PeopleMapTab() {
                 lyr.on({
                     mouseover: () => (lyr as Path).setStyle({ fillOpacity: 0.75, weight: 2 }),
                     mouseout: () => (lyr as Path).setStyle({ fillOpacity: 0.55, weight: 1 }),
-                    click: () => select(id),
+                    click: () => {
+                        regionClickAt.current = Date.now()
+                        explore(id)
+                    },
                 })
             },
         })
         layer.addTo(map)
         regionLayer.current = layer
-    }, [ready, visible, featureFor, select, colorOf])
+    }, [ready, visible, featureFor, explore, colorOf])
 
     /* ---- Outline of the selected group ---- */
     useEffect(() => {
@@ -419,10 +516,17 @@ export default function PeopleMapTab() {
         if (!selectedId) return
         const f = featureFor(selectedId)
         if (!f) return
+        const renderer = L.svg({ pane: 'peoples-focus' })
         outlineLayer.current = L.geoJSON(f, {
             interactive: false,
-            style: { color: '#1a1b1e', weight: 2, opacity: 0.8, fill: false },
+            pane: 'peoples-focus',
+            style: { color: '#ffffff', weight: 7, opacity: 0.85, fill: false, renderer, lineJoin: 'round' },
         }).addTo(map)
+        L.geoJSON(f, {
+            interactive: false,
+            pane: 'peoples-focus',
+            style: { color: '#1c7ed6', weight: 2.5, opacity: 1, fill: false, renderer, lineJoin: 'round' },
+        }).addTo(outlineLayer.current)
     }, [ready, selectedId, featureFor])
 
     /* ---- Labels for regions large enough on screen ---- */
@@ -474,11 +578,12 @@ export default function PeopleMapTab() {
         }
         group.addTo(map)
         labelLayer.current = group
-    }, [ready, visible, featureFor, zoom, viewTick])
+    }, [ready, visible, featureFor, viewTick])
 
     /* ---- Info panel ---- */
     const path = selected ? pathTo(selected.id) : []
     const subgroups = selected ? childrenOf(selected.id) : []
+    const relations = selected ? relationsOf(selected.id) : []
 
     return (
         <Stack gap="xs" style={{ textAlign: 'left' }}>
@@ -515,7 +620,7 @@ export default function PeopleMapTab() {
                             <Text size="xs" c="dimmed" visibleFrom="sm">Zoom level shows:</Text>
                             <Text size="xs" fw={600} c="dark">{LEVEL_NAMES[Math.min(zDepth, LEVEL_NAMES.length) - 1]}</Text>
                             <Tooltip label="Back to the whole world">
-                                <ActionIcon size="sm" variant="subtle" onClick={() => select(null)} aria-label="Reset view">
+                                <ActionIcon size="sm" variant="subtle" onClick={resetToWorld} aria-label="Reset view">
                                     <IconWorld size={16} />
                                 </ActionIcon>
                             </Tooltip>
@@ -526,7 +631,8 @@ export default function PeopleMapTab() {
 
             <Text size="xs" c="dimmed">
                 Each province or state is colored by its majority (or largest) people, so minorities and mixed areas are simplified away.
-                Click a region to open its profile and reveal its subgroups; zoom in to see finer groups everywhere. {PEOPLE_NODES.length} groups in all.
+                In the US, each county shows its largest ancestry or origin group (ACS 2020–2024).
+                Click a region to focus on it and reveal its subgroups; close the panel to step back, or click empty map to return to the world. {PEOPLE_NODES.length} groups in all.
             </Text>
 
             {/* Spacer so the fixed panel never hides the caption */}
@@ -546,7 +652,7 @@ export default function PeopleMapTab() {
                             <Breadcrumbs separator="›" separatorMargin={4} style={{ flexWrap: 'wrap' }}>
                                 {path.map(n => n.id === selected.id
                                     ? <Text key={n.id} size="xs" c="dimmed">{n.name}</Text>
-                                    : <Anchor key={n.id} size="xs" onClick={() => select(n.id)}>{n.name}</Anchor>,
+                                    : <Anchor key={n.id} size="xs" onClick={() => explore(n.id)}>{n.name}</Anchor>,
                                 )}
                             </Breadcrumbs>
                             <Group gap="xs" align="baseline">
@@ -557,13 +663,13 @@ export default function PeopleMapTab() {
                         <Group gap={4} wrap="nowrap">
                             {selected.parent && (
                                 <Tooltip label="Up one level">
-                                    <ActionIcon variant="subtle" onClick={() => select(selected.parent)} aria-label="Up one level">
+                                    <ActionIcon variant="subtle" onClick={() => explore(selected.parent!)} aria-label="Up one level">
                                         <IconArrowUp size={18} />
                                     </ActionIcon>
                                 </Tooltip>
                             )}
-                            <Tooltip label="Close">
-                                <ActionIcon variant="subtle" onClick={() => select(null, false)} aria-label="Close">
+                            <Tooltip label={history.current.length && history.current[history.current.length - 1] ? `Back to ${NODE_BY_ID.get(history.current[history.current.length - 1]!)?.name}` : 'Close and return to the world'}>
+                                <ActionIcon variant="subtle" onClick={goBack} aria-label="Close">
                                     <IconX size={18} />
                                 </ActionIcon>
                             </Tooltip>
@@ -581,6 +687,26 @@ export default function PeopleMapTab() {
                                     </div>
                                 ))}
                             </SimpleGrid>
+                            {relations.length > 0 && (
+                                <div>
+                                    <Text size="xs" fw={700} tt="uppercase" c="dimmed" mb={4} style={{ letterSpacing: 0.4 }}>
+                                        Relations with neighbours
+                                    </Text>
+                                    <Stack gap={6}>
+                                        {relations.map((r, i) => {
+                                            const other = r.with ? NODE_BY_ID.get(r.with) : undefined
+                                            return (
+                                                <Text key={i} size="sm">
+                                                    {other
+                                                        ? <Anchor fw={600} onClick={() => explore(other.id)}>{other.name.replace(/\s*\([^)]*\)\s*$/, '')}</Anchor>
+                                                        : <Text span fw={600}>{r.label}</Text>}
+                                                    {': '}{r.text}
+                                                </Text>
+                                            )
+                                        })}
+                                    </Stack>
+                                </div>
+                            )}
                             {subgroups.length > 0 && (
                                 <div>
                                     <Text size="xs" fw={700} tt="uppercase" c="dimmed" mb={4} style={{ letterSpacing: 0.4 }}>
@@ -590,7 +716,7 @@ export default function PeopleMapTab() {
                                         {subgroups.map(s => (
                                             <Button
                                                 key={s.id} size="compact-xs" radius="xl" variant="light"
-                                                onClick={() => select(s.id)}
+                                                onClick={() => explore(s.id)}
                                                 leftSection={<span style={{ width: 8, height: 8, borderRadius: 4, background: colorOf(s.id), display: 'inline-block' }} />}
                                             >
                                                 {s.name}
