@@ -18,6 +18,9 @@ import type { PeopleNode } from "./peoples/index.ts"
 const DEPTH_THRESHOLDS = [3, 4, 5]
 const LEVEL_NAMES = ['Language families', 'Branches', 'Sub-branches', 'Peoples']
 
+/** The default world framing (inhabited latitudes, one copy of the world). */
+const WORLD_VIEW: [[number, number], [number, number]] = [[-56, -170], [78, 180]]
+
 function zoomDepth(zoom: number): number {
     const i = DEPTH_THRESHOLDS.findIndex(t => zoom < t)
     return i === -1 ? DEPTH_THRESHOLDS.length + 1 : i + 1
@@ -177,6 +180,33 @@ function signedDistance(x: number, y: number, ring: Position[]): number {
 
 interface LabelPoint { lat: number, lng: number, radius: number }
 
+/**
+ * Bounds of a group's main body: its pieces from largest down until 90% of its
+ * area is covered, so far-flung islands (the Falklands for the English, Hawaii
+ * for Americans) don't drag the view into the ocean.
+ */
+function focusBounds(geom: Polygon | MultiPolygon): [[number, number], [number, number]] | null {
+    const polys = geom.type === 'Polygon' ? [geom.coordinates] : geom.coordinates
+    const parts = polys
+        .map(p => p[0])
+        .filter((r): r is Position[] => !!r && r.length > 3)
+        .map(r => ({ r, a: ringArea(r) }))
+        .sort((x, y) => y.a - x.a)
+    const total = parts.reduce((t, x) => t + x.a, 0)
+    if (!parts.length || total <= 0) return null
+    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity
+    let covered = 0
+    for (const { r, a } of parts) {
+        for (const [x = 0, y = 0] of r) {
+            minX = Math.min(minX, x); maxX = Math.max(maxX, x)
+            minY = Math.min(minY, y); maxY = Math.max(maxY, y)
+        }
+        covered += a
+        if (covered >= total * 0.9) break
+    }
+    return [[minY, minX], [maxY, maxX]]
+}
+
 /** Approximate pole of inaccessibility of a ring: the interior point farthest from any edge. */
 function poleOf(fullRing: Position[]): LabelPoint | null {
     const stride = Math.ceil(fullRing.length / 400)
@@ -325,14 +355,16 @@ export default function PeopleMapTab() {
                 })
 
                 const map = L.map(mapContainer.current, {
-                    center: [25, 20],
+                    center: [25, 0],
                     zoom: 2,
-                    minZoom: 2,
+                    minZoom: 1,
                     maxZoom: 7,
+                    maxBounds: L.latLngBounds([-85, -180], [85, 180]),
+                    maxBoundsViscosity: 1,
                     zoomSnap: 0,
                     zoomDelta: 0.5,
                     scrollWheelZoom: false, // replaced by the eased wheel zoom below
-                    worldCopyJump: true,
+                    worldCopyJump: false,
                     preferCanvas: true,
                 })
                 mapRef.current = map
@@ -379,6 +411,8 @@ export default function PeopleMapTab() {
 
                 L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
                     maxZoom: 16,
+                    noWrap: true,
+                    bounds: L.latLngBounds([-85, -180], [85, 180]),
                     attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ · Regions from <a href="https://www.naturalearthdata.com/">Natural Earth</a> provinces',
                 }).addTo(map)
 
@@ -405,7 +439,17 @@ export default function PeopleMapTab() {
                     resetRef.current()
                 })
 
-                resizeObserver = new ResizeObserver(() => map.invalidateSize())
+                // Never zoom out so far that the single (non-repeating) world is narrower than the map.
+                const fitMinZoom = () => {
+                    const z = Math.log2(map.getSize().x / 256)
+                    map.setMinZoom(Math.max(1, Math.ceil(z * 4) / 4))
+                }
+                fitMinZoom()
+                map.fitBounds(WORLD_VIEW)
+                resizeObserver = new ResizeObserver(() => {
+                    map.invalidateSize()
+                    fitMinZoom()
+                })
                 resizeObserver.observe(mapContainer.current)
 
                 setZDepth(zoomDepth(map.getZoom()))
@@ -426,20 +470,34 @@ export default function PeopleMapTab() {
     }, [])
 
     /* ---- Navigation: select a group and frame it ---- */
+    /** Ask for the view to be framed on a group (or the world) once the layout has settled. */
+    const pendingFrame = useRef<{ id: string | null } | null>(null)
+    const [frameTick, setFrameTick] = useState(0)
     const frame = useCallback((id: string | null) => {
+        pendingFrame.current = { id }
+        setFrameTick(t => t + 1)
+    }, [])
+
+    useEffect(() => {
         const map = mapRef.current
         const L = leafletRef.current
-        if (!map || !L) return
-        const feature = id ? featureFor(id) : null
-        const bounds = feature ? L.geoJSON(feature).getBounds() : null
-        // The world view, and groups that span most of the globe (e.g. Indo-European).
-        if (!bounds || bounds.getEast() - bounds.getWest() > 200) {
-            map.flyTo([25, 20], 2, { duration: 0.8 })
-            return
-        }
-        const target = map.getBoundsZoom(bounds, false, L.point(40, 40))
-        map.flyTo(bounds.getCenter(), Math.max(2, Math.min(target, 6)), { duration: 0.8 })
-    }, [featureFor])
+        const req = pendingFrame.current
+        if (!ready || !map || !L || !req) return
+        pendingFrame.current = null
+        // The map's height changes when the panel opens or closes; measure the new size first.
+        const raf = requestAnimationFrame(() => {
+            map.invalidateSize({ pan: false })
+            const feature = req.id ? featureFor(req.id) : null
+            const box = feature ? focusBounds(feature.geometry) : null
+            // The world view, and groups whose main body spans most of the globe (e.g. Indo-European).
+            if (!box || box[1][1] - box[0][1] > 200) {
+                map.flyToBounds(WORLD_VIEW, { duration: 0.8 })
+                return
+            }
+            map.flyToBounds(L.latLngBounds(box), { padding: L.point(48, 48), maxZoom: 6, duration: 0.8 })
+        })
+        return () => cancelAnimationFrame(raf)
+    }, [ready, frameTick, featureFor])
 
     /** Explore a group, remembering where we came from. */
     const explore = useCallback((id: string) => {
@@ -598,7 +656,7 @@ export default function PeopleMapTab() {
 
             <div style={{
                 position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden',
-                height: selected ? 'calc(58vh - 60px)' : '68vh', minHeight: 320, transition: 'height 200ms ease',
+                height: selected ? 'calc(58vh - 60px)' : '68vh', minHeight: 320, 
             }}>
                 <div ref={mapContainer} style={{ position: 'absolute', inset: 0 }} />
 

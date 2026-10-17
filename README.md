@@ -26,7 +26,7 @@ npm run deploy     # build + push to gh-pages branch (deploys to GitHub Pages)
 
 ## People Groups Map
 
-The **Peoples** tab (Works → Peoples) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes. Clicking a region focuses it (only its subgroups stay drawn), opens its profile (language, religion, food, name origin, history, relations with neighbours) at the bottom of the page; the panel's close button steps back to the previous group, and clicking empty map returns to the world view.
+The **People groups map** tab (Works → People groups map) maps the world's people groups as a tree: language families → branches → sub-branches → peoples. Zoom controls how deep the map goes. Clicking a region focuses it (only its subgroups stay drawn), opens its profile (language, religion, food, name origin, history, relations with neighbours) at the bottom of the page; the panel's close button steps back to the previous group, and clicking empty map returns to the world view.
 
 - `src/peoples/data/*.ts` — the tree and the text for every group
 - `src/peoples/relations/*.ts` — "Relations with neighbours" notes for every group

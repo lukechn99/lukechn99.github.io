@@ -52,7 +52,7 @@ export default function Works() {
                         Maps
                     </Tabs.Tab>
                     <Tabs.Tab value="peoples" ref={setControlRef('peoples')} className={classes.tab}>
-                        Peoples
+                        People groups map
                     </Tabs.Tab>
                     <Tabs.Tab value="2" ref={setControlRef('2')} className={classes.tab}>
                         Micro-frontends
