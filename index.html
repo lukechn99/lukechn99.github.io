@@ -5,10 +5,17 @@
     <link rel="icon" type="image/svg+xml" href="/death-star.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>lukechn99.github.io</title>
-    <script type="module" crossorigin src="/assets/index-DbJvDgOR.js"></script>
+    <script>
+      // Apply the saved light/dark choice before first paint (Mantine's storage key).
+      try {
+        var scheme = localStorage.getItem('mantine-color-scheme-value');
+        document.documentElement.setAttribute('data-mantine-color-scheme', scheme === 'dark' ? 'dark' : 'light');
+      } catch (e) {}
+    </script>
+    <script type="module" crossorigin src="/assets/index-B5gaHgD2.js"></script>
     <link rel="modulepreload" crossorigin href="/assets/mapping-engine-D94FaC79.js">
     <link rel="stylesheet" crossorigin href="/assets/mapping-engine-CIGW-MKW.css">
-    <link rel="stylesheet" crossorigin href="/assets/index-CS1YJ-Me.css">
+    <link rel="stylesheet" crossorigin href="/assets/index-DjfsMIwJ.css">
   </head>
   <body>
     <div id="root"></div>
