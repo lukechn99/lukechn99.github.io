@@ -276,7 +276,7 @@ export default function PeopleMapTab() {
     const geomsByLeaf = useRef<Map<string, LeafGeometry>>(new Map())
     const featureCache = useRef<Map<string, Feature<MultiPolygon, { id: string }> | null>>(new Map())
     const regionLayer = useRef<LeafletGeoJSON | null>(null)
-    const outlineLayer = useRef<LeafletGeoJSON | null>(null)
+    const outlineLayer = useRef<import("leaflet").LayerGroup | null>(null)
     const labelLayer = useRef<Layer | null>(null)
     const anchorCache = useRef<Map<string, LabelPoint[]>>(new Map())
 
@@ -579,17 +579,19 @@ export default function PeopleMapTab() {
         if (!selectedId) return
         const f = featureFor(selectedId)
         if (!f) return
-        const renderer = L.svg({ pane: 'peoples-focus' })
-        outlineLayer.current = L.geoJSON(f, {
+        // A canvas, like the regions below it: during zoom the browser just stretches the bitmap,
+        // so outline and fill move together (an SVG outline had to re-render every frame and lagged).
+        const renderer = L.canvas({ pane: 'peoples-focus', padding: 0.5 })
+        const outline = (color: string, weight: number, opacity: number) => L.geoJSON(f, {
             interactive: false,
             pane: 'peoples-focus',
-            style: { color: isDark ? '#1a1b1e' : '#ffffff', weight: 7, opacity: 0.85, fill: false, renderer, lineJoin: 'round' },
-        }).addTo(map)
-        L.geoJSON(f, {
-            interactive: false,
-            pane: 'peoples-focus',
-            style: { color: '#1c7ed6', weight: 2.5, opacity: 1, fill: false, renderer, lineJoin: 'round' },
-        }).addTo(outlineLayer.current)
+            renderer,
+            style: { color, weight, opacity, fill: false, lineJoin: 'round' },
+        } as import('leaflet').GeoJSONOptions)
+        outlineLayer.current = L.layerGroup([
+            outline(isDark ? '#1a1b1e' : '#ffffff', 7, 0.85),
+            outline('#1c7ed6', 2.5, 1),
+        ]).addTo(map)
     }, [ready, selectedId, featureFor, isDark])
 
     /* ---- Labels for regions large enough on screen ---- */
