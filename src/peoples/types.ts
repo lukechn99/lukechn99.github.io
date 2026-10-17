@@ -17,6 +17,12 @@ export interface PeopleInfo {
 export interface PeopleNode {
     id: string
     parent: string | null
+    /**
+     * For top-level groups: the language family they belong to (e.g. "Indo-European").
+     * Families are too broad to be people groups, so they are not nodes; this only
+     * keeps related groups in a shared colour range and is explained in the relations.
+     */
+    family?: string
     name: string
     info: PeopleInfo
 }

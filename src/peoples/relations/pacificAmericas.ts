@@ -1,11 +1,8 @@
 import type { RelationsMap } from './types.ts'
 
 export const pacificAmericasRelations: RelationsMap = {
-    'austronesian': [
-        { with: 'papuans', text: 'Austronesians settled the coasts around New Guinea, mixing with Papuans to form many Melanesian peoples.' },
-        { with: 'han', text: 'Taiwan\'s Indigenous peoples, the family\'s origin, are now a small minority among Han Chinese.' },
-    ],
     'malayic': [
+        { label: "Austronesian family", text: "Part of the Austronesian family, which spread by sea from Taiwan about 5,000 years ago to Madagascar, Indonesia, the Philippines and the Pacific. Basic words still match across 15,000 km: 'eye' is mata in Malay and Tagalog, maka in Hawaiian, maso in Malagasy; 'five' is lima in Malay, Tagalog and Hawaiian, dimy in Malagasy. Malay and Indonesian are close to Javanese, Sundanese and the languages of Borneo, where Malagasy also originated." },
         { with: 'han', text: 'Chinese commercial minorities have faced riots and discrimination; Malaysia\'s affirmative action favors Malays over Chinese.' },
         { with: 'dutch', text: 'Dutch rule (about 1600–1949) and the brutal independence war.' },
     ],
@@ -43,6 +40,7 @@ export const pacificAmericasRelations: RelationsMap = {
         { with: 'javanese', text: 'Indonesia\'s 1975–99 occupation of East Timor killed perhaps 100,000–180,000 Timorese.' },
     ],
     'philippine': [
+        { label: "Austronesian family", text: "Part of the Austronesian family, which spread by sea from Taiwan about 5,000 years ago to Madagascar, Indonesia, the Philippines and the Pacific. Basic words still match across 15,000 km: 'eye' is mata in Malay and Tagalog, maka in Hawaiian, maso in Malagasy; 'five' is lima in Malay, Tagalog and Hawaiian, dimy in Malagasy. Tagalog, Cebuano and Ilocano are close relatives of each other; 'two' is dalawa in Tagalog and duha in Cebuano, dua in Malay and rua in Māori." },
         { label: 'Spain and the US', text: 'Three centuries of Spanish rule and the brutal 1899–1902 Philippine–American War.' },
         { with: 'han', text: 'Disputes with China in the South China Sea; Chinese Filipinos are prominent in business.' },
     ],
@@ -67,10 +65,12 @@ export const pacificAmericasRelations: RelationsMap = {
         { with: 'malays', text: 'Sulu sultans once ruled Sabah, still claimed by the Philippines.' },
     ],
     'malagasy': [
+        { label: "Austronesian family", text: "Part of the Austronesian family, which spread by sea from Taiwan about 5,000 years ago to Madagascar, Indonesia, the Philippines and the Pacific. Basic words still match across 15,000 km: 'eye' is mata in Malay and Tagalog, maka in Hawaiian, maso in Malagasy; 'five' is lima in Malay, Tagalog and Hawaiian, dimy in Malagasy. Malagasy's closest relative is Ma'anyan, spoken in southern Borneo, 7,000 km away; settlers sailed across the Indian Ocean about 1,500 years ago." },
         { label: 'Merina and côtiers', text: 'Highland Merina and coastal peoples are rivals rooted in the 19th-century Merina kingdom.' },
         { with: 'french', text: 'France suppressed the 1947 uprising, killing tens of thousands.' },
     ],
     'oceanic': [
+        { label: "Austronesian family", text: "Part of the Austronesian family, which spread by sea from Taiwan about 5,000 years ago to Madagascar, Indonesia, the Philippines and the Pacific. Basic words still match across 15,000 km: 'eye' is mata in Malay and Tagalog, maka in Hawaiian, maso in Malagasy; 'five' is lima in Malay, Tagalog and Hawaiian, dimy in Malagasy. Polynesian languages are so close that Hawaiian, Māori, Tahitian and Samoan speakers can recognise many words: 'two' is lua, rua, piti (rua in old Tahitian) and lua." },
         { with: 'papuans', text: 'Melanesians blend Austronesian and Papuan ancestry.' },
         { with: 'anglosphere', text: 'Australia, New Zealand and the US dominate aid and security; many islanders migrate there.' },
     ],

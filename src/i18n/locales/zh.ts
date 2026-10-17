@@ -93,7 +93,7 @@ const zh: Resources = {
         tagPlaceholder: '为该站点添加标签…',
     },
     people: {
-        levels: ['语系', '语族', '语支', '民族'],
+        levels: ['主要群体', '下属群体', '民族', '地方群体'],
         zoomShows: '当前缩放级别显示：',
         backToWorld: '返回世界全图',
         loading: '地图加载中…',

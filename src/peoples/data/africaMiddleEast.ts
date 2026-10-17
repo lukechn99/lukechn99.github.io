@@ -3,20 +3,7 @@ import type { PeopleNode } from '../types.ts'
 export const africaMiddleEast: PeopleNode[] = [
     /* ---------- Afro-Asiatic ---------- */
     {
-        id: 'afro-asiatic', parent: null, name: 'Afro-Asiatic peoples',
-        info: {
-            summary: 'An ancient family spanning North Africa, the Horn, the Sahel and the Middle East, including Arabs, Berbers, Jews, Somalis, Oromo and Hausa.',
-            population: '≈ 550 million',
-            homeland: 'From Morocco to Iraq, south through the Horn of Africa and the Lake Chad basin',
-            language: 'Six branches: Semitic (Arabic, Hebrew, Amharic), Berber, Cushitic, Chadic, Omotic, and extinct Egyptian. Many share consonant-root word building (k-t-b = "write").',
-            religion: 'Birthplace of Judaism, Christianity and Islam; Islam dominates today.',
-            food: 'Wheat, barley, dates, olive oil, legumes and sheep and goats in the north; teff and sorghum in the Horn.',
-            etymology: 'Coined by the linguist Joseph Greenberg in the 1950s to replace the older "Hamito-Semitic".',
-            history: 'The family may have originated in northeast Africa over 10,000 years ago.',
-        },
-    },
-    {
-        id: 'semitic', parent: 'afro-asiatic', name: 'Semitic peoples',
+        id: 'semitic', parent: null, family: 'Afro-Asiatic', name: 'Semitic peoples',
         info: {
             summary: 'Arabs, Jews, Amhara and Tigrinya, Maltese and Assyrians, speakers of the family that gave the world its first alphabet.',
             population: '≈ 500 million',
@@ -185,7 +172,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'berbers', parent: 'afro-asiatic', name: 'Berbers (Amazigh)',
+        id: 'berbers', parent: null, family: 'Afro-Asiatic', name: 'Berbers (Amazigh)',
         info: {
             summary: 'The Indigenous peoples of North Africa, present long before the Arab conquest.',
             population: '≈ 30–40 million',
@@ -224,7 +211,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'cushitic', parent: 'afro-asiatic', name: 'Cushitic peoples',
+        id: 'cushitic', parent: null, family: 'Afro-Asiatic', name: 'Cushitic peoples',
         info: {
             summary: 'Peoples of the Horn of Africa: Oromo, Somalis, Afar, Beja and many southern Ethiopians.',
             population: '≈ 90 million',
@@ -301,7 +288,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'hausa', parent: 'afro-asiatic', name: 'Hausa (Chadic)',
+        id: 'hausa', parent: null, family: 'Afro-Asiatic', name: 'Hausa (Chadic)',
         info: {
             summary: 'West Africa\'s largest people, Muslim city-dwellers and traders whose language is the Sahel\'s lingua franca.',
             population: '≈ 55 million (plus tens of millions of second-language speakers)',
@@ -316,20 +303,7 @@ export const africaMiddleEast: PeopleNode[] = [
 
     /* ---------- Niger-Congo ---------- */
     {
-        id: 'niger-congo', parent: null, name: 'Niger-Congo peoples',
-        info: {
-            summary: 'The world\'s largest language family by number of languages (about 1,500), spoken by most people in sub-Saharan Africa.',
-            population: '≈ 700 million',
-            homeland: 'West, Central, East and Southern Africa',
-            language: 'Bantu languages (Swahili, Zulu, Kongo), Yoruba, Igbo, Fula, Wolof, Akan and many more; most are tonal and many use noun classes.',
-            religion: 'Christianity and Islam, often blended with traditional religion and ancestor veneration.',
-            food: 'Starchy staples (yam, cassava, plantain, maize, millet, sorghum) eaten with stews and sauces, "swallow" foods like fufu and ugali.',
-            etymology: 'From the Niger and Congo rivers; the family was defined by Joseph Greenberg in 1963.',
-            history: 'The Bantu expansion from the Cameroon–Nigeria border, beginning around 3,000 years ago, spread farming and iron across half the continent.',
-        },
-    },
-    {
-        id: 'bantu', parent: 'niger-congo', name: 'Bantu peoples',
+        id: 'bantu', parent: null, family: 'Niger-Congo', name: 'Bantu peoples',
         info: {
             summary: 'About 500 related peoples spread across Central, East and Southern Africa.',
             population: '≈ 350 million',
@@ -522,7 +496,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'volta-niger', parent: 'niger-congo', name: 'Volta-Niger peoples (southern Nigeria)',
+        id: 'volta-niger', parent: null, family: 'Niger-Congo', name: 'Volta-Niger peoples (southern Nigeria)',
         info: {
             summary: 'The Yoruba, Igbo and their neighbors in Nigeria\'s south and middle belt.',
             population: '≈ 120 million',
@@ -587,7 +561,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'atlantic', parent: 'niger-congo', name: 'Atlantic peoples (Wolof, Fulani, Temne)',
+        id: 'atlantic', parent: null, family: 'Niger-Congo', name: 'Atlantic peoples (Wolof, Fulani, Temne)',
         info: {
             summary: 'The westernmost Niger-Congo branch, from the Senegal River to Sierra Leone, plus the far-roaming Fulani.',
             population: '≈ 60 million',
@@ -625,7 +599,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'mande', parent: 'niger-congo', name: 'Mande peoples (Bambara, Mandinka, Soninke, Mende)',
+        id: 'mande', parent: null, family: 'Niger-Congo', name: 'Mande peoples (Bambara, Mandinka, Soninke, Mende)',
         info: {
             summary: 'Heirs of the great Sahelian empires of Ghana and Mali, famous for griot musicians and long-distance traders.',
             population: '≈ 35 million',
@@ -638,7 +612,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'kwa', parent: 'niger-congo', name: 'Kwa peoples (Akan and Gbe)',
+        id: 'kwa', parent: null, family: 'Niger-Congo', name: 'Kwa peoples (Akan and Gbe)',
         info: {
             summary: 'Peoples of the Gold Coast and Slave Coast forests, including the Ashanti and the Fon of Dahomey.',
             population: '≈ 35 million',
@@ -676,7 +650,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'gur', parent: 'niger-congo', name: 'Gur (Voltaic) peoples (Mossi, Dagomba, Senufo)',
+        id: 'gur', parent: null, family: 'Niger-Congo', name: 'Gur (Voltaic) peoples (Mossi, Dagomba, Senufo)',
         info: {
             summary: 'Savanna farmers of the Volta basin, including the Mossi kingdoms that resisted Islamic empires for centuries.',
             population: '≈ 25 million',
@@ -689,7 +663,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'kru', parent: 'niger-congo', name: 'Kru peoples (Bété, Guéré)',
+        id: 'kru', parent: null, family: 'Niger-Congo', name: 'Kru peoples (Bété, Guéré)',
         info: {
             summary: 'Forest and coastal peoples of southwestern Côte d\'Ivoire and Liberia, historically famous as sailors.',
             population: '≈ 5 million',
@@ -702,7 +676,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'ubangian', parent: 'niger-congo', name: 'Ubangian peoples (Gbaya, Banda, Zande)',
+        id: 'ubangian', parent: null, family: 'Niger-Congo', name: 'Ubangian peoples (Gbaya, Banda, Zande)',
         info: {
             summary: 'Peoples of the savanna between the Congo and Nile basins.',
             population: '≈ 8 million',
@@ -717,19 +691,7 @@ export const africaMiddleEast: PeopleNode[] = [
 
     /* ---------- Nilo-Saharan ---------- */
     {
-        id: 'nilo-saharan', parent: null, name: 'Nilo-Saharan peoples',
-        info: {
-            summary: 'A disputed grouping of peoples from the upper Nile across the Sahara and Sahel, including Nilotes, Kanuri and Songhai.',
-            population: '≈ 70 million',
-            homeland: 'South Sudan, Sudan, Chad, Niger, Mali, Kenya, Uganda',
-            language: 'About 200 languages; many linguists doubt they form one family.',
-            religion: 'Islam in the Sahel, Christianity and traditional faiths in the south.',
-            food: 'Milk and cattle among Nilotic herders; millet and sorghum porridges; fish along the Nile and Niger.',
-            etymology: 'From the Nile and the Sahara; proposed by Joseph Greenberg in 1963.',
-        },
-    },
-    {
-        id: 'nilotes-sudan', parent: 'nilo-saharan', name: 'Nilotes of South Sudan (Dinka, Nuer, Shilluk)',
+        id: 'nilotes-sudan', parent: null, family: 'Nilo-Saharan', name: 'Nilotes of South Sudan (Dinka, Nuer, Shilluk)',
         info: {
             summary: 'Cattle-herding peoples of the Sudd marshes, where cattle define wealth, marriage and status.',
             population: '≈ 9 million',
@@ -742,7 +704,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'nilotes-east', parent: 'nilo-saharan', name: 'East African Nilotes (Luo, Kalenjin, Maasai, Acholi)',
+        id: 'nilotes-east', parent: null, family: 'Nilo-Saharan', name: 'East African Nilotes (Luo, Kalenjin, Maasai, Acholi)',
         info: {
             summary: 'Nilotic peoples who migrated south into the Kenyan and Ugandan highlands.',
             population: '≈ 20 million',
@@ -755,7 +717,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'kanuri-teda', parent: 'nilo-saharan', name: 'Kanuri and Teda (Saharan)',
+        id: 'kanuri-teda', parent: null, family: 'Nilo-Saharan', name: 'Kanuri and Teda (Saharan)',
         info: {
             summary: 'Peoples of the Lake Chad basin and the Tibesti mountains, heirs of the Kanem-Bornu empire.',
             population: '≈ 10 million',
@@ -768,7 +730,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'songhai-zarma', parent: 'nilo-saharan', name: 'Songhai and Zarma',
+        id: 'songhai-zarma', parent: null, family: 'Nilo-Saharan', name: 'Songhai and Zarma',
         info: {
             summary: 'Peoples of the Niger bend, heirs of the Songhai Empire, the largest of West Africa\'s medieval states.',
             population: '≈ 7 million',
@@ -781,7 +743,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'darfur', parent: 'nilo-saharan', name: 'Darfur and Wadai peoples (Fur, Masalit, Zaghawa, Maba)',
+        id: 'darfur', parent: null, family: 'Nilo-Saharan', name: 'Darfur and Wadai peoples (Fur, Masalit, Zaghawa, Maba)',
         info: {
             summary: 'Non-Arab farming and herding peoples of western Sudan and eastern Chad.',
             population: '≈ 5 million',
@@ -794,7 +756,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'nubians', parent: 'nilo-saharan', name: 'Nubians',
+        id: 'nubians', parent: null, family: 'Nilo-Saharan', name: 'Nubians',
         info: {
             summary: 'People of the middle Nile, heirs of the kingdom of Kush that once ruled Egypt.',
             population: '≈ 2 million',
@@ -807,7 +769,7 @@ export const africaMiddleEast: PeopleNode[] = [
         },
     },
     {
-        id: 'sara', parent: 'nilo-saharan', name: 'Sara and southern Chadians',
+        id: 'sara', parent: null, family: 'Nilo-Saharan', name: 'Sara and southern Chadians',
         info: {
             summary: 'Farming peoples of southern Chad, largely Christian, long rivals of the Muslim north.',
             population: '≈ 5 million',

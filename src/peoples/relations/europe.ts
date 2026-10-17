@@ -5,14 +5,9 @@ export const europeRelations: RelationsMap = {
         { with: 'castilians', text: 'Centuries of local self-rule (the fueros) gave way to strong Spanish centralization. Franco banned Basque in public life, which fed ETA\'s campaign; today the region has the widest tax and policing autonomy in Spain.' },
         { with: 'french', text: 'French Basques are more assimilated: Basque has no official status in France, and nationalism there has stayed small.' },
     ],
-    'indo-european': [
-        { with: 'turkic', text: 'A long frontier from the Balkans to Xinjiang: Turkic steppe empires conquered Iranian and Slavic lands, and Russia later ruled most Turkic peoples.' },
-        { with: 'afro-asiatic', text: 'Europe and Persia have faced the Arab world across the Mediterranean and the Zagros for 2,500 years of trade, conquest and crusade.' },
-        { with: 'sino-tibetan', text: 'Indo-Aryans and Tibeto-Burmans meet in the Himalaya and northeast India; Russia and China share a 4,200 km border.' },
-        { with: 'indigenous-americas', text: 'European colonization of the Americas, from 1492, displaced and largely replaced Indigenous populations.' },
-    ],
 
     'slavic': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Slavic is closest to the Baltic languages. Russian brat and mat′ match English brother and mother, Latin frater and mater, and Sanskrit bhrātṛ and mātṛ." },
         { with: 'germanic', text: 'A thousand-year frontier of eastward German settlement, Teutonic crusades, Prussian partitions of Poland, and the Nazi war of annihilation in the East.' },
         { with: 'turkic', text: 'Rus\' fought steppe nomads, lived under the Mongol-Turkic Golden Horde, then conquered the Volga, Crimea and Central Asia.' },
         { with: 'romance', text: 'Romanians sit between South and East Slavs, sharing Orthodoxy but not language.' },
@@ -97,6 +92,7 @@ export const europeRelations: RelationsMap = {
     ],
 
     'germanic': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. A regular sound shift (Grimm's law) turned p into f, so Latin pater, piscis and pes became English father, fish and foot, German Vater, Fisch and Fuß." },
         { with: 'romance', text: 'Germanic tribes conquered the Western Roman Empire; the France–Germany rivalry drove three wars between 1870 and 1945, and its reconciliation founded the EU.' },
         { with: 'slavic', text: 'The East was colonized, partitioned and devastated by German states; today Germany and Poland are close EU partners.' },
         { with: 'celtic', text: 'English expansion conquered Wales, Ireland and Scotland.' },
@@ -177,9 +173,10 @@ export const europeRelations: RelationsMap = {
     ],
 
     'romance': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Romance languages descend from Latin: pater, mater and frater became Spanish padre, madre and fraile (friar) and French père, mère and frère, the same words as English father, mother and brother." },
         { with: 'germanic', text: 'From Roman frontier battles to two world wars, the Romance–Germanic line was Europe\'s main fault line.' },
         { with: 'indigenous-americas', text: 'Spain and Portugal conquered the Americas, mixing with and dominating Indigenous peoples.' },
-        { with: 'afro-asiatic', text: 'Al-Andalus, the Crusades and the colonization of North Africa link the Latin and Arab worlds.' },
+        { with: 'arabs', text: 'Al-Andalus, the Crusades and the colonization of North Africa link the Latin and Arab worlds.' },
     ],
     'iberian': [
         { with: 'maghrebis', text: 'Moorish rule (711–1492) left a deep Arab-Berber legacy; Morocco and Spain now argue over Ceuta, Melilla and migration.' },
@@ -279,6 +276,7 @@ export const europeRelations: RelationsMap = {
     ],
 
     'celtic': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Celtic lost the initial p, so Irish athair (father) matches Latin pater; Irish máthair and bráthair match English mother and brother, and Welsh tri matches three." },
         { with: 'germanic', text: 'Anglo-Saxons, Vikings and Normans pushed the Celts to the western edges of Britain and France.' },
     ],
     'irish': [
@@ -300,17 +298,20 @@ export const europeRelations: RelationsMap = {
     ],
 
     'greeks': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Greek forms its own branch: patēr, mētēr and treis match Latin pater, mater and tres, and Sanskrit pitṛ, mātṛ and trayas." },
         { with: 'turks', text: 'Four centuries of Ottoman rule, the 1821 independence war, the 1923 population exchange, and the 1974 Cyprus division; tension over the Aegean persists.' },
         { with: 'macedonians', text: 'A long name dispute settled in 2018.' },
         { with: 'albanians', text: 'Hundreds of thousands of Albanians migrated to Greece after 1991; a Greek minority lives in southern Albania.' },
     ],
     'albanians': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Albanian is a branch of its own, with no close relatives. Its words still fit the pattern: natë (night) matches Latin nox and English night, and motër (sister) comes from the old word for mother." },
         { with: 'serbs', text: 'Kosovo is the central conflict, from the 1998–99 war to today\'s unresolved recognition.' },
         { with: 'macedonians', text: 'Power-sharing since the 2001 Ohrid Agreement.' },
         { with: 'greeks', text: 'Large migration to Greece; disputes over Cham Albanians expelled from Greece in 1944–45.' },
         { with: 'italians', text: 'Italy invaded in 1939; the Arbëreshë are Albanians who settled in southern Italy in the 15th century.' },
     ],
     'baltic': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Lithuanian is famous for keeping very old forms: sūnus (son) and dievas (god) are almost identical to Sanskrit sūnu and deva. The nearest relatives are the Slavic languages." },
         { with: 'russians', text: 'Annexed by the USSR in 1940 with mass deportations; Russian minorities and Russian pressure remain major concerns.' },
         { with: 'germans', text: 'Baltic German nobles dominated Latvia and Estonia for seven centuries until 1939.' },
     ],
@@ -324,6 +325,7 @@ export const europeRelations: RelationsMap = {
         { with: 'estonians', text: 'Close neighbours despite unrelated languages.' },
     ],
     'armenians': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Armenian is a branch of its own: hayr, mayr and eġbayr (father, mother, brother) are regular descendants of the same words as Latin pater, mater and frater." },
         { with: 'turks', text: 'The 1915 genocide, which Türkiye denies, defines the relationship; the border has been closed since 1993.' },
         { with: 'azerbaijanis', text: 'Wars over Nagorno-Karabakh (1988–94, 2020, 2023) ended with the flight of its Armenian population.' },
         { with: 'georgians', text: 'Friendly Christian neighbours; an Armenian minority lives in southern Georgia.' },
@@ -331,6 +333,7 @@ export const europeRelations: RelationsMap = {
     ],
 
     'iranian': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Iranian is the sister branch of Indo-Aryan: Persian pedar, mādar and barādar (father, mother, brother) match Sanskrit pitṛ, mātṛ and bhrātṛ, and English father, mother and brother." },
         { with: 'arabs', text: 'The 7th-century Arab conquest Islamized Iran; the modern Saudi–Iran rivalry adds a Sunni–Shia layer.' },
         { with: 'turkic', text: 'Turkic dynasties ruled Iran for about 900 years, and Azerbaijanis are deeply woven into Iranian society.' },
         { with: 'indo-aryan', text: 'Persian was the court language of Mughal India for three centuries.' },
@@ -378,6 +381,7 @@ export const europeRelations: RelationsMap = {
     ],
 
     'indo-aryan': [
+        { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Hindi bhāī (brother) and nām (name) come from Sanskrit bhrātṛ and nāman, the same words as English brother and name; Sanskrit's resemblance to Latin and Greek is how the family was discovered in the 1780s." },
         { with: 'dravidian', text: 'North–south tensions over Hindi imposition and federal funding; Tamil Nadu has resisted Hindi since the 1960s.' },
         { with: 'iranian', text: 'Persian and Central Asian dynasties ruled north India for centuries.' },
         { with: 'tibeto-burman-hills', text: 'Northeast India\'s hill peoples have long resisted rule from Delhi.' },

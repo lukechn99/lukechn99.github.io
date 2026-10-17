@@ -3,20 +3,7 @@ import type { PeopleNode } from '../types.ts'
 export const asia: PeopleNode[] = [
     /* ---------- Sino-Tibetan ---------- */
     {
-        id: 'sino-tibetan', parent: null, name: 'Sino-Tibetan peoples',
-        info: {
-            summary: 'The world\'s second-largest language family, dominated by the Han Chinese and extending across the Himalaya into Myanmar.',
-            population: '≈ 1.4 billion',
-            homeland: 'China, Taiwan, Tibet, Myanmar, Bhutan, northeast India, Nepal',
-            language: 'Chinese (Sinitic) plus some 400 Tibeto-Burman languages; most are tonal and many are written in Chinese characters or Indic-derived scripts.',
-            religion: 'Chinese folk religion, Buddhism, Taoism and Confucian ethics; Tibetan Buddhism; Theravada Buddhism in Myanmar; Christianity among many hill peoples.',
-            food: 'Rice in the south, wheat and millet in the north, soy, pork, tea (first domesticated in this region).',
-            etymology: '"Sino" from Latin Sinae, via Greek and Sanskrit Cīna, likely from the Qin dynasty that first unified China in 221 BCE.',
-            history: 'Proto-Sino-Tibetan was likely spoken by millet farmers in the Yellow River basin around 6000–7000 years ago.',
-        },
-    },
-    {
-        id: 'han', parent: 'sino-tibetan', name: 'Han Chinese',
+        id: 'han', parent: null, family: 'Sino-Tibetan', name: 'Han Chinese',
         info: {
             summary: 'The largest ethnic group on Earth: one identity spanning several mutually unintelligible "dialects" as different as Spanish and Italian.',
             population: '≈ 1.3 billion (≈ 50 million overseas)',
@@ -93,7 +80,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'tibetans', parent: 'sino-tibetan', name: 'Tibetans and Bhutanese',
+        id: 'tibetans', parent: null, family: 'Sino-Tibetan', name: 'Tibetans and Bhutanese',
         info: {
             summary: 'Peoples of the Tibetan Plateau, the world\'s highest inhabited region, and of Bhutan and Ladakh.',
             population: '≈ 7 million Tibetans, ≈ 0.5 million Bhutanese Ngalop',
@@ -106,7 +93,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'burmans', parent: 'sino-tibetan', name: 'Burmans (Bamar) and Rakhine',
+        id: 'burmans', parent: null, family: 'Sino-Tibetan', name: 'Burmans (Bamar) and Rakhine',
         info: {
             summary: 'The Buddhist lowland majority of Myanmar\'s Irrawaddy valley, plus the related Rakhine of the western coast.',
             population: '≈ 35 million',
@@ -119,7 +106,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'tibeto-burman-hills', parent: 'sino-tibetan', name: 'Tibeto-Burman hill peoples',
+        id: 'tibeto-burman-hills', parent: null, family: 'Sino-Tibetan', name: 'Tibeto-Burman hill peoples',
         info: {
             summary: 'Highland peoples of the Myanmar–India borderlands, mostly Christian, with long histories of resistance to lowland states.',
             population: '≈ 15 million',
@@ -343,20 +330,7 @@ export const asia: PeopleNode[] = [
 
     /* ---------- Uralic ---------- */
     {
-        id: 'uralic', parent: null, name: 'Uralic peoples',
-        info: {
-            summary: 'Finns, Estonians, Hungarians and the Sámi and Siberian peoples, a family centered on the forests around the Ural Mountains.',
-            population: '≈ 25 million',
-            homeland: 'Finland, Estonia, Hungary, northern Russia',
-            language: 'About 40 languages, with many grammatical cases (Finnish has 15) and no grammatical gender.',
-            religion: 'Lutheran (Finns, Estonians); Catholic and Calvinist (Hungarians); shamanism among Siberian groups.',
-            food: 'Rye, fish, berries, mushrooms, reindeer in the north; paprika and goulash in Hungary.',
-            etymology: 'From the Ural Mountains, near the family\'s presumed homeland.',
-            history: 'Magyars migrated from the steppe into the Carpathian Basin around 895, far from their linguistic kin.',
-        },
-    },
-    {
-        id: 'finnic', parent: 'uralic', name: 'Finnic peoples',
+        id: 'finnic', parent: null, family: 'Uralic', name: 'Finnic peoples',
         info: {
             summary: 'Finns, Estonians and the smaller Karelian, Veps and Livonian peoples of the Baltic rim.',
             population: '≈ 6.5 million',
@@ -395,7 +369,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'hungarians', parent: 'uralic', name: 'Hungarians (Magyars)',
+        id: 'hungarians', parent: null, family: 'Uralic', name: 'Hungarians (Magyars)',
         info: {
             summary: 'A Uralic-speaking people in the heart of Central Europe, descended from steppe horsemen who arrived in 895.',
             population: '≈ 13 million',
@@ -425,20 +399,7 @@ export const asia: PeopleNode[] = [
 
     /* ---------- Caucasian ---------- */
     {
-        id: 'caucasian', parent: null, name: 'Caucasus peoples',
-        info: {
-            summary: 'A geographic grouping of three unrelated native families (Kartvelian, Northeast and Northwest Caucasian) packed into one of the most linguistically dense regions on Earth.',
-            population: '≈ 8 million',
-            homeland: 'Georgia and Russia\'s North Caucasus republics',
-            language: 'About 40 languages, many with huge consonant inventories (Ubykh had 80 consonants).',
-            religion: 'Orthodox Christian (Georgians); Sunni Islam (Chechens, Dagestanis, Circassians).',
-            food: 'Flatbreads, cheese pies, grilled meats, walnuts, herbs, and some of the oldest wine traditions in the world.',
-            etymology: 'Greek Kaukasos, possibly from a Scythian phrase meaning "white with snow".',
-            history: 'Russia conquered the region in the 19th-century Caucasian War (1817–1864).',
-        },
-    },
-    {
-        id: 'georgians', parent: 'caucasian', name: 'Georgians (Kartvelians)',
+        id: 'georgians', parent: null, family: 'Caucasian', name: 'Georgians (Kartvelians)',
         info: {
             summary: 'An ancient Christian nation of the South Caucasus with a unique alphabet and an 8,000-year wine tradition.',
             population: '≈ 4 million',
@@ -451,7 +412,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'nakh-dagestanian', parent: 'caucasian', name: 'Northeast Caucasian peoples',
+        id: 'nakh-dagestanian', parent: null, family: 'Caucasian', name: 'Northeast Caucasian peoples',
         info: {
             summary: 'Chechens, Ingush and the 30-plus peoples of Dagestan, highland Muslims with a history of fierce resistance to Russia.',
             population: '≈ 5 million',
@@ -489,7 +450,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'circassians-abkhaz', parent: 'caucasian', name: 'Circassians and Abkhaz',
+        id: 'circassians-abkhaz', parent: null, family: 'Caucasian', name: 'Circassians and Abkhaz',
         info: {
             summary: 'Northwest Caucasian peoples whose 19th-century expulsion by Russia created large diasporas in Türkiye, Syria and Jordan.',
             population: '≈ 0.9 million in the Caucasus (several million of Circassian descent abroad)',
@@ -570,20 +531,7 @@ export const asia: PeopleNode[] = [
 
     /* ---------- Austroasiatic ---------- */
     {
-        id: 'austroasiatic', parent: null, name: 'Austroasiatic peoples',
-        info: {
-            summary: 'An old family scattered from eastern India to Vietnam, including the Vietnamese and Khmer.',
-            population: '≈ 120 million',
-            homeland: 'Vietnam, Cambodia, Mon State (Myanmar), Meghalaya and the Munda belt (India)',
-            language: 'About 170 languages; Vietnamese became tonal through contact with Chinese.',
-            religion: 'Theravada Buddhism (Khmer, Mon), Mahayana Buddhism and folk religion (Vietnamese), Christianity (Khasi).',
-            food: 'Rice, fish sauce and fermented fish pastes, fresh herbs.',
-            etymology: 'Latin auster, "south", plus Asia: "southern Asian".',
-            history: 'Early rice farmers likely spread these languages through mainland Southeast Asia before Tai and Burman speakers arrived.',
-        },
-    },
-    {
-        id: 'vietnamese', parent: 'austroasiatic', name: 'Vietnamese (Kinh)',
+        id: 'vietnamese', parent: null, family: 'Austroasiatic', name: 'Vietnamese (Kinh)',
         info: {
             summary: 'A nation forged in a thousand years of Chinese rule and a long march south down the coast.',
             population: '≈ 90 million (≈ 5 million abroad)',
@@ -596,7 +544,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'khmer', parent: 'austroasiatic', name: 'Khmer',
+        id: 'khmer', parent: null, family: 'Austroasiatic', name: 'Khmer',
         info: {
             summary: 'Heirs of the Angkor empire, which dominated mainland Southeast Asia from the 9th to 15th centuries.',
             population: '≈ 17 million',
@@ -609,7 +557,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'mon', parent: 'austroasiatic', name: 'Mon',
+        id: 'mon', parent: null, family: 'Austroasiatic', name: 'Mon',
         info: {
             summary: 'An ancient Buddhist people of lower Myanmar who passed writing and Theravada Buddhism to the Burmans and Thai.',
             population: '≈ 1 million',
@@ -622,7 +570,7 @@ export const asia: PeopleNode[] = [
         },
     },
     {
-        id: 'khasi', parent: 'austroasiatic', name: 'Khasi and Garo hill peoples',
+        id: 'khasi', parent: null, family: 'Austroasiatic', name: 'Khasi and Garo hill peoples',
         info: {
             summary: 'Matrilineal hill peoples of Meghalaya, where property and clan name pass through the youngest daughter.',
             population: '≈ 3 million',

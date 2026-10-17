@@ -69,16 +69,28 @@ function visibleNodes(selectedId: string | null, zDepth: number): PeopleNode[] {
 /* Colors: one hue per family, children fan out around their parent  */
 /* ------------------------------------------------------------------ */
 
+/** Hues for top-level groups, or for the language family that several top-level groups share. */
 const ROOT_HUES: Record<string, number> = {
-    'indo-european': 214, 'sino-tibetan': 2, 'afro-asiatic': 32, 'niger-congo': 128, 'turkic': 168,
-    'austronesian': 276, 'dravidian': 328, 'uralic': 24, 'mongols': 268, 'caucasian': 52,
-    'austroasiatic': 92, 'tai-kadai': 302, 'japonic': 318, 'koreans': 45, 'nilo-saharan': 70,
+    'Indo-European': 214, 'Sino-Tibetan': 2, 'Afro-Asiatic': 32, 'Niger-Congo': 128, 'turkic': 168,
+    'Austronesian': 276, 'dravidian': 328, 'Uralic': 24, 'mongols': 268, 'Caucasian': 52,
+    'Austroasiatic': 92, 'tai-kadai': 302, 'japonic': 318, 'koreans': 45, 'Nilo-Saharan': 70,
     'khoe-san': 145, 'indigenous-americas': 12, 'papuans': 300, 'aboriginal-australians': 22, 'basques': 58,
 }
 
 const SIBLING_HUE_OFFSETS = [0, 42, -42, 84, -84, 21, -21, 63, -63, 105, -105, 126]
-/** Families whose children fan out the other way, to avoid clashing with neighbours. */
+/** Groups whose children fan out the other way, to avoid clashing with neighbours. */
 const FLIPPED_FAMILIES = new Set(['turkic'])
+
+/** Siblings for colouring: a top-level group's siblings are the other groups of its language family. */
+function colorSiblings(node: PeopleNode): PeopleNode[] {
+    if (node.parent) return childrenOf(node.parent)
+    return node.family ? ROOTS.filter(r => r.family === node.family) : [node]
+}
+
+/** Depth as if language families were still a level, so shades match the family's spread. */
+function colorDepth(id: string): number {
+    return depthOf(id) + (pathTo(id)[0]?.family ? 1 : 0)
+}
 
 const hueCache = new Map<string, number>()
 function nodeHue(id: string): number {
@@ -86,16 +98,17 @@ function nodeHue(id: string): number {
     if (cached !== undefined) return cached
     const node = NODE_BY_ID.get(id)!
     let hue: number
-    if (!node.parent) {
+    if (!node.parent && !node.family) {
         hue = ROOT_HUES[id] ?? 0
     } else {
-        const siblings = childrenOf(node.parent)
+        const siblings = colorSiblings(node)
         const i = siblings.findIndex(s => s.id === id)
-        // Siblings fan out around the parent's hue so neighbours differ, while the
-        // first child keeps the family hue. Deeper levels fan out less.
+        // Siblings fan out around the parent's (or family's) hue so neighbours differ, while
+        // the first keeps the base hue. Deeper levels fan out less.
         const offset = SIBLING_HUE_OFFSETS[i % SIBLING_HUE_OFFSETS.length] ?? 0
         const flip = FLIPPED_FAMILIES.has(pathTo(id)[0]?.id ?? '') ? -1 : 1
-        hue = nodeHue(node.parent) + flip * offset * (depthOf(id) > 2 ? 0.6 : 1)
+        const base = node.parent ? nodeHue(node.parent) : ROOT_HUES[node.family!] ?? 0
+        hue = base + flip * offset * (colorDepth(id) > 2 ? 0.6 : 1)
     }
     hueCache.set(id, hue)
     return hue
@@ -105,7 +118,7 @@ interface Hsl { h: number, s: number, l: number }
 
 function baseHsl(id: string): Hsl {
     const node = NODE_BY_ID.get(id)!
-    const siblings = node.parent ? childrenOf(node.parent) : ROOTS
+    const siblings = colorSiblings(node)
     const i = siblings.findIndex(s => s.id === id)
     return {
         h: ((nodeHue(id) % 360) + 360) % 360,

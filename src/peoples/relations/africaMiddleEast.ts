@@ -1,12 +1,9 @@
 import type { RelationsMap } from './types.ts'
 
 export const africaMiddleEastRelations: RelationsMap = {
-    'afro-asiatic': [
-        { with: 'indo-european', text: 'From the Persian–Arab wars to crusades and European colonialism, the longest-running cross-family rivalry in the Old World.' },
-        { with: 'niger-congo', text: 'Along the Sahel, Arab and Berber herders and traders met Black African farmers through trade, Islam and the trans-Saharan slave trade.' },
-        { with: 'turkic', text: 'The Ottomans ruled most Arab lands from 1516 to 1918.' },
-    ],
     'semitic': [
+        { label: "Afro-Asiatic family", text: "Part of the Afro-Asiatic family, which links Arabic and Hebrew with Berber, Somali, Oromo, Hausa and ancient Egyptian; it split so long ago (perhaps 10,000+ years) that few words still match. One that does is the root for 'die': Arabic māta, Hebrew mēt, Hausa mutu, Kabyle (Berber) immut 'he died'. Within Semitic, Arabic, Hebrew and Amharic share three-consonant roots: k-t-b 'write' gives Arabic kitāb and Hebrew ktav; the word for peace is salām, shalom and selam." },
+        { with: 'turkic', text: 'The Ottomans ruled most Arab lands from 1516 to 1918; Arab nationalism grew partly against Turkish rule.' },
         { with: 'iranian', text: 'Arab–Persian rivalry, now framed as Saudi Arabia versus Iran.' },
         { with: 'cushitic', text: 'Ethiopia\'s Semitic highlanders long ruled Cushitic Oromo and Somali lowlands.' },
     ],
@@ -69,6 +66,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'maghrebis', text: 'The language is Arabic in origin, but Maltese identity is firmly Catholic and European.' },
     ],
     'berbers': [
+        { label: "Afro-Asiatic family", text: "Part of the Afro-Asiatic family, which links Arabic and Hebrew with Berber, Somali, Oromo, Hausa and ancient Egyptian; it split so long ago (perhaps 10,000+ years) that few words still match. One that does is the root for 'die': Arabic māta, Hebrew mēt, Hausa mutu, Kabyle (Berber) immut 'he died'. Berber marks feminine nouns with t (tamɣart 'woman', from amɣar 'elder'), the same feminine t found in Arabic -at and Hebrew -et." },
         { with: 'arabs', text: 'Arabization over 13 centuries; the Amazigh cultural movement has won official recognition in Morocco and Algeria.' },
     ],
     'amazigh': [
@@ -81,6 +79,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { label: 'Jihadist groups', text: 'Some Tuareg factions allied with, then fought, al-Qaeda-linked groups in northern Mali.' },
     ],
     'cushitic': [
+        { label: "Afro-Asiatic family", text: "Part of the Afro-Asiatic family, which links Arabic and Hebrew with Berber, Somali, Oromo, Hausa and ancient Egyptian; it split so long ago (perhaps 10,000+ years) that few words still match. One that does is the root for 'die': Arabic māta, Hebrew mēt, Hausa mutu, Kabyle (Berber) immut 'he died'. Somali, Oromo, Afar and Beja are Cushitic; like Semitic and Berber, Cushitic verbs mark the feminine with t." },
         { with: 'ethio-semitic', text: 'Incorporated into the Ethiopian empire in the late 1800s; ethnic federalism since 1995 gave them regions of their own.' },
     ],
     'somalis': [
@@ -104,17 +103,15 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'oromo', text: 'Border disputes between Oromo and southern groups such as the Gedeo displaced about a million people in 2018.' },
     ],
     'hausa': [
+        { label: "Afro-Asiatic family", text: "Part of the Afro-Asiatic family, which links Arabic and Hebrew with Berber, Somali, Oromo, Hausa and ancient Egyptian; it split so long ago (perhaps 10,000+ years) that few words still match. One that does is the root for 'die': Arabic māta, Hebrew mēt, Hausa mutu, Kabyle (Berber) immut 'he died'. Hausa is the largest Chadic language, the Afro-Asiatic branch spoken around Lake Chad; mutu (die) and suna (name, compare Arabic ism, Hebrew shem) are among its old shared words." },
         { with: 'fulani', text: 'Fulani jihadists conquered the Hausa states in 1804; elites intermarried into a "Hausa-Fulani" aristocracy.' },
         { with: 'yoruba', text: 'Rivals for national power; Nigeria\'s presidency often alternates between north and south.' },
         { with: 'igbo', text: 'Anti-Igbo pogroms in the north in 1966 helped trigger the Biafran war.' },
         { with: 'middle-belt', text: 'Christian Middle Belt peoples resist northern Muslim political dominance.' },
     ],
 
-    'niger-congo': [
-        { with: 'afro-asiatic', text: 'The Sahel meeting zone: centuries of trade and Islamization, and today\'s farmer–herder and jihadist violence.' },
-        { with: 'nilo-saharan', text: 'Bantu and Nilotic peoples intermingle across East Africa.' },
-    ],
     'bantu': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Bantu is a branch of Benue-Congo; its closest relatives outside Bantu are Bantoid languages such as Tiv in Nigeria, and more distantly Yoruba and Igbo. The name comes from ba-ntu 'people', the plural of mu-ntu 'person', a word found across the Bantu languages." },
         { with: 'khoe-san', text: 'Expanding Bantu farmers absorbed or displaced Khoe-San foragers; Nguni languages borrowed their clicks.' },
         { with: 'nilotes-east', text: 'Bantu and Nilotic peoples share Kenya, Uganda and Tanzania, sometimes clashing over land.' },
     ],
@@ -177,6 +174,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'somalis', text: 'Kenya has fought al-Shabaab in Somalia since 2011.' },
     ],
     'volta-niger': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Yoruba, Igbo and Edo are distant cousins of the Bantu languages; the Bantu expansion began next door, in the Nigeria–Cameroon borderland." },
         { with: 'hausa', text: 'Nigeria\'s north–south divide shapes national politics.' },
     ],
     'yoruba': [
@@ -198,6 +196,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'hausa', text: 'Resist northern Muslim political dominance.' },
     ],
     'atlantic': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Fula marks some 20 noun classes with suffixes and consonant changes; Wolof marks them on its articles (xaj bi, 'the dog')." },
         { with: 'mande', text: 'Wolof, Fula and Mande states have competed and intermarried across Senegambia for centuries.' },
     ],
     'senegambians': [
@@ -212,11 +211,13 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'mande', text: 'Many Fulani are suspected of jihadist sympathies by Mande-led states, fueling abuses by armies.' },
     ],
     'mande': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Mande's membership is debated: it lacks noun classes and may be a separate family. Bambara, Mandinka and Dyula are close enough to understand each other." },
         { with: 'tuareg', text: 'Mali\'s southern-dominated government has fought northern Tuareg rebellions since 1963.' },
         { with: 'fulani', text: 'Old partners in the Mali Empire, now tense amid jihadist insurgency.' },
         { with: 'senegambians', text: 'Close historic ties; Mandinka kingdoms once ruled the Gambia valley.' },
     ],
     'kwa': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Akan and Ewe are tone languages that have lost most of the old noun-class system." },
         { with: 'gur', text: 'Coastal Akan and Gbe peoples and northern Gur peoples share Ghana, Togo and Benin; the north is poorer.' },
     ],
     'akan': [
@@ -229,48 +230,54 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'gur', text: 'Togo\'s northern Kabye-led government and southern Ewe have long been at odds.' },
     ],
     'gur': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Gur (Mossi, Dagbani, Senufo) keeps noun classes as suffixes; it is the northern neighbour and relative of the Kwa languages." },
         { with: 'akan', text: 'The poorer north versus the cocoa-rich south in Ghana and Côte d\'Ivoire.' },
         { with: 'fulani', text: 'Jihadist violence in Burkina Faso since 2015 has displaced about 2 million, with reprisals against Fulani civilians.' },
     ],
     'kru': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Kru languages (Bété, Guéré, Bassa) are tone languages distantly related to Kwa and Gur." },
         { with: 'akan', text: 'Rivals of the Baoulé in Ivorian politics; President Gbagbo was Bété.' },
         { with: 'mande', text: 'Clashes with northern Dioula migrants over land in western Côte d\'Ivoire.' },
     ],
     'ubangian': [
+        { label: "Niger-Congo family", text: "Part of the proposed Niger-Congo family, which covers most of Africa south of the Sahara and is known for noun-class systems (prefixes that sort nouns into classes, like Swahili m-tu 'person', wa-tu 'people'). Ubangian (Gbaya, Banda, Zande) is only tentatively placed in Niger-Congo; Sango, the lingua franca of the Central African Republic, is Ubangian-based." },
         { label: 'Muslim northerners (Séléka)', text: 'The CAR war since 2013 pitted largely Muslim Séléka rebels against Christian anti-balaka militias.' },
         { with: 'nilotes-sudan', text: 'Zande and Dinka have clashed in South Sudan\'s Western Equatoria.' },
     ],
 
-    'nilo-saharan': [
-        { with: 'afro-asiatic', text: 'The Arab–African divide in Sudan and Chad.' },
-        { with: 'niger-congo', text: 'Nilotic and Bantu peoples interlace across East Africa.' },
-    ],
     'nilotes-sudan': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. The Nilotic languages, though, are clearly related: Dinka, Nuer and Shilluk are closest to the Luo, Kalenjin and Maasai of East Africa, and all share cattle-centred vocabulary." },
         { with: 'sudanic-arabs', text: 'Decades of north–south war and slave raiding before South Sudan\'s independence.' },
         { label: 'Dinka and Nuer', text: 'Old cattle-raiding rivals whose leaders\' split in 2013 started a civil war that killed about 400,000.' },
     ],
     'nilotes-east': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. The Nilotic languages are clearly related: Luo is close to Shilluk and Acholi, while Kalenjin and Maasai are more distant cousins of Sudan's Dinka and Nuer." },
         { with: 'east-african-bantu', text: 'Luo–Kikuyu and Kalenjin–Kikuyu rivalries dominate Kenyan elections.' },
         { with: 'great-lakes', text: 'Northern Ugandans (Acholi) suffered heavily under Museveni\'s war against the Lord\'s Resistance Army.' },
         { label: 'Maasai and conservation', text: 'Maasai have been evicted from land in Tanzania for game reserves and hunting concessions.' },
     ],
     'kanuri-teda': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. Kanuri and Teda form the Saharan branch, which also includes Zaghawa in Darfur and Chad." },
         { with: 'hausa', text: 'Kanem-Bornu and the Hausa states were rival Sahelian powers.' },
         { label: 'Boko Haram', text: 'The insurgency, born in Kanuri Maiduguri, has killed about 35,000 people in combat and displaced millions.' },
     ],
     'songhai-zarma': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. Songhai is the hardest to place: some linguists link it to Nilo-Saharan, others treat it as a family of its own." },
         { with: 'tuareg', text: 'Competition over the Niger valley, with Songhai militias forming during Mali\'s 1990s rebellion.' },
         { with: 'hausa', text: 'Niger\'s two main peoples; politics balances between them.' },
     ],
     'darfur': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. Fur forms its own branch, Masalit and Maba belong to the Maban branch, and Zaghawa is Saharan, related to Kanuri." },
         { with: 'sudanic-arabs', text: 'Two genocidal campaigns (2003–05 and since 2023) by Arab militias against Fur, Masalit and Zaghawa.' },
         { label: 'Zaghawa in Chad', text: 'Chad\'s ruling family is Zaghawa, linking Darfur\'s conflict to Chadian politics.' },
     ],
     'nubians': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. Nubian belongs to the Eastern Sudanic branch, with Nilotic as a distant cousin; Old Nubian was written in a Greek-based script from the 8th century." },
         { with: 'egyptians', text: 'Displaced by the Aswan dams; a demand to return to ancestral land is now written into Egypt\'s constitution.' },
         { with: 'sudanic-arabs', text: 'Many Nubians in Sudan have shifted to Arabic, but a distinct identity remains.' },
     ],
     'sara': [
+        { label: "Nilo-Saharan languages", text: "Nilo-Saharan is a proposed grouping of languages from the Niger bend to the Nile and East Africa; linguists have not proven it is a single family. Sara belongs to the Central Sudanic branch, with Lugbara and Mangbetu in Uganda and Congo." },
         { with: 'sudanic-arabs', text: 'Southern Christians dominated Chad\'s early government; northern rebels took over after 1979.' },
     ],
 

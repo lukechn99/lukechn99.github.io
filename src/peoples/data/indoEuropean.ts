@@ -14,23 +14,10 @@ export const indoEuropean: PeopleNode[] = [
             history: 'Genetic studies show Basques kept unusually high levels of early European farmer ancestry. The armed separatist group ETA disbanded in 2018 after about 850 killings.',
         },
     },
-    {
-        id: 'indo-european', parent: null, name: 'Indo-European peoples',
-        info: {
-            summary: 'The largest language family on Earth, spoken natively by nearly half of humanity, from Iceland to Bangladesh and, through colonization, across the Americas and Oceania.',
-            population: '≈ 3.3 billion native speakers',
-            homeland: 'Europe, the Iranian plateau, northern South Asia, and settler societies in the Americas and Oceania',
-            language: 'About 450 languages in a dozen branches. All descend from Proto-Indo-European, reconstructed from shared words such as Latin pater, Sanskrit pitṛ and English father.',
-            religion: 'Every major tradition is represented: Christianity in Europe and the Americas, Islam in Iran and Pakistan, Hinduism and Sikhism in India, Buddhism in Sri Lanka.',
-            food: 'No shared cuisine, but ancient shared words for cattle, milk, wool and grain hint at the herding diet of the first speakers.',
-            etymology: 'Coined by the English scholar Thomas Young in 1813 to describe a family stretching from India to Europe.',
-            history: 'The leading "steppe hypothesis" places the first speakers among herders north of the Black and Caspian Seas around 4000–3000 BCE, who spread with horses and wheeled wagons.',
-        },
-    },
 
     /* ---------- Slavic ---------- */
     {
-        id: 'slavic', parent: 'indo-european', name: 'Slavs',
+        id: 'slavic', parent: null, family: 'Indo-European', name: 'Slavs',
         info: {
             summary: "Europe's largest ethnolinguistic bloc, spread across Eastern Europe, the Balkans and northern Asia.",
             population: '≈ 300 million',
@@ -253,7 +240,7 @@ export const indoEuropean: PeopleNode[] = [
 
     /* ---------- Germanic ---------- */
     {
-        id: 'germanic', parent: 'indo-european', name: 'Germanic peoples',
+        id: 'germanic', parent: null, family: 'Indo-European', name: 'Germanic peoples',
         info: {
             summary: 'Peoples of northern and central Europe whose languages, through English, became the most widely used on Earth.',
             population: '≈ 500 million native speakers (most via English)',
@@ -475,7 +462,7 @@ export const indoEuropean: PeopleNode[] = [
 
     /* ---------- Romance ---------- */
     {
-        id: 'romance', parent: 'indo-european', name: 'Romance (Latin) peoples',
+        id: 'romance', parent: null, family: 'Indo-European', name: 'Romance (Latin) peoples',
         info: {
             summary: 'Peoples speaking descendants of Latin, the language of Rome, now dominant from Portugal to Romania and across Latin America.',
             population: '≈ 900 million native speakers',
@@ -761,7 +748,7 @@ export const indoEuropean: PeopleNode[] = [
 
     /* ---------- Celtic ---------- */
     {
-        id: 'celtic', parent: 'indo-european', name: 'Celtic peoples',
+        id: 'celtic', parent: null, family: 'Indo-European', name: 'Celtic peoples',
         info: {
             summary: 'The Atlantic-fringe peoples of Ireland, Scotland, Wales and Brittany, survivors of a family once spread from Spain to Turkey.',
             population: '≈ 16 million (Celtic languages have about 1 million speakers)',
@@ -828,7 +815,7 @@ export const indoEuropean: PeopleNode[] = [
 
     /* ---------- Single-language branches ---------- */
     {
-        id: 'greeks', parent: 'indo-european', name: 'Greeks (Hellenic)',
+        id: 'greeks', parent: null, family: 'Indo-European', name: 'Greeks (Hellenic)',
         info: {
             summary: 'One of Europe\'s oldest documented peoples, with 3,400 years of written language.',
             population: '≈ 13 million (≈ 3–5 million abroad)',
@@ -841,7 +828,7 @@ export const indoEuropean: PeopleNode[] = [
         },
     },
     {
-        id: 'albanians', parent: 'indo-european', name: 'Albanians',
+        id: 'albanians', parent: null, family: 'Indo-European', name: 'Albanians',
         info: {
             summary: 'Speakers of an isolated Indo-European branch, possibly descended from the ancient Illyrians.',
             population: '≈ 7–8 million',
@@ -854,7 +841,7 @@ export const indoEuropean: PeopleNode[] = [
         },
     },
     {
-        id: 'baltic', parent: 'indo-european', name: 'Balts',
+        id: 'baltic', parent: null, family: 'Indo-European', name: 'Balts',
         info: {
             summary: 'Lithuanians and Latvians, the last speakers of the Baltic branch, which preserves very old Indo-European features. (Estonians are not Balts but Finnic.)',
             population: '≈ 4.5 million',
@@ -892,7 +879,7 @@ export const indoEuropean: PeopleNode[] = [
         },
     },
     {
-        id: 'armenians', parent: 'indo-european', name: 'Armenians',
+        id: 'armenians', parent: null, family: 'Indo-European', name: 'Armenians',
         info: {
             summary: 'An ancient people of the Armenian Highlands and the first nation to adopt Christianity as a state religion, in 301.',
             population: '≈ 3 million in Armenia, 8–10 million worldwide',
@@ -907,7 +894,7 @@ export const indoEuropean: PeopleNode[] = [
 
     /* ---------- Iranian ---------- */
     {
-        id: 'iranian', parent: 'indo-european', name: 'Iranian peoples',
+        id: 'iranian', parent: null, family: 'Indo-European', name: 'Iranian peoples',
         info: {
             summary: 'Peoples speaking Iranian languages, from the Kurds of Anatolia to the Pashtuns of Afghanistan, heirs of the Persian and Scythian worlds.',
             population: '≈ 200 million',
@@ -1025,7 +1012,7 @@ export const indoEuropean: PeopleNode[] = [
 
     /* ---------- Indo-Aryan ---------- */
     {
-        id: 'indo-aryan', parent: 'indo-european', name: 'Indo-Aryan peoples',
+        id: 'indo-aryan', parent: null, family: 'Indo-European', name: 'Indo-Aryan peoples',
         info: {
             summary: 'The largest Indo-European branch by speakers, covering northern and central South Asia.',
             population: '≈ 1.5 billion',

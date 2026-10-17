@@ -3,20 +3,7 @@ import type { PeopleNode } from '../types.ts'
 export const pacificAmericas: PeopleNode[] = [
     /* ---------- Austronesian ---------- */
     {
-        id: 'austronesian', parent: null, name: 'Austronesian peoples',
-        info: {
-            summary: 'History\'s greatest seafarers before 1500: from Taiwan they settled Indonesia, the Philippines, Madagascar, Hawaii, Easter Island and New Zealand.',
-            population: '≈ 400 million',
-            homeland: 'Maritime Southeast Asia, Madagascar, the Pacific Islands, Taiwan\'s Indigenous peoples',
-            language: 'About 1,250 languages, the second-largest family by count; Malay/Indonesian is the largest.',
-            religion: 'Islam in Indonesia and Malaysia, Catholicism in the Philippines, Protestantism across Polynesia, Hinduism in Bali.',
-            food: 'Rice, coconut, taro, breadfruit, yams, fish, and fermented fish and shrimp pastes.',
-            etymology: 'Latin auster, "south", plus Greek nēsos, "island": the "southern island" family.',
-            history: 'Outrigger canoes carried Austronesians out of Taiwan from about 3000 BCE; they reached Madagascar around 500 CE and New Zealand around 1250–1300 CE.',
-        },
-    },
-    {
-        id: 'malayic', parent: 'austronesian', name: 'Indonesian and Malay peoples',
+        id: 'malayic', parent: null, family: 'Austronesian', name: 'Indonesian and Malay peoples',
         info: {
             summary: 'Hundreds of peoples of the Indonesian archipelago, Malaysia and Brunei, united by Malay as a lingua franca.',
             population: '≈ 310 million',
@@ -133,7 +120,7 @@ export const pacificAmericas: PeopleNode[] = [
         },
     },
     {
-        id: 'philippine', parent: 'austronesian', name: 'Filipino peoples',
+        id: 'philippine', parent: null, family: 'Austronesian', name: 'Filipino peoples',
         info: {
             summary: 'About 180 ethnolinguistic groups of the Philippine archipelago, shaped by Spanish and American rule.',
             population: '≈ 115 million',
@@ -210,7 +197,7 @@ export const pacificAmericas: PeopleNode[] = [
         },
     },
     {
-        id: 'malagasy', parent: 'austronesian', name: 'Malagasy',
+        id: 'malagasy', parent: null, family: 'Austronesian', name: 'Malagasy',
         info: {
             summary: 'The people of Madagascar, of mixed Bornean and East African ancestry.',
             population: '≈ 30 million',
@@ -223,7 +210,7 @@ export const pacificAmericas: PeopleNode[] = [
         },
     },
     {
-        id: 'oceanic', parent: 'austronesian', name: 'Pacific Islanders (Oceanic)',
+        id: 'oceanic', parent: null, family: 'Austronesian', name: 'Pacific Islanders (Oceanic)',
         info: {
             summary: 'Melanesians, Polynesians and Micronesians, who navigated the world\'s largest ocean by stars and swells.',
             population: '≈ 3 million',

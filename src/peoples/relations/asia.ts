@@ -1,15 +1,13 @@
 import type { RelationsMap } from './types.ts'
 
 export const asiaRelations: RelationsMap = {
-    'sino-tibetan': [
-        { with: 'turkic', text: 'Chinese dynasties fought and traded with Turkic steppe empires for 1,500 years; today the Uyghur question dominates.' },
-        { with: 'mongols', text: 'The Great Wall was built against northern nomads; Mongols ruled all of China as the Yuan dynasty (1271–1368).' },
-        { with: 'koreans', text: 'Korea and Vietnam absorbed Chinese script and Confucian statecraft while resisting Chinese rule.' },
-    ],
     'han': [
+        { label: "Sino-Tibetan family", text: "Chinese, Tibetan and Burmese descend from a common Sino-Tibetan ancestor, probably spoken in northern China over 6,000 years ago; they are no longer mutually intelligible. Basic words still line up: 'five' is wǔ in Mandarin (Old Chinese *ŋaʔ) and lnga in written Tibetan, 'fish' is yú (Old Chinese *ŋa) and nya, and Burmese uses ngá for both." },
         { with: 'tibetans', text: 'China took control of Tibet in 1950; Han migration, restrictions on religion and boarding schools fuel resentment.' },
         { with: 'uyghurs', text: 'Han settlement and mass internment since 2017 define the relationship in Xinjiang.' },
-        { with: 'mongols', text: 'Han now outnumber Mongols about 4 to 1 in Inner Mongolia; cuts to Mongolian-language schooling sparked protests in 2020.' },
+        { with: 'mongols', text: 'The Great Wall was built against northern nomads, and Mongols ruled all of China as the Yuan dynasty (1271–1368). Han now outnumber Mongols about 4 to 1 in Inner Mongolia; cuts to Mongolian-language schooling sparked protests in 2020.' },
+        { with: 'turkic', text: 'Chinese dynasties fought and traded with Turkic steppe empires for 1,500 years, from the Göktürk khaganates to the Tang dynasty\'s alliance with the Uyghur Khaganate.' },
+        { with: 'koreans', text: 'Korea and Vietnam absorbed Chinese script and Confucian statecraft while resisting Chinese rule.' },
         { with: 'japanese', text: 'Japan\'s invasion (1937–45), including the Nanjing Massacre, still shapes Chinese views of Japan.' },
         { label: 'Overseas Chinese and Southeast Asians', text: 'Chinese commercial minorities have faced periodic violence, notably in Indonesia in 1965 and 1998.' },
     ],
@@ -34,17 +32,20 @@ export const asiaRelations: RelationsMap = {
         { with: 'han-mandarin', text: 'Fully part of mainstream Han China; Hunan produced many Communist leaders, including Mao.' },
     ],
     'tibetans': [
+        { label: "Sino-Tibetan family", text: "Chinese, Tibetan and Burmese descend from a common Sino-Tibetan ancestor, probably spoken in northern China over 6,000 years ago; they are no longer mutually intelligible. Written Tibetan lnga (five), nya (fish) and gsum (three) match Burmese ngá (five, and also fish) and thóun, and Old Chinese *ŋaʔ, *ŋa and *sum." },
         { with: 'han', text: 'The 1959 uprising, the Cultural Revolution\'s destruction of monasteries, and today\'s tight control; the Dalai Lama\'s succession is a looming flashpoint.' },
         { with: 'mongols', text: 'Mongols adopted Tibetan Buddhism; the title "Dalai Lama" is Mongolian ("ocean").' },
         { with: 'nepalis', text: 'Trade across the Himalaya for centuries; Nepal hosts about 20,000 Tibetan refugees.' },
     ],
     'burmans': [
+        { label: "Sino-Tibetan family", text: "Chinese, Tibetan and Burmese descend from a common Sino-Tibetan ancestor, probably spoken in northern China over 6,000 years ago; they are no longer mutually intelligible. Burmese is closest to the other Tibeto-Burman languages; ngá (both five and fish) and thóun (three) match Tibetan lnga, nya and gsum." },
         { with: 'karen', text: 'The army has fought Karen forces since 1949, burning villages and creating refugee camps in Thailand.' },
         { with: 'shan', text: 'Shan princes lost autonomy after the 1962 coup; several Shan armies still fight or bargain with the junta.' },
         { label: 'Rohingya', text: 'Burman nationalists deny the Muslim Rohingya are a native people; the army\'s 2017 clearance operations drove about 700,000 into Bangladesh.' },
         { with: 'thai', text: 'Burma destroyed the Thai capital Ayutthaya in 1767, a lasting memory in Thailand.' },
     ],
     'tibeto-burman-hills': [
+        { label: "Sino-Tibetan family", text: "Chinese, Tibetan and Burmese descend from a common Sino-Tibetan ancestor, probably spoken in northern China over 6,000 years ago; they are no longer mutually intelligible. Karen, Kachin, Chin, Naga and the other hill languages belong to the Tibeto-Burman branch with Burmese and Tibetan, and share old roots: 'five' is panga in Mizo and manga in Kachin, built on the same root as Burmese ngá." },
         { with: 'burmans', text: 'Most hill peoples have fought the Burman-led army; since 2021 many have joined the wider resistance.' },
         { with: 'hindustanis', text: 'Northeast India\'s hill states have their own insurgencies and special laws such as AFSPA.' },
     ],
@@ -123,11 +124,9 @@ export const asiaRelations: RelationsMap = {
         { with: 'mongols', text: 'Tuvans share Buddhism and nomadic culture with Mongols.' },
     ],
 
-    'uralic': [
-        { with: 'slavic', text: 'Most Uralic peoples were absorbed into Russia; only Finns, Estonians and Hungarians have states.' },
-        { with: 'germanic', text: 'Swedish and German elites ruled Finland and Estonia for centuries.' },
-    ],
     'finnic': [
+        { label: "Uralic family", text: "Part of the Uralic family with Hungarian and the Sámi, Mari and Komi of Russia. Finnish and Hungarian split 4,000+ years ago and are not intelligible, but basic words match: kala and hal (fish), käsi and kéz (hand), vesi and víz (water)." },
+        { with: 'germanic', text: 'Swedish and German elites ruled Finland and Estonia for centuries.' },
         { with: 'east-slavic', text: 'Karelia was partly lost to the USSR in 1940–44; Karelians in Russia are now a small minority.' },
     ],
     'finns': [
@@ -141,6 +140,7 @@ export const asiaRelations: RelationsMap = {
         { with: 'latvians', text: 'Close partners despite unrelated languages.' },
     ],
     'hungarians': [
+        { label: "Uralic family", text: "Hungarian is Uralic, related to Finnish and Estonian and most closely to the Khanty and Mansi of western Siberia, not to its Slavic, German or Romanian neighbours. Shared words: hal and kala (fish), kéz and käsi (hand), víz and vesi (water)." },
         { with: 'romanians', text: 'Transylvania changed hands in 1920 and 1940; Hungarian minority rights remain a regular dispute.' },
         { with: 'slovaks', text: 'Language laws and the 1945–47 expulsions of Hungarians still cause friction.' },
         { with: 'germans', text: 'The Habsburg partnership (Austria-Hungary, 1867–1918) and allies in both world wars.' },
@@ -152,17 +152,15 @@ export const asiaRelations: RelationsMap = {
         { with: 'kazakhs', text: 'Kazakhs form a minority of about 4% in western Mongolia.' },
     ],
 
-    'caucasian': [
-        { with: 'slavic', text: 'Russia conquered the region in the 19th century and fought Chechnya in two modern wars.' },
-        { with: 'turkic', text: 'Ottoman and Persian influence shaped the Caucasus for centuries.' },
-    ],
     'georgians': [
+        { label: "Caucasus neighbours", text: "Caucasus neighbours, not relatives: Georgian (Kartvelian), Chechen and Avar (Northeast Caucasian), and Circassian and Abkhaz (Northwest Caucasian) belong to three separate language families with no proven link. What they share is mountain culture: codes of hospitality and blood feud, elaborate toasting at feasts, and centuries between Persian, Ottoman and Russian empires. Georgian's own small family, Kartvelian, includes Mingrelian, Laz and Svan." },
         { with: 'russians', text: 'Annexed in 1801; the 2008 war and Russian troops in Abkhazia and South Ossetia leave deep hostility.' },
         { with: 'circassians-abkhaz', text: 'The 1992–93 war in Abkhazia expelled about 200,000 Georgians.' },
         { with: 'ossetians', text: 'South Ossetia broke away with Russian support.' },
         { with: 'armenians', text: 'Friendly Christian neighbours.' },
     ],
     'nakh-dagestanian': [
+        { label: "Caucasus neighbours", text: "Caucasus neighbours, not relatives: Georgian (Kartvelian), Chechen and Avar (Northeast Caucasian), and Circassian and Abkhaz (Northwest Caucasian) belong to three separate language families with no proven link. What they share is mountain culture: codes of hospitality and blood feud, elaborate toasting at feasts, and centuries between Persian, Ottoman and Russian empires. Chechen and Ingush form the Nakh branch; Dagestan's Avar, Lezgin, Dargin and dozens more make up the rest of Northeast Caucasian." },
         { with: 'russians', text: 'The longest resistance to Russian conquest, from Imam Shamil to the Chechen wars.' },
         { with: 'azerbaijanis', text: 'Lezgins and Avars live on both sides of the Russia–Azerbaijan border.' },
     ],
@@ -176,6 +174,7 @@ export const asiaRelations: RelationsMap = {
         { with: 'azerbaijanis', text: 'Lezgins are divided by the border.' },
     ],
     'circassians-abkhaz': [
+        { label: "Caucasus neighbours", text: "Caucasus neighbours, not relatives: Georgian (Kartvelian), Chechen and Avar (Northeast Caucasian), and Circassian and Abkhaz (Northwest Caucasian) belong to three separate language families with no proven link. What they share is mountain culture: codes of hospitality and blood feud, elaborate toasting at feasts, and centuries between Persian, Ottoman and Russian empires. Circassian (Adyghe and Kabardian) and Abkhaz belong to Northwest Caucasian, known for huge consonant inventories (the extinct Ubykh had about 80) and only two or three vowels." },
         { with: 'russians', text: 'The 1864 expulsion, called a genocide by many Circassians, is commemorated every May 21.' },
         { with: 'georgians', text: 'Abkhazia\'s breakaway and the expulsion of Georgians in 1993.' },
         { with: 'turks', text: 'Several million Turkish citizens are of Circassian descent.' },
@@ -203,31 +202,31 @@ export const asiaRelations: RelationsMap = {
         { with: 'gulf-arabs', text: 'About 2 million Malayalis work in the Gulf, sending home remittances that transformed Kerala.' },
     ],
 
-    'austroasiatic': [
-        { with: 'tai-kadai', text: 'Tai peoples moved into lands once ruled by the Khmer and Mon.' },
-        { with: 'han', text: 'Vietnam was ruled by China for about 1,000 years.' },
-    ],
     'vietnamese': [
+        { label: "Austroasiatic family", text: "Vietnamese belongs to the Austroasiatic family with Khmer, Mon, Khasi and the Munda languages of India. Its huge Chinese vocabulary hides this, but the numbers show it: một, ba, bốn (one, three, four) match Khmer muŏy, bei, buŏn." },
         { with: 'han', text: 'A thousand years of Chinese rule, a 1979 border war, and disputes in the South China Sea.' },
         { with: 'khmer', text: 'Vietnam absorbed the Mekong delta from Cambodia; Vietnam ended the Khmer Rouge in 1979 but occupied Cambodia until 1989.' },
         { label: 'Cham', text: 'The Hindu, then Muslim Cham kingdom of central Vietnam was conquered by 1832.' },
         { with: 'french', text: 'French colonial rule ended at Dien Bien Phu in 1954.' },
     ],
     'khmer': [
+        { label: "Austroasiatic family", text: "Khmer belongs to the Austroasiatic family with Vietnamese, Mon, Khasi and India's Munda languages. Its numbers match Vietnamese: muŏy, bei, buŏn and một, ba, bốn (one, three, four)." },
         { with: 'vietnamese', text: 'Fear of Vietnamese domination runs deep, from the loss of the Mekong delta to the 1979–89 occupation.' },
         { with: 'thai', text: 'Thailand ruled western Cambodia at times; a 2008–11 dispute over Preah Vihear temple turned deadly, and border fighting broke out again in 2025.' },
     ],
     'mon': [
+        { label: "Austroasiatic family", text: "Mon belongs to the Austroasiatic family with Khmer, Vietnamese and Khasi; Mon and Khmer are its two oldest written languages, both with inscriptions from the 6th–7th centuries." },
         { with: 'burmans', text: 'Mon kingdoms were conquered by Burmans in the 1750s; a Mon armed group has fought for autonomy.' },
         { with: 'thai', text: 'Many Mon fled to Siam after Burmese conquest; Mon culture influenced Thai Buddhism.' },
     ],
     'khasi': [
+        { label: "Austroasiatic family", text: "Khasi belongs to the Austroasiatic family, making it a distant relative of Khmer and Vietnamese and of the Munda languages (such as Santali) spoken elsewhere in India." },
         { with: 'bengalis', text: 'Tension over migration from Bangladesh.' },
         { with: 'assamese', text: 'Meghalaya was split from Assam in 1972; border disputes continue.' },
     ],
 
     'tai-kadai': [
-        { with: 'austroasiatic', text: 'Tai migrants moved into Khmer and Mon lands from about 1000 CE.' },
+        { with: 'khmer', text: 'Tai migrants moved into Khmer and Mon lands from about 1000 CE.' },
         { with: 'han', text: 'The Zhuang and other Tai peoples remained in southern China.' },
     ],
     'thai': [

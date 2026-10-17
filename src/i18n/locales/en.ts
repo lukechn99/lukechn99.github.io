@@ -91,7 +91,7 @@ const en = {
         tagPlaceholder: 'Tag this stop...',
     },
     people: {
-        levels: ['Language families', 'Branches', 'Sub-branches', 'Peoples'],
+        levels: ['Major groups', 'Subgroups', 'Peoples', 'Local groups'],
         zoomShows: 'Zoom level shows:',
         backToWorld: 'Back to the whole world',
         loading: 'Loading map…',

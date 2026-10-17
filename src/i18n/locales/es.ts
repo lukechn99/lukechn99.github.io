@@ -93,7 +93,7 @@ const es: Resources = {
         tagPlaceholder: 'Etiqueta esta parada...',
     },
     people: {
-        levels: ['Familias lingüísticas', 'Ramas', 'Subramas', 'Pueblos'],
+        levels: ['Grandes grupos', 'Subgrupos', 'Pueblos', 'Grupos locales'],
         zoomShows: 'El nivel de zoom muestra:',
         backToWorld: 'Volver al mundo entero',
         loading: 'Cargando mapa…',

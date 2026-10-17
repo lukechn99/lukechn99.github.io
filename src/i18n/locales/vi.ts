@@ -93,7 +93,7 @@ const vi: Resources = {
         tagPlaceholder: 'Gắn thẻ cho điểm dừng này...',
     },
     people: {
-        levels: ['Ngữ hệ', 'Nhánh', 'Phân nhánh', 'Dân tộc'],
+        levels: ['Nhóm lớn', 'Nhóm con', 'Dân tộc', 'Nhóm địa phương'],
         zoomShows: 'Mức phóng to hiển thị:',
         backToWorld: 'Quay về toàn thế giới',
         loading: 'Đang tải bản đồ…',
