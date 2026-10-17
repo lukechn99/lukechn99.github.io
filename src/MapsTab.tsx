@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState, useCallback, useMemo } from "react"
 import {
     Stack, Text, ActionIcon, Collapse, Group, Button, Paper, TextInput, Loader, Select, Tooltip,
+    useComputedColorScheme,
 } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
 import {
@@ -17,6 +18,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { useTranslation } from "react-i18next"
 import type { Map as LeafletMap } from "leaflet"
+import type { MaptilerLayer as MaptilerLayerType } from "@maptiler/leaflet-maptilersdk"
 import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
 import {
@@ -98,8 +100,18 @@ function SortableItem({ item, index, isDragMode, onUpdate, onRemove, onFocus }: 
     )
 }
 
+/** MapTiler Streets, in its dark variant when the site is in dark mode. */
+const streetsStyle = (dark: boolean) => (dark ? 'streets-v2-dark' : 'streets-v2')
+
 export default function MapsTab() {
-    const { t } = useTranslation()
+    const { t, i18n } = useTranslation()
+    const isDark = useComputedColorScheme('light', { getInitialValueInEffect: false }) === 'dark'
+    const darkRef = useRef(isDark)
+    darkRef.current = isDark
+    const langRef = useRef(i18n.resolvedLanguage ?? 'en')
+    langRef.current = i18n.resolvedLanguage ?? 'en'
+    const mtLayerRef = useRef<MaptilerLayerType | null>(null)
+    const mtLanguageRef = useRef<((code: string) => unknown) | null>(null)
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapInstance = useRef<LeafletMap | null>(null)
     const leafletRef = useRef<typeof import("leaflet") | null>(null)
@@ -155,6 +167,16 @@ export default function MapsTab() {
         saveItems(activeId, next)
     }, [activeId])
 
+    /* ---- Basemap follows the site's colour scheme and language ---- */
+
+    useEffect(() => {
+        const layer = mtLayerRef.current
+        if (!layer) return
+        layer.setStyle(streetsStyle(isDark))
+        const toLanguage = mtLanguageRef.current
+        if (toLanguage) layer.setLanguage(toLanguage(i18n.resolvedLanguage ?? 'en') as Parameters<typeof layer.setLanguage>[0])
+    }, [isDark, i18n.resolvedLanguage])
+
     /* ---- Map lifecycle ---- */
 
     useEffect(() => {
@@ -169,7 +191,7 @@ export default function MapsTab() {
             }
 
             try {
-                const [L, { MaptilerLayer }] = await Promise.all([
+                const [L, { MaptilerLayer, Language }] = await Promise.all([
                     import("leaflet"),
                     import("@maptiler/leaflet-maptilersdk"),
                     import("leaflet/dist/leaflet.css"),
@@ -218,8 +240,17 @@ export default function MapsTab() {
                     }
                 }, { passive: false })
 
-                const mtLayer = new MaptilerLayer({ apiKey: MAPTILER_API_KEY })
+                const mtLanguage = (code: string) => ({
+                    es: Language.SPANISH, vi: Language.VIETNAMESE, zh: Language.SIMPLIFIED_CHINESE,
+                }[code] ?? Language.ENGLISH)
+                mtLanguageRef.current = mtLanguage
+                const mtLayer = new MaptilerLayer({
+                    apiKey: MAPTILER_API_KEY,
+                    style: streetsStyle(darkRef.current),
+                    language: mtLanguage(langRef.current),
+                })
                 mtLayer.addTo(map)
+                mtLayerRef.current = mtLayer
 
                 // Recalculate map size when container resizes (fixes wide-window off-center)
                 resizeObserver = new ResizeObserver(() => {
@@ -241,6 +272,7 @@ export default function MapsTab() {
             if (timeoutId !== undefined) window.clearTimeout(timeoutId)
             resizeObserver?.disconnect()
             resizeObserver = undefined
+            mtLayerRef.current = null
             if (mapInstance.current) {
                 mapInstance.current.remove()
                 mapInstance.current = null

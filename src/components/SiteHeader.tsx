@@ -24,7 +24,7 @@ export default function SiteHeader() {
             }}
         >
             <Group justify="space-between" w="100%" wrap="nowrap">
-                <Menu position="bottom-start" shadow="md" width={180}>
+                <Menu position="bottom-start" shadow="md" width={180} zIndex={1300}>
                     <Menu.Target>
                         <Button
                             variant="subtle" color="gray" size="sm"
@@ -49,7 +49,7 @@ export default function SiteHeader() {
                     </Menu.Dropdown>
                 </Menu>
 
-                <Tooltip label={isDark ? t('header.lightMode') : t('header.darkMode')}>
+                <Tooltip label={isDark ? t('header.lightMode') : t('header.darkMode')} zIndex={1300}>
                     <ActionIcon
                         variant="default" size="lg" radius="xl"
                         onClick={() => setColorScheme(isDark ? 'light' : 'dark')}
