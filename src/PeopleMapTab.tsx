@@ -3,6 +3,7 @@ import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, SimpleGri
 import { useTranslation } from "react-i18next"
 import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
 import { relationsOf } from "./peoples/relations/index.ts"
+import { localName, shortName } from "./peoples/names/index.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
 import type { GeometryCollection, MultiPolygon as TopoMultiPolygon, Polygon as TopoPolygon, Topology } from "topojson-specification"
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, Path } from "leaflet"
@@ -18,10 +19,18 @@ import type { PeopleNode } from "./peoples/index.ts"
 /** Below these zoom levels the map shows depth 1, 2, 3; at or above the last, every leaf. */
 const DEPTH_THRESHOLDS = [3, 4, 5]
 
-/** The default world framing (inhabited latitudes, one copy of the world). */
+/** Esri's light or dark grey canvas basemap. */
 const basemapUrl = (dark: boolean) =>
     `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${dark ? 'Dark' : 'Light'}_Gray_Base/MapServer/tile/{z}/{y}/{x}`
 
+const makeBasemap = (L: typeof import("leaflet"), dark: boolean) => L.tileLayer(basemapUrl(dark), {
+    maxZoom: 16,
+    noWrap: true,
+    bounds: L.latLngBounds([-85, -180], [85, 180]),
+    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ · Regions from <a href="https://www.naturalearthdata.com/">Natural Earth</a> provinces',
+})
+
+/** The default world framing (inhabited latitudes, one copy of the world). */
 const WORLD_VIEW: [[number, number], [number, number]] = [[-56, -170], [78, 180]]
 
 function zoomDepth(zoom: number): number {
@@ -255,17 +264,34 @@ function labelAnchors(geom: Polygon | MultiPolygon, max = 4): LabelPoint[] {
 /* Component                                                           */
 /* ------------------------------------------------------------------ */
 
+/** Rough rendered width of label text: CJK glyphs are about twice as wide as Latin ones. */
+const textPx = (s: string) => [...s].reduce((w, ch) => w + (/[\u2e80-\u9fff\uff00-\uffef]/.test(ch) ? 12.5 : 6.5), 0)
+
 const INFO_FIELDS = ['language', 'religion', 'food', 'etymology', 'homeland', 'history'] as const
 
 export default function PeopleMapTab() {
     const { t, i18n } = useTranslation()
+    const lang = i18n.resolvedLanguage
+    const nameOf = useCallback((n: PeopleNode) => localName(n, lang), [lang])
     const levelNames = t('people.levels', { returnObjects: true }) as string[]
     const isDark = useComputedColorScheme('light', { getInitialValueInEffect: false }) === 'dark'
     const tileLayer = useRef<import("leaflet").TileLayer | null>(null)
     const darkRef = useRef(isDark)
     useEffect(() => {
         darkRef.current = isDark
-        tileLayer.current?.setUrl(basemapUrl(isDark))
+        const map = mapRef.current
+        const L = leafletRef.current
+        const old = tileLayer.current
+        if (!map || !L || !old) return
+        // Swap in a fresh layer rather than old.setUrl(): Leaflet's redraw() skips the zoom
+        // rounding, so at our fractional zooms it fetched tiles for "zoom 2.4" — misplaced, and
+        // answered by Esri with "Map data not yet available". The old layer stays until the new
+        // one has loaded so the basemap never blinks.
+        const next = makeBasemap(L, isDark).addTo(map)
+        next.bringToBack()
+        tileLayer.current = next
+        next.once('load', () => { old.remove() })
+        return () => { if (map.hasLayer(old)) old.remove() }
     }, [isDark])
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapRef = useRef<LeafletMap | null>(null)
@@ -414,12 +440,7 @@ export default function PeopleMapTab() {
                 }
                 map.getContainer().addEventListener('wheel', wheelHandler, { passive: false })
 
-                tileLayer.current = L.tileLayer(basemapUrl(darkRef.current), {
-                    maxZoom: 16,
-                    noWrap: true,
-                    bounds: L.latLngBounds([-85, -180], [85, 180]),
-                    attribution: 'Tiles &copy; Esri &mdash; Esri, DeLorme, NAVTEQ · Regions from <a href="https://www.naturalearthdata.com/">Natural Earth</a> provinces',
-                }).addTo(map)
+                tileLayer.current = makeBasemap(L, darkRef.current).addTo(map)
 
                 // Focus outline sits above the regions; labels above that but below tooltips (650).
                 map.createPane('peoples-focus').style.zIndex = '420'
@@ -552,7 +573,7 @@ export default function PeopleMapTab() {
                 const node = NODE_BY_ID.get(id)!
                 const hasKids = childrenOf(id).length > 0
                 lyr.bindTooltip(
-                    `<strong>${node.name}</strong>${hasKids ? `<br><span style="opacity:.7">${t('people.subgroupsTooltip', { count: childrenOf(id).length })}</span>` : ''}`,
+                    `<strong>${nameOf(node)}</strong>${hasKids ? `<br><span style="opacity:.7">${t('people.subgroupsTooltip', { count: childrenOf(id).length })}</span>` : ''}`,
                     { sticky: true, direction: 'top', offset: [0, -8] },
                 )
                 lyr.on({
@@ -567,7 +588,7 @@ export default function PeopleMapTab() {
         })
         layer.addTo(map)
         regionLayer.current = layer
-    }, [ready, visible, featureFor, explore, colorOf, isDark, t])
+    }, [ready, visible, featureFor, explore, colorOf, isDark, t, nameOf])
 
     /* ---- Outline of the selected group ---- */
     useEffect(() => {
@@ -611,7 +632,7 @@ export default function PeopleMapTab() {
                 anchorCache.current.set(n.id, anchors)
             }
             // Map labels drop trailing parentheticals; the full name is in the tooltip and panel.
-            const short = n.name.replace(/\s*\([^)]*\)\s*$/, '')
+            const short = shortName(nameOf(n))
             for (const a of anchors) {
                 const radiusPx = a.radius * pxPerDegree
                 // Only label pieces with room for the text around their deepest interior point.
@@ -625,8 +646,8 @@ export default function PeopleMapTab() {
         for (const c of candidates) {
             const pt = map.latLngToContainerPoint([c.a.lat, c.a.lng])
             if (pt.x < -50 || pt.y < -20 || pt.x > size.x + 50 || pt.y > size.y + 20) continue
-            const w = Math.min(160, c.radiusPx * 3, c.name.length * 6.5 + 8)
-            const lines = Math.ceil((c.name.length * 6.5) / Math.max(w, 1))
+            const w = Math.min(160, c.radiusPx * 3, textPx(c.name) + 8)
+            const lines = Math.ceil(textPx(c.name) / Math.max(w, 1))
             const h = lines * 13 + 4
             const box = { x: pt.x - w / 2, y: pt.y - h / 2, w, h }
             if (placed.some(b => box.x < b.x + b.w && b.x < box.x + box.w && box.y < b.y + b.h && b.y < box.y + box.h)) continue
@@ -643,7 +664,7 @@ export default function PeopleMapTab() {
         }
         group.addTo(map)
         labelLayer.current = group
-    }, [ready, visible, featureFor, viewTick])
+    }, [ready, visible, featureFor, viewTick, nameOf])
 
     /* ---- Info panel ---- */
     const path = selected ? pathTo(selected.id) : []
@@ -651,7 +672,8 @@ export default function PeopleMapTab() {
     const relations = selected ? relationsOf(selected.id) : []
 
     const backTarget = history.current.length ? history.current[history.current.length - 1] : null
-    const backLabel = backTarget ? t('people.backTo', { name: NODE_BY_ID.get(backTarget)?.name }) : t('people.closeToWorld')
+    const backNode = backTarget ? NODE_BY_ID.get(backTarget) : undefined
+    const backLabel = backTarget ? t('people.backTo', { name: backNode ? nameOf(backNode) : '' }) : t('people.closeToWorld')
     const sectionLabel = (text: string) => (
         <Text size="xs" fw={700} tt="uppercase" c="dimmed" mb={4} style={{ letterSpacing: 0.4 }}>{text}</Text>
     )
@@ -718,12 +740,12 @@ export default function PeopleMapTab() {
                             <Stack gap={4} style={{ minWidth: 0 }}>
                                 <Breadcrumbs separator="›" separatorMargin={4} style={{ flexWrap: 'wrap' }}>
                                     {path.map(n => n.id === selected.id
-                                        ? <Text key={n.id} size="xs" c="dimmed">{n.name}</Text>
-                                        : <Anchor key={n.id} size="xs" onClick={() => explore(n.id)}>{n.name}</Anchor>,
+                                        ? <Text key={n.id} size="xs" c="dimmed">{nameOf(n)}</Text>
+                                        : <Anchor key={n.id} size="xs" onClick={() => explore(n.id)}>{nameOf(n)}</Anchor>,
                                     )}
                                 </Breadcrumbs>
                                 <Group gap="xs" align="baseline">
-                                    <Title order={3} style={{ lineHeight: 1.2 }}>{selected.name}</Title>
+                                    <Title order={3} style={{ lineHeight: 1.2 }}>{nameOf(selected)}</Title>
                                     {selected.info.population && <Badge variant="light" color="gray">{selected.info.population}</Badge>}
                                 </Group>
                             </Stack>
@@ -761,7 +783,7 @@ export default function PeopleMapTab() {
                                         return (
                                             <Text key={i} size="sm">
                                                 {other
-                                                    ? <Anchor fw={600} onClick={() => explore(other.id)}>{other.name.replace(/\s*\([^)]*\)\s*$/, '')}</Anchor>
+                                                    ? <Anchor fw={600} onClick={() => explore(other.id)}>{shortName(nameOf(other))}</Anchor>
                                                     : <Text span fw={600}>{r.label}</Text>}
                                                 {': '}{r.text}
                                             </Text>
@@ -780,7 +802,7 @@ export default function PeopleMapTab() {
                                             onClick={() => explore(s.id)}
                                             leftSection={<span style={{ width: 8, height: 8, borderRadius: 4, background: colorOf(s.id), display: 'inline-block' }} />}
                                         >
-                                            {s.name}
+                                            {nameOf(s)}
                                         </Button>
                                     ))}
                                 </Group>
