@@ -22,7 +22,7 @@ const en = {
     },
     works: {
         itinerary: 'Itinerary Builder',
-        peopleMap: 'People groups map',
+        peopleMap: 'People Groups Map',
         microfrontends: 'Micro-frontends',
         aws: 'AWS',
         games: 'Games',
