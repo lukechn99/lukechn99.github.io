@@ -14,7 +14,8 @@ npm run deploy     # build + push to gh-pages branch (deploys to GitHub Pages)
 ## Tech Stack
 
 - **React 19** + **TypeScript** via Vite
-- **Mantine** — UI component library
+- **Mantine** — UI component library (light/dark color scheme)
+- **i18next + react-i18next** — UI translations (English, Spanish, Vietnamese, Chinese) in `src/i18n/locales/`
 - **Leaflet** + **MapTiler** — interactive maps
 - **TopoJSON** + **Natural Earth** — people-groups map regions (`topojson-client` in the browser, `mapshaper` at build time)
 - **@dnd-kit** — drag-and-drop

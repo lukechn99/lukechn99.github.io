@@ -22,8 +22,8 @@ export default function TransitConnector({ distance, duration }: TransitConnecto
       <div style={{
         display: 'flex', alignItems: 'center', gap: 6,
         padding: '2px 10px', borderRadius: 99,
-        background: 'var(--mantine-color-gray-1)',
-        border: '1px solid var(--mantine-color-gray-3)',
+        background: 'var(--mantine-color-default-hover)',
+        border: '1px solid var(--mantine-color-default-border)',
       }}>
         <IconCar size={12} color="var(--mantine-color-gray-6)" />
         <Text size="xs" c="dimmed" style={{ whiteSpace: 'nowrap' }}>

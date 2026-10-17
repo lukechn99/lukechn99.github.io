@@ -4,19 +4,15 @@ import { Link } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useState } from 'react'
 import PushingHoverIcon from './components/PushingHoverIcon.tsx'
+import { useTranslation } from 'react-i18next'
 
 function App() {
   const sleep = (ms: number) => {
     return new Promise(resolve => setTimeout(resolve, ms));
   }
 
-  const messages = [
-    "Hello, I'm Luke Chen.",
-    "Welcome to my portfolio website.",
-    "Feel free to explore my works and projects.",
-    "Connect with me on GitHub and LinkedIn.",
-    "Enjoy your stay!"
-  ]
+  const { t } = useTranslation()
+  const messages = t('home.messages', { returnObjects: true }) as string[]
 
   const [currentMessageIndex, setCurrentMessageIndex] = useState(0)
   const [carouselRunning, setCarouselRunning] = useState(true)
@@ -56,7 +52,7 @@ function App() {
           </ThemeIcon>
         </ActionIcon>,
         <Box p="xs">  
-          Explore my projects and works here!
+          {t('home.works')}
         </Box>
       )}
       {PushingHoverIcon(
@@ -66,7 +62,7 @@ function App() {
           </ThemeIcon>
         </ActionIcon>,
         <Box p="xs">  
-          Check out my GitHub
+          {t('home.github')}
         </Box>
       )}
       {PushingHoverIcon(
@@ -76,7 +72,7 @@ function App() {
           </ThemeIcon>
         </ActionIcon>,
         <Box p="xs">  
-          Connect with me on LinkedIn
+          {t('home.linkedin')}
         </Box>
       )}
       {PushingHoverIcon(
@@ -86,7 +82,7 @@ function App() {
           </ThemeIcon>
         </ActionIcon>,
         <Box p="xs">  
-          Send me a message!
+          {t('home.contact')}
         </Box>
       )}
       <Space h="sm" />

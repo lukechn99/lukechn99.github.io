@@ -15,6 +15,7 @@ import {
     SortableContext, verticalListSortingStrategy, useSortable, arrayMove, sortableKeyboardCoordinates,
 } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
+import { useTranslation } from "react-i18next"
 import type { Map as LeafletMap } from "leaflet"
 import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
@@ -98,6 +99,7 @@ function SortableItem({ item, index, isDragMode, onUpdate, onRemove, onFocus }: 
 }
 
 export default function MapsTab() {
+    const { t } = useTranslation()
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapInstance = useRef<LeafletMap | null>(null)
     const leafletRef = useRef<typeof import("leaflet") | null>(null)
@@ -713,10 +715,10 @@ export default function MapsTab() {
             : <IconGripVertical size={18} />
 
     const sortTooltip = sortMode === 'manual'
-        ? 'Manual order (drag to reorder) — click to sort by date'
+        ? t('itinerary.sortManual')
         : sortMode === 'date-asc'
-            ? 'Sorted earliest first — click for latest first'
-            : 'Sorted latest first — click for manual order'
+            ? t('itinerary.sortAsc')
+            : t('itinerary.sortDesc')
 
     /* ---- Render ---- */
 
@@ -735,7 +737,7 @@ export default function MapsTab() {
                             background: "var(--mantine-color-body)", color: "var(--mantine-color-text)",
                         }}
                     >
-                        Loading map...
+                        {t('works.loadingMap')}
                     </div>
                 )}
 
@@ -744,7 +746,7 @@ export default function MapsTab() {
                     <div style={{
                         position: 'absolute', bottom: 16, left: '50%', transform: 'translateX(-50%)',
                         zIndex: 1000, display: 'flex', alignItems: 'center', gap: 6,
-                        background: 'rgba(255,255,255,0.92)',
+                        background: 'color-mix(in srgb, var(--mantine-color-body) 92%, transparent)',
                         backdropFilter: 'blur(6px)',
                         borderRadius: 99, padding: '4px 8px',
                         boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
@@ -759,8 +761,8 @@ export default function MapsTab() {
                         </ActionIcon>
                         <Text size="xs" fw={500} style={{ whiteSpace: 'nowrap', minWidth: 90, textAlign: 'center' }}>
                             {activeSegment === null
-                                ? 'Full route'
-                                : `Leg ${activeSegment + 1} of ${segmentCount}`}
+                                ? t('itinerary.fullRoute')
+                                : t('itinerary.leg', { n: activeSegment + 1, total: segmentCount })}
                         </Text>
                         <ActionIcon
                             size="sm" variant="subtle"
@@ -780,7 +782,7 @@ export default function MapsTab() {
                         data={itineraries.map(i => ({ value: i.id, label: i.name }))}
                         value={activeId}
                         onChange={handleSelectItinerary}
-                        placeholder="Select itinerary"
+                        placeholder={t('itinerary.selectItinerary')}
                         size="sm"
                         style={{ flex: 1, maxWidth: 280 }}
                         allowDeselect={false}
@@ -791,7 +793,7 @@ export default function MapsTab() {
                         leftSection={<IconPlus size={14} />}
                         onClick={() => setCreatingNew(true)}
                     >
-                        New
+                        {t('itinerary.new')}
                     </Button>
                     <ActionIcon
                         variant="light"
@@ -799,7 +801,7 @@ export default function MapsTab() {
                         color="red"
                         onClick={handleDeleteItinerary}
                         disabled={!activeId}
-                        aria-label="Delete itinerary"
+                        aria-label={t('itinerary.deleteItinerary')}
                     >
                         <IconTrash size={16} />
                     </ActionIcon>
@@ -812,12 +814,12 @@ export default function MapsTab() {
                     <Stack gap="sm">
                         <Text fw={600} size="sm">
                             {itineraries.length === 0
-                                ? "Create your first itinerary to get started"
-                                : "Create a new itinerary"}
+                                ? t('itinerary.createFirst')
+                                : t('itinerary.createNew')}
                         </Text>
                         <Group>
                             <TextInput
-                                placeholder="e.g. Japan 2025, Europe Road Trip"
+                                placeholder={t('itinerary.namePlaceholder')}
                                 value={newItineraryName}
                                 onChange={e => setNewItineraryName(e.currentTarget.value)}
                                 size="sm"
@@ -829,7 +831,7 @@ export default function MapsTab() {
                                 disabled={!newItineraryName.trim()}
                                 onClick={handleCreateItinerary}
                             >
-                                Create
+                                {t('itinerary.create')}
                             </Button>
                             {itineraries.length > 0 && (
                                 <Button
@@ -837,7 +839,7 @@ export default function MapsTab() {
                                     size="sm"
                                     onClick={() => { setCreatingNew(false); setNewItineraryName("") }}
                                 >
-                                    Cancel
+                                    {t('itinerary.cancel')}
                                 </Button>
                             )}
                         </Group>
@@ -854,7 +856,7 @@ export default function MapsTab() {
                         radius="xl"
                         color="blue"
                         onClick={toggleForm}
-                        aria-label={formOpen ? "Close add form" : "Add itinerary item"}
+                        aria-label={formOpen ? t('itinerary.closeAddForm') : t('itinerary.addItem')}
                     >
                         {formOpen ? <IconX size={18} /> : <IconPlus size={18} />}
                     </ActionIcon>
@@ -867,7 +869,7 @@ export default function MapsTab() {
                                     radius="xl"
                                     color={sortMode === 'manual' ? 'gray' : 'orange'}
                                     onClick={cycleSortMode}
-                                    aria-label="Change sort order"
+                                    aria-label={t('itinerary.changeSort')}
                                 >
                                     {sortIcon}
                                 </ActionIcon>
@@ -879,7 +881,7 @@ export default function MapsTab() {
                                 color="teal"
                                 onClick={() => { void handleExportPDF() }}
                                 disabled={exporting}
-                                aria-label="Export itinerary as PDF"
+                                aria-label={t('itinerary.exportPdf')}
                             >
                                 {exporting ? <Loader size={16} color="teal" /> : <IconDownload size={18} />}
                             </ActionIcon>
@@ -893,7 +895,7 @@ export default function MapsTab() {
                 <Collapse in={formOpen}>
                     <Paper p="md" radius="md" withBorder>
                         <Stack gap="sm">
-                            <Text fw={600} size="sm">Add a stop</Text>
+                            <Text fw={600} size="sm">{t('itinerary.addStop')}</Text>
 
                             <LocationSearch onSelect={setPendingLocation} />
 
@@ -905,7 +907,7 @@ export default function MapsTab() {
                                         </Text>
                                         {isHotelLocation(pendingLocation) && (
                                             <Text size="xs" c="orange" fw={600}>
-                                                Hotel — will create check-in & check-out stops
+                                                {t('itinerary.hotelNote')}
                                             </Text>
                                         )}
                                     </Group>
@@ -915,7 +917,7 @@ export default function MapsTab() {
 
                             <Group grow>
                                 <TextInput
-                                    label={<Text size="xs" fw={500}>Start <Text span size="xs" c="dimmed">(optional)</Text></Text>}
+                                    label={<Text size="xs" fw={500}>{t('itinerary.start')} <Text span size="xs" c="dimmed">{t('itinerary.optional')}</Text></Text>}
                                     type="datetime-local"
                                     value={startDate}
                                     onChange={e => setStartDate(e.currentTarget.value)}
@@ -923,7 +925,7 @@ export default function MapsTab() {
                                     size="sm"
                                 />
                                 <TextInput
-                                    label={<Text size="xs" fw={500}>End <Text span size="xs" c="dimmed">(optional)</Text></Text>}
+                                    label={<Text size="xs" fw={500}>{t('itinerary.end')} <Text span size="xs" c="dimmed">{t('itinerary.optional')}</Text></Text>}
                                     type="datetime-local"
                                     value={endDate}
                                     onChange={e => setEndDate(e.currentTarget.value)}
@@ -938,14 +940,14 @@ export default function MapsTab() {
                                     size="sm"
                                     onClick={() => { closeForm(); setPendingLocation(null); setStartDate(""); setEndDate(""); }}
                                 >
-                                    Cancel
+                                    {t('itinerary.cancel')}
                                 </Button>
                                 <Button
                                     size="sm"
                                     disabled={!pendingLocation}
                                     onClick={() => { void handleAddItem() }}
                                 >
-                                    Add to Itinerary
+                                    {t('itinerary.addToItinerary')}
                                 </Button>
                             </Group>
                         </Stack>
@@ -957,9 +959,9 @@ export default function MapsTab() {
             {activeId && items.length > 0 && (
                 <Stack gap={0}>
                     <Text fw={600} size="sm" c="dimmed" mb="xs">
-                        {activeItineraryName} — {items.length} {items.length === 1 ? 'stop' : 'stops'}
+                        {activeItineraryName} — {t('itinerary.stops', { count: items.length })}
                         {sortMode === 'manual' && (
-                            <Text span size="xs" c="dimmed"> · drag to reorder</Text>
+                            <Text span size="xs" c="dimmed"> · {t('itinerary.dragToReorder')}</Text>
                         )}
                     </Text>
                     <DndContext
@@ -998,7 +1000,7 @@ export default function MapsTab() {
 
             {activeId && items.length === 0 && !formOpen && (
                 <Text ta="center" c="dimmed" size="sm" py="lg">
-                    No stops yet. Tap the + button to start building your itinerary.
+                    {t('itinerary.noStops')}
                 </Text>
             )}
         </Stack>

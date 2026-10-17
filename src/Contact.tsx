@@ -3,9 +3,11 @@ import type { FormEvent } from 'react';
 import { ActionIcon, Alert, Box, Button, Group, Space, Stack, TextInput } from '@mantine/core';
 import { IconChevronLeft, IconInfoCircle, IconSend } from '@tabler/icons-react';
 import { useNavigate } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 
 export default function Contact() {
     const navigate = useNavigate()
+    const { t } = useTranslation()
     const [result, setResult] = useState<string | null>(null)
 
     const icon = <IconInfoCircle />
@@ -25,10 +27,10 @@ export default function Contact() {
 
         const data = await response.json()
         if (data.success) {
-            setResult("Success!")
+            setResult(t('contact.success'))
             form.reset()
         } else {
-        setResult("Error")
+        setResult(t('contact.error'))
         }
     }
 
@@ -38,8 +40,8 @@ export default function Contact() {
             size="lg"
             radius="xl"
             onClick={() => navigate('/')}
-            aria-label="Back to home"
-            style={{ position: 'fixed', top: 16, left: 16, zIndex: 1000 }}
+            aria-label={t('nav.backHome')}
+            style={{ position: 'fixed', top: 68, left: 16, zIndex: 1000 }}
         >
             <IconChevronLeft size={22} />
         </ActionIcon>
@@ -54,8 +56,8 @@ export default function Contact() {
         <Box component="form" onSubmit={onSubmit} w="100%" style={{ textAlign: 'left' }}>
             <TextInput
                 withAsterisk
-                label="Name"
-                placeholder="John Wick"
+                label={t('contact.name')}
+                placeholder={t('contact.namePlaceholder')}
                 required={true}
                 type="text"
                 name="name" // needed for web3forms
@@ -64,8 +66,8 @@ export default function Contact() {
             <Space h="md" />
             <TextInput
                 withAsterisk
-                label="Email"
-                placeholder="your@email.com"
+                label={t('contact.email')}
+                placeholder={t('contact.emailPlaceholder')}
                 required={true}
                 name="email" // needed for web3forms
                 type="email"
@@ -73,14 +75,14 @@ export default function Contact() {
             <Space h="md" />
             <TextInput
                 withAsterisk
-                label="Message"
-                placeholder="I'd like to offer you a job!"
+                label={t('contact.message')}
+                placeholder={t('contact.messagePlaceholder')}
                 required={true}
                 name="message" // needed for web3forms
                 type="text"
             />
             <Group justify="flex-end" mt="md">
-                <Button type="submit">Submit {<Space />} {<IconSend />}</Button>
+                <Button type="submit">{t('contact.submit')} {<Space />} {<IconSend />}</Button>
             </Group>
         </Box>
     </Stack></>)

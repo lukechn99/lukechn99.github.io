@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next';
 import { useState, useRef } from 'react';
 import { TextInput, Loader, Paper, Text, Group, Stack, UnstyledButton, Badge } from '@mantine/core';
 import {
@@ -39,6 +40,7 @@ function formatSubtitle(r: NominatimResult): string {
 }
 
 export default function LocationSearch({ onSelect }: LocationSearchProps) {
+  const { t } = useTranslation();
   const [query, setQuery] = useState('');
   const [results, setResults] = useState<NominatimResult[]>([]);
   const [loading, setLoading] = useState(false);
@@ -83,7 +85,7 @@ export default function LocationSearch({ onSelect }: LocationSearchProps) {
         onChange={e => doSearch(e.currentTarget.value)}
         onFocus={() => results.length > 0 && setShowResults(true)}
         onBlur={() => setTimeout(() => setShowResults(false), 200)}
-        placeholder="Search for a place, restaurant, hotel..."
+        placeholder={t('itinerary.searchPlaceholder')}
         leftSection={<IconSearch size={16} />}
         rightSection={loading ? <Loader size="xs" /> : null}
         size="md"
@@ -129,7 +131,7 @@ export default function LocationSearch({ onSelect }: LocationSearchProps) {
                           {name}
                         </Text>
                         {hotel && (
-                          <Badge size="xs" variant="light" color="orange" style={{ flexShrink: 0 }}>Hotel</Badge>
+                          <Badge size="xs" variant="light" color="orange" style={{ flexShrink: 0 }}>{t('itinerary.hotel')}</Badge>
                         )}
                         {r.type && !hotel && (
                           <Badge size="xs" variant="light" color="gray" style={{ flexShrink: 0, textTransform: 'none' }}>

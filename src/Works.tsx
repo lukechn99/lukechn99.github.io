@@ -2,6 +2,7 @@ import { Suspense, lazy, useState } from 'react'
 import { ActionIcon, FloatingIndicator, Stack, Tabs } from '@mantine/core'
 import { IconChevronLeft } from '@tabler/icons-react'
 import { useNavigate } from 'react-router-dom'
+import { useTranslation } from 'react-i18next'
 import classes from './Works.module.css'
 import GamesTab from './GamesTab.tsx';
 
@@ -15,6 +16,7 @@ const PeopleMapTab = lazy(() => import('./PeopleMapTab.tsx'))
 
 export default function Works() {
     const navigate = useNavigate()
+    const { t } = useTranslation()
     const [rootRef, setRootRef] = useState<HTMLDivElement | null>(null);
     const [value, setValue] = useState<string | null>('1');
     const [controlsRefs, setControlsRefs] = useState<Record<string, HTMLButtonElement | null>>({});
@@ -30,8 +32,8 @@ export default function Works() {
             size="lg"
             radius="xl"
             onClick={() => navigate('/')}
-            aria-label="Back to home"
-            style={{ position: 'fixed', top: 16, left: 16, zIndex: 1000 }}
+            aria-label={t('nav.backHome')}
+            style={{ position: 'fixed', top: 68, left: 16, zIndex: 1000 }}
         >
             <IconChevronLeft size={22} />
         </ActionIcon>
@@ -49,19 +51,19 @@ export default function Works() {
                     style={{ display: 'flex', justifyContent: 'center' }}
                 >
                     <Tabs.Tab value="1" ref={setControlRef('1')} className={classes.tab}>
-                        Maps
+                        {t('works.itinerary')}
                     </Tabs.Tab>
                     <Tabs.Tab value="peoples" ref={setControlRef('peoples')} className={classes.tab}>
-                        People groups map
+                        {t('works.peopleMap')}
                     </Tabs.Tab>
                     <Tabs.Tab value="2" ref={setControlRef('2')} className={classes.tab}>
-                        Micro-frontends
+                        {t('works.microfrontends')}
                     </Tabs.Tab>
                     <Tabs.Tab value="3" ref={setControlRef('3')} className={classes.tab}>
-                        AWS
+                        {t('works.aws')}
                     </Tabs.Tab>
                     <Tabs.Tab value="4" ref={setControlRef('4')} className={classes.tab}>
-                        Games
+                        {t('works.games')}
                     </Tabs.Tab>
 
                     <FloatingIndicator
@@ -72,17 +74,17 @@ export default function Works() {
                 </Tabs.List>
 
                 <Tabs.Panel value="1">
-                    <Suspense fallback={<div style={{ padding: '1rem' }}>Loading map...</div>}>
+                    <Suspense fallback={<div style={{ padding: '1rem' }}>{t('works.loadingMap')}</div>}>
                         <MapsTab />
                     </Suspense>
                 </Tabs.Panel>
                 <Tabs.Panel value="peoples">
-                    <Suspense fallback={<div style={{ padding: '1rem' }}>Loading map...</div>}>
+                    <Suspense fallback={<div style={{ padding: '1rem' }}>{t('works.loadingMap')}</div>}>
                         <PeopleMapTab />
                     </Suspense>
                 </Tabs.Panel>
-                <Tabs.Panel value="2">Micro-frontends should showcase module federated widgets like a calculator, Sankey diagram maker, and others</Tabs.Panel>
-                <Tabs.Panel value="3">AWS could include architectures, learnings, best practices, etc.</Tabs.Panel>
+                <Tabs.Panel value="2">{t('works.mfeBlurb')}</Tabs.Panel>
+                <Tabs.Panel value="3">{t('works.awsBlurb')}</Tabs.Panel>
                 <Tabs.Panel value="4"><GamesTab /></Tabs.Panel>
             </Tabs>
         </Stack>

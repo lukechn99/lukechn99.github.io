@@ -11,6 +11,7 @@ import type { ItineraryItem } from './types.ts';
 import type { NominatimResult } from './types.ts';
 import TagInput, { colorForTag } from './TagInput.tsx';
 import LocationSearch from './LocationSearch.tsx';
+import { useTranslation } from 'react-i18next';
 
 function weatherIcon(icon: string, size = 18) {
   const props = { size, stroke: 1.5 };
@@ -56,6 +57,7 @@ interface EditState {
 }
 
 export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onFocus, isDragMode, dragHandleProps }: ItineraryItemCardProps) {
+  const { t } = useTranslation();
   const [expanded, { toggle, open: openExpand }] = useDisclosure(false);
   const [editState, setEditState] = useState<EditState | null>(null);
   const [changingLocation, setChangingLocation] = useState(false);
@@ -140,7 +142,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                 size="sm"
                 color="gray"
                 style={{ cursor: 'grab', touchAction: 'none', flexShrink: 0 }}
-                aria-label="Drag to reorder"
+                aria-label={t('itinerary.dragToReorder')}
                 {...(dragHandleProps as object)}
                 onClick={e => e.stopPropagation()}
               >
@@ -171,7 +173,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                   </Group>
                 </Tooltip>
               ) : (
-                <Tooltip label="Weather for this date at this location" withArrow fz="xs">
+                <Tooltip label={t('itinerary.weatherForDateTooltip')} withArrow fz="xs">
                   <Group gap={0} wrap="nowrap" style={{ cursor: 'help' }}>
                     {weatherIcon(item.weather.icon)}
                   </Group>
@@ -210,19 +212,19 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
           {editing ? (
             <Stack gap="sm" mt="xs" onClick={e => e.stopPropagation()}>
               <TextInput
-                label="Name"
+                label={t('itinerary.name')}
                 value={editState.name}
                 onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, name: v } : prev) }}
                 size="sm"
               />
 
               <div>
-                <Text size="xs" fw={500} mb={4}>Location</Text>
+                <Text size="xs" fw={500} mb={4}>{t('itinerary.location')}</Text>
                 {changingLocation ? (
                   <Stack gap="xs">
                     <LocationSearch onSelect={handleLocationSelect} />
                     <Button size="xs" variant="subtle" onClick={() => setChangingLocation(false)}>
-                      Cancel
+                      {t('itinerary.cancel')}
                     </Button>
                   </Stack>
                 ) : (
@@ -231,7 +233,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                       {editState.displayName}
                     </Text>
                     <Button size="xs" variant="light" onClick={() => setChangingLocation(true)}>
-                      Change
+                      {t('itinerary.change')}
                     </Button>
                   </Group>
                 )}
@@ -239,7 +241,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
 
               <Group grow>
                 <TextInput
-                  label="Start"
+                  label={t('itinerary.start')}
                   type="datetime-local"
                   value={editState.startDate}
                   onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, startDate: v } : prev) }}
@@ -247,7 +249,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                   size="sm"
                 />
                 <TextInput
-                  label="End"
+                  label={t('itinerary.end')}
                   type="datetime-local"
                   value={editState.endDate}
                   onChange={e => { const v = e.currentTarget.value; setEditState(prev => prev ? { ...prev, endDate: v } : prev) }}
@@ -257,8 +259,8 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
               </Group>
 
               <Group justify="flex-end">
-                <Button size="xs" variant="light" onClick={cancelEdit}>Cancel</Button>
-                <Button size="xs" onClick={saveEdit}>Save</Button>
+                <Button size="xs" variant="light" onClick={cancelEdit}>{t('itinerary.cancel')}</Button>
+                <Button size="xs" onClick={saveEdit}>{t('itinerary.save')}</Button>
               </Group>
             </Stack>
           ) : (
@@ -270,16 +272,16 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                       <Badge size="xs" variant="light" color="yellow" mb={6} style={{ cursor: 'help' }}>
                         <Group gap={4} wrap="nowrap">
                           <IconInfoCircle size={10} />
-                          <span>Showing current weather</span>
+                          <span>{t('itinerary.showingCurrentWeather')}</span>
                         </Group>
                       </Badge>
                     </Tooltip>
                   ) : (
-                    <Tooltip label="This is the weather for the scheduled date at this location" withArrow multiline w={250} fz="xs">
+                    <Tooltip label={t('itinerary.weatherScheduledTooltip')} withArrow multiline w={250} fz="xs">
                       <Badge size="xs" variant="light" color="teal" mb={6} style={{ cursor: 'help' }}>
                         <Group gap={4} wrap="nowrap">
                           <IconInfoCircle size={10} />
-                          <span>Weather for this date &amp; place</span>
+                          <span>{t('itinerary.weatherForDate')}</span>
                         </Group>
                       </Badge>
                     </Tooltip>
@@ -295,7 +297,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
                     <Stack gap={2} align="flex-end">
                       <Group gap={4}>
                         <IconTemperature size={12} />
-                        <Text size="xs">Feels {Math.round(item.weather.feelsLike)}°F</Text>
+                        <Text size="xs">{t('itinerary.feels', { temp: Math.round(item.weather.feelsLike) })}</Text>
                       </Group>
                       {item.weather.humidity > 0 && (
                         <Group gap={4}>
@@ -313,7 +315,7 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
               )}
 
               <div>
-                <Text size="xs" fw={500} mb={4}>Rating</Text>
+                <Text size="xs" fw={500} mb={4}>{t('itinerary.rating')}</Text>
                 <Rating
                   value={item.rating ?? 0}
                   onChange={(val: number) => onUpdate({ ...item, rating: val })}
@@ -322,11 +324,11 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
               </div>
 
               <div>
-                <Text size="xs" fw={500} mb={4}>Notes & Review</Text>
+                <Text size="xs" fw={500} mb={4}>{t('itinerary.notes')}</Text>
                 <Textarea
                   value={item.notes}
                   onChange={e => onUpdate({ ...item, notes: e.currentTarget.value })}
-                  placeholder="Add notes, tips, or a review..."
+                  placeholder={t('itinerary.notesPlaceholder')}
                   autosize
                   minRows={2}
                   maxRows={6}
@@ -335,11 +337,11 @@ export default function ItineraryItemCard({ item, index, onUpdate, onRemove, onF
               </div>
 
               <div>
-                <Text size="xs" fw={500} mb={4}>Tags</Text>
+                <Text size="xs" fw={500} mb={4}>{t('itinerary.tags')}</Text>
                 <TagInput
                   tags={item.tags}
                   onChange={(tags: string[]) => onUpdate({ ...item, tags })}
-                  placeholder="Tag this stop..."
+                  placeholder={t('itinerary.tagPlaceholder')}
                 />
               </div>
 

@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
-import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, ScrollArea, SimpleGrid, Stack, Text, Title, Tooltip } from "@mantine/core"
+import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, SimpleGrid, Stack, Text, Title, Tooltip, useComputedColorScheme } from "@mantine/core"
+import { useTranslation } from "react-i18next"
 import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
 import { relationsOf } from "./peoples/relations/index.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
@@ -16,9 +17,11 @@ import type { PeopleNode } from "./peoples/index.ts"
 
 /** Below these zoom levels the map shows depth 1, 2, 3; at or above the last, every leaf. */
 const DEPTH_THRESHOLDS = [3, 4, 5]
-const LEVEL_NAMES = ['Language families', 'Branches', 'Sub-branches', 'Peoples']
 
 /** The default world framing (inhabited latitudes, one copy of the world). */
+const basemapUrl = (dark: boolean) =>
+    `https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_${dark ? 'Dark' : 'Light'}_Gray_Base/MapServer/tile/{z}/{y}/{x}`
+
 const WORLD_VIEW: [[number, number], [number, number]] = [[-56, -170], [78, 180]]
 
 function zoomDepth(zoom: number): number {
@@ -252,16 +255,18 @@ function labelAnchors(geom: Polygon | MultiPolygon, max = 4): LabelPoint[] {
 /* Component                                                           */
 /* ------------------------------------------------------------------ */
 
-const INFO_FIELDS: { key: keyof PeopleNode['info'], label: string }[] = [
-    { key: 'language', label: 'Language' },
-    { key: 'religion', label: 'Religion' },
-    { key: 'food', label: 'Food' },
-    { key: 'etymology', label: 'Origin of the name' },
-    { key: 'homeland', label: 'Where they live' },
-    { key: 'history', label: 'History' },
-]
+const INFO_FIELDS = ['language', 'religion', 'food', 'etymology', 'homeland', 'history'] as const
 
 export default function PeopleMapTab() {
+    const { t, i18n } = useTranslation()
+    const levelNames = t('people.levels', { returnObjects: true }) as string[]
+    const isDark = useComputedColorScheme('light', { getInitialValueInEffect: false }) === 'dark'
+    const tileLayer = useRef<import("leaflet").TileLayer | null>(null)
+    const darkRef = useRef(isDark)
+    useEffect(() => {
+        darkRef.current = isDark
+        tileLayer.current?.setUrl(basemapUrl(isDark))
+    }, [isDark])
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapRef = useRef<LeafletMap | null>(null)
     const leafletRef = useRef<typeof import("leaflet") | null>(null)
@@ -336,7 +341,7 @@ export default function PeopleMapTab() {
                     fetch(new URL("peoples/leaves.topo.json", document.baseURI)),
                     import("leaflet/dist/leaflet.css"),
                 ])
-                if (!topoRes.ok) throw new Error(`Map data failed to load (${topoRes.status})`)
+                if (!topoRes.ok) throw new Error(t('people.loadFailed', { status: topoRes.status }))
                 const topology = await topoRes.json() as LeafTopology
                 if (cancelled || !mapContainer.current) return
 
@@ -409,7 +414,7 @@ export default function PeopleMapTab() {
                 }
                 map.getContainer().addEventListener('wheel', wheelHandler, { passive: false })
 
-                L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}', {
+                tileLayer.current = L.tileLayer(basemapUrl(darkRef.current), {
                     maxZoom: 16,
                     noWrap: true,
                     bounds: L.latLngBounds([-85, -180], [85, 180]),
@@ -533,7 +538,7 @@ export default function PeopleMapTab() {
         const features = visible.map(n => featureFor(n.id)).filter((f): f is Feature<MultiPolygon, { id: string }> => !!f)
 
         const baseStyle = (id: string) => ({
-            color: '#ffffff',
+            color: isDark ? '#1a1b1e' : '#ffffff',
             weight: 1,
             opacity: 0.9,
             fillColor: colorOf(id),
@@ -547,7 +552,7 @@ export default function PeopleMapTab() {
                 const node = NODE_BY_ID.get(id)!
                 const hasKids = childrenOf(id).length > 0
                 lyr.bindTooltip(
-                    `<strong>${node.name}</strong>${hasKids ? `<br><span style="opacity:.7">${childrenOf(id).length} subgroups · click to explore</span>` : ''}`,
+                    `<strong>${node.name}</strong>${hasKids ? `<br><span style="opacity:.7">${t('people.subgroupsTooltip', { count: childrenOf(id).length })}</span>` : ''}`,
                     { sticky: true, direction: 'top', offset: [0, -8] },
                 )
                 lyr.on({
@@ -562,7 +567,7 @@ export default function PeopleMapTab() {
         })
         layer.addTo(map)
         regionLayer.current = layer
-    }, [ready, visible, featureFor, explore, colorOf])
+    }, [ready, visible, featureFor, explore, colorOf, isDark, t])
 
     /* ---- Outline of the selected group ---- */
     useEffect(() => {
@@ -578,14 +583,14 @@ export default function PeopleMapTab() {
         outlineLayer.current = L.geoJSON(f, {
             interactive: false,
             pane: 'peoples-focus',
-            style: { color: '#ffffff', weight: 7, opacity: 0.85, fill: false, renderer, lineJoin: 'round' },
+            style: { color: isDark ? '#1a1b1e' : '#ffffff', weight: 7, opacity: 0.85, fill: false, renderer, lineJoin: 'round' },
         }).addTo(map)
         L.geoJSON(f, {
             interactive: false,
             pane: 'peoples-focus',
             style: { color: '#1c7ed6', weight: 2.5, opacity: 1, fill: false, renderer, lineJoin: 'round' },
         }).addTo(outlineLayer.current)
-    }, [ready, selectedId, featureFor])
+    }, [ready, selectedId, featureFor, isDark])
 
     /* ---- Labels for regions large enough on screen ---- */
     useEffect(() => {
@@ -643,42 +648,51 @@ export default function PeopleMapTab() {
     const subgroups = selected ? childrenOf(selected.id) : []
     const relations = selected ? relationsOf(selected.id) : []
 
+    const backTarget = history.current.length ? history.current[history.current.length - 1] : null
+    const backLabel = backTarget ? t('people.backTo', { name: NODE_BY_ID.get(backTarget)?.name }) : t('people.closeToWorld')
+    const sectionLabel = (text: string) => (
+        <Text size="xs" fw={700} tt="uppercase" c="dimmed" mb={4} style={{ letterSpacing: 0.4 }}>{text}</Text>
+    )
+
     return (
-        <Stack gap="xs" style={{ textAlign: 'left' }}>
+        <Stack gap="sm" style={{ textAlign: 'left' }}>
             <style>{`
                 .peoples-label { display:flex; justify-content:center; pointer-events:none; }
                 .peoples-label span {
-                    font: 600 11px/1.15 system-ui, sans-serif; color:#1a1b1e; text-align:center;
-                    text-shadow: 0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff;
+                    font: 600 11px/1.15 system-ui, sans-serif; text-align:center;
+                    color: var(--peoples-label-color); text-shadow: var(--peoples-label-halo);
                     transform: translateY(-50%); white-space: normal; max-width: 160px;
                 }
             `}</style>
 
             <div style={{
-                position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden',
-                height: selected ? 'calc(58vh - 60px)' : '68vh', minHeight: 320, 
+                position: 'relative', width: '100%', borderRadius: 12, overflow: 'hidden', height: '62vh', minHeight: 360,
+                ['--peoples-label-color' as string]: isDark ? '#f1f3f5' : '#1a1b1e',
+                ['--peoples-label-halo' as string]: isDark
+                    ? '0 0 3px #1a1b1e, 0 0 3px #1a1b1e, 0 0 2px #1a1b1e'
+                    : '0 0 3px #fff, 0 0 3px #fff, 0 0 2px #fff',
             }}>
-                <div ref={mapContainer} style={{ position: 'absolute', inset: 0 }} />
+                <div ref={mapContainer} style={{ position: 'absolute', inset: 0, background: isDark ? '#2c2e33' : '#e9ecef' }} />
 
                 {(!ready || error) && (
                     <div style={{
                         position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center',
                         background: 'var(--mantine-color-body)', color: 'var(--mantine-color-text)',
                     }}>
-                        {error ?? 'Loading map…'}
+                        {error ?? t('people.loading')}
                     </div>
                 )}
 
                 {ready && (
                     <Paper shadow="sm" radius="md" p={6} style={{
                         position: 'absolute', top: 12, right: 12, zIndex: 1000,
-                        background: 'rgba(255,255,255,0.92)', backdropFilter: 'blur(6px)',
+                        background: 'color-mix(in srgb, var(--mantine-color-body) 92%, transparent)', backdropFilter: 'blur(6px)',
                     }}>
                         <Group gap={6} wrap="nowrap">
-                            <Text size="xs" c="dimmed" visibleFrom="sm">Zoom level shows:</Text>
-                            <Text size="xs" fw={600} c="dark">{LEVEL_NAMES[Math.min(zDepth, LEVEL_NAMES.length) - 1]}</Text>
-                            <Tooltip label="Back to the whole world">
-                                <ActionIcon size="sm" variant="subtle" onClick={resetToWorld} aria-label="Reset view">
+                            <Text size="xs" c="dimmed" visibleFrom="sm">{t('people.zoomShows')}</Text>
+                            <Text size="xs" fw={600}>{levelNames[Math.min(zDepth, levelNames.length) - 1]}</Text>
+                            <Tooltip label={t('people.backToWorld')}>
+                                <ActionIcon size="sm" variant="subtle" onClick={resetToWorld} aria-label={t('people.backToWorld')}>
                                     <IconWorld size={16} />
                                 </ActionIcon>
                             </Tooltip>
@@ -687,106 +701,93 @@ export default function PeopleMapTab() {
                 )}
             </div>
 
-            <Text size="xs" c="dimmed">
-                Each province or state is colored by its majority (or largest) people, so minorities and mixed areas are simplified away.
-                In the US, each county shows its largest ancestry or origin group (ACS 2020–2024).
-                Click a region to focus on it and reveal its subgroups; close the panel to step back, or click empty map to return to the world. {PEOPLE_NODES.length} groups in all.
-            </Text>
-
-            {/* Spacer so the fixed panel never hides the caption */}
-            {selected && <div style={{ height: '40vh' }} />}
-
-            {selected && (
-                <Paper
-                    shadow="xl" radius="lg" withBorder
-                    style={{
-                        position: 'fixed', left: '50%', bottom: 12, transform: 'translateX(-50%)',
-                        width: 'min(960px, calc(100vw - 24px))', maxHeight: '40vh', zIndex: 1100,
-                        display: 'flex', flexDirection: 'column', textAlign: 'left',
-                    }}
-                >
-                    <Group justify="space-between" align="flex-start" wrap="nowrap" p="md" pb="xs">
-                        <Stack gap={4} style={{ minWidth: 0 }}>
-                            <Breadcrumbs separator="›" separatorMargin={4} style={{ flexWrap: 'wrap' }}>
-                                {path.map(n => n.id === selected.id
-                                    ? <Text key={n.id} size="xs" c="dimmed">{n.name}</Text>
-                                    : <Anchor key={n.id} size="xs" onClick={() => explore(n.id)}>{n.name}</Anchor>,
+            {/* Info section: the selected group's profile, or what the map shows */}
+            <Paper radius="lg" withBorder p="md">
+                {!selected ? (
+                    <Stack gap="xs">
+                        <Title order={4}>{t('people.aboutTitle')}</Title>
+                        <Text size="sm">{t('people.about1')}</Text>
+                        <Text size="sm">{t('people.about2', { count: PEOPLE_NODES.length })}</Text>
+                        {i18n.resolvedLanguage !== 'en' && <Text size="xs" c="dimmed">{t('people.contentNote')}</Text>}
+                    </Stack>
+                ) : (
+                    <Stack gap="sm">
+                        <Group justify="space-between" align="flex-start" wrap="nowrap">
+                            <Stack gap={4} style={{ minWidth: 0 }}>
+                                <Breadcrumbs separator="›" separatorMargin={4} style={{ flexWrap: 'wrap' }}>
+                                    {path.map(n => n.id === selected.id
+                                        ? <Text key={n.id} size="xs" c="dimmed">{n.name}</Text>
+                                        : <Anchor key={n.id} size="xs" onClick={() => explore(n.id)}>{n.name}</Anchor>,
+                                    )}
+                                </Breadcrumbs>
+                                <Group gap="xs" align="baseline">
+                                    <Title order={3} style={{ lineHeight: 1.2 }}>{selected.name}</Title>
+                                    {selected.info.population && <Badge variant="light" color="gray">{selected.info.population}</Badge>}
+                                </Group>
+                            </Stack>
+                            <Group gap={4} wrap="nowrap">
+                                {selected.parent && (
+                                    <Tooltip label={t('people.upOneLevel')}>
+                                        <ActionIcon variant="subtle" onClick={() => explore(selected.parent!)} aria-label={t('people.upOneLevel')}>
+                                            <IconArrowUp size={18} />
+                                        </ActionIcon>
+                                    </Tooltip>
                                 )}
-                            </Breadcrumbs>
-                            <Group gap="xs" align="baseline">
-                                <Title order={3} style={{ lineHeight: 1.2 }}>{selected.name}</Title>
-                                {selected.info.population && <Badge variant="light" color="gray">{selected.info.population}</Badge>}
-                            </Group>
-                        </Stack>
-                        <Group gap={4} wrap="nowrap">
-                            {selected.parent && (
-                                <Tooltip label="Up one level">
-                                    <ActionIcon variant="subtle" onClick={() => explore(selected.parent!)} aria-label="Up one level">
-                                        <IconArrowUp size={18} />
+                                <Tooltip label={backLabel}>
+                                    <ActionIcon variant="subtle" onClick={goBack} aria-label="Close">
+                                        <IconX size={18} />
                                     </ActionIcon>
                                 </Tooltip>
-                            )}
-                            <Tooltip label={history.current.length && history.current[history.current.length - 1] ? `Back to ${NODE_BY_ID.get(history.current[history.current.length - 1]!)?.name}` : 'Close and return to the world'}>
-                                <ActionIcon variant="subtle" onClick={goBack} aria-label="Close">
-                                    <IconX size={18} />
-                                </ActionIcon>
-                            </Tooltip>
+                            </Group>
                         </Group>
-                    </Group>
 
-                    <ScrollArea.Autosize mah="calc(40vh - 90px)" px="md" pb="md" type="auto">
-                        <Stack gap="sm">
-                            <Text size="sm">{selected.info.summary}</Text>
-                            <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" verticalSpacing="xs">
-                                {INFO_FIELDS.filter(f => selected.info[f.key]).map(f => (
-                                    <div key={f.key}>
-                                        <Text size="xs" fw={700} tt="uppercase" c="dimmed" style={{ letterSpacing: 0.4 }}>{f.label}</Text>
-                                        <Text size="sm">{selected.info[f.key]}</Text>
-                                    </div>
-                                ))}
-                            </SimpleGrid>
-                            {relations.length > 0 && (
-                                <div>
-                                    <Text size="xs" fw={700} tt="uppercase" c="dimmed" mb={4} style={{ letterSpacing: 0.4 }}>
-                                        Relations with neighbours
-                                    </Text>
-                                    <Stack gap={6}>
-                                        {relations.map((r, i) => {
-                                            const other = r.with ? NODE_BY_ID.get(r.with) : undefined
-                                            return (
-                                                <Text key={i} size="sm">
-                                                    {other
-                                                        ? <Anchor fw={600} onClick={() => explore(other.id)}>{other.name.replace(/\s*\([^)]*\)\s*$/, '')}</Anchor>
-                                                        : <Text span fw={600}>{r.label}</Text>}
-                                                    {': '}{r.text}
-                                                </Text>
-                                            )
-                                        })}
-                                    </Stack>
+                        <Text size="sm">{selected.info.summary}</Text>
+                        <SimpleGrid cols={{ base: 1, sm: 2 }} spacing="sm" verticalSpacing="xs">
+                            {INFO_FIELDS.filter(f => selected.info[f]).map(f => (
+                                <div key={f}>
+                                    {sectionLabel(t(`people.fields.${f}`))}
+                                    <Text size="sm">{selected.info[f]}</Text>
                                 </div>
-                            )}
-                            {subgroups.length > 0 && (
-                                <div>
-                                    <Text size="xs" fw={700} tt="uppercase" c="dimmed" mb={4} style={{ letterSpacing: 0.4 }}>
-                                        Subgroups ({subgroups.length})
-                                    </Text>
-                                    <Group gap={6}>
-                                        {subgroups.map(s => (
-                                            <Button
-                                                key={s.id} size="compact-xs" radius="xl" variant="light"
-                                                onClick={() => explore(s.id)}
-                                                leftSection={<span style={{ width: 8, height: 8, borderRadius: 4, background: colorOf(s.id), display: 'inline-block' }} />}
-                                            >
-                                                {s.name}
-                                            </Button>
-                                        ))}
-                                    </Group>
-                                </div>
-                            )}
-                        </Stack>
-                    </ScrollArea.Autosize>
-                </Paper>
-            )}
+                            ))}
+                        </SimpleGrid>
+                        {relations.length > 0 && (
+                            <div>
+                                {sectionLabel(t('people.relations'))}
+                                <Stack gap={6}>
+                                    {relations.map((r, i) => {
+                                        const other = r.with ? NODE_BY_ID.get(r.with) : undefined
+                                        return (
+                                            <Text key={i} size="sm">
+                                                {other
+                                                    ? <Anchor fw={600} onClick={() => explore(other.id)}>{other.name.replace(/\s*\([^)]*\)\s*$/, '')}</Anchor>
+                                                    : <Text span fw={600}>{r.label}</Text>}
+                                                {': '}{r.text}
+                                            </Text>
+                                        )
+                                    })}
+                                </Stack>
+                            </div>
+                        )}
+                        {subgroups.length > 0 && (
+                            <div>
+                                {sectionLabel(t('people.subgroups', { count: subgroups.length }))}
+                                <Group gap={6}>
+                                    {subgroups.map(s => (
+                                        <Button
+                                            key={s.id} size="compact-xs" radius="xl" variant="light"
+                                            onClick={() => explore(s.id)}
+                                            leftSection={<span style={{ width: 8, height: 8, borderRadius: 4, background: colorOf(s.id), display: 'inline-block' }} />}
+                                        >
+                                            {s.name}
+                                        </Button>
+                                    ))}
+                                </Group>
+                            </div>
+                        )}
+                        {i18n.resolvedLanguage !== 'en' && <Text size="xs" c="dimmed">{t('people.contentNote')}</Text>}
+                    </Stack>
+                )}
+            </Paper>
         </Stack>
     )
 }
