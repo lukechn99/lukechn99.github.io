@@ -100,7 +100,7 @@ const es: Resources = {
         loadFailed: 'No se pudieron cargar los datos del mapa ({{status}})',
         aboutTitle: 'Sobre este mapa',
         about1: 'Cada provincia o estado se colorea según su pueblo mayoritario (o el más numeroso), por lo que las minorías y las zonas mixtas se simplifican. En EE. UU., cada condado muestra su grupo de ascendencia u origen más numeroso (ACS 2020–2024).',
-        about2: 'Haz clic en una región para centrarte en ella y ver sus subgrupos; cierra su perfil para retroceder o haz clic en una zona vacía del mapa para volver al mundo. Acerca el zoom para ver grupos más específicos. {{count}} grupos en total.',
+        about2: 'Haz clic en una región para centrarte en ella y ver sus subgrupos; cierra su perfil para retroceder o haz clic en una zona vacía del mapa para volver a mostrar todas las regiones. Acerca el zoom para ver grupos más específicos. {{count}} grupos en total.',
         contentNote: 'Por ahora, los perfiles de los grupos están en inglés.',
         fields: {
             language: 'Idioma',

@@ -459,10 +459,10 @@ export default function PeopleMapTab() {
                     }, 120)
                 })
 
-                // A click on empty map (not on a region) goes back to the world view.
+                // A click on empty map (not on a region) leaves focus mode but keeps the current view.
                 map.on('click', () => {
                     if (Date.now() - regionClickAt.current < 300) return
-                    resetRef.current()
+                    resetRef.current(false)
                 })
 
                 // Never zoom out so far that the single (non-repeating) world is narrower than the map.
@@ -541,10 +541,11 @@ export default function PeopleMapTab() {
         frame(prev)
     }, [frame])
 
-    const resetToWorld = useCallback(() => {
+    /** Leaves focus mode. The world button also zooms out; an empty-map click keeps the view. */
+    const resetToWorld = useCallback((reframe = true) => {
         history.current = []
         setSelectedId(null)
-        frame(null)
+        if (reframe) frame(null)
     }, [frame])
     const resetRef = useRef(resetToWorld)
     useEffect(() => { resetRef.current = resetToWorld }, [resetToWorld])
@@ -716,7 +717,7 @@ export default function PeopleMapTab() {
                             <Text size="xs" c="dimmed" visibleFrom="sm">{t('people.zoomShows')}</Text>
                             <Text size="xs" fw={600}>{levelNames[Math.min(zDepth, levelNames.length) - 1]}</Text>
                             <Tooltip label={t('people.backToWorld')}>
-                                <ActionIcon size="sm" variant="subtle" onClick={resetToWorld} aria-label={t('people.backToWorld')}>
+                                <ActionIcon size="sm" variant="subtle" onClick={() => resetToWorld()} aria-label={t('people.backToWorld')}>
                                     <IconWorld size={16} />
                                 </ActionIcon>
                             </Tooltip>

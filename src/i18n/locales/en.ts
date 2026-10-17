@@ -98,7 +98,7 @@ const en = {
         loadFailed: 'Map data failed to load ({{status}})',
         aboutTitle: 'About this map',
         about1: 'Each province or state is colored by its majority (or largest) people, so minorities and mixed areas are simplified away. In the US, each county shows its largest ancestry or origin group (ACS 2020–2024).',
-        about2: 'Click a region to focus on it and reveal its subgroups; close its profile to step back, or click empty map to return to the world. Zoom in to see finer groups everywhere. {{count}} groups in all.',
+        about2: 'Click a region to focus on it and reveal its subgroups; close its profile to step back, or click empty map to show every region again. Zoom in to see finer groups everywhere. {{count}} groups in all.',
         contentNote: 'Group profiles are currently written in English.',
         fields: {
             language: 'Language',

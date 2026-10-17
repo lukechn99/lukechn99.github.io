@@ -100,7 +100,7 @@ const vi: Resources = {
         loadFailed: 'Không tải được dữ liệu bản đồ ({{status}})',
         aboutTitle: 'Về bản đồ này',
         about1: 'Mỗi tỉnh hoặc bang được tô màu theo dân tộc chiếm đa số (hoặc đông nhất), nên các nhóm thiểu số và vùng đan xen được giản lược. Ở Mỹ, mỗi quận hiển thị nhóm tổ tiên hoặc nguồn gốc đông nhất (ACS 2020–2024).',
-        about2: 'Nhấn vào một vùng để tập trung vào đó và xem các nhóm con; đóng phần giới thiệu để quay lại, hoặc nhấn vào chỗ trống trên bản đồ để về toàn thế giới. Phóng to để xem các nhóm chi tiết hơn. Tổng cộng {{count}} nhóm.',
+        about2: 'Nhấn vào một vùng để tập trung vào đó và xem các nhóm con; đóng phần giới thiệu để quay lại, hoặc nhấn vào chỗ trống trên bản đồ để hiện lại tất cả các vùng. Phóng to để xem các nhóm chi tiết hơn. Tổng cộng {{count}} nhóm.',
         contentNote: 'Hiện tại phần giới thiệu các nhóm vẫn bằng tiếng Anh.',
         fields: {
             language: 'Ngôn ngữ',
