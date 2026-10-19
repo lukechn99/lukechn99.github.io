@@ -119,6 +119,8 @@ const zh: Resources = {
         subgroupsTooltip: '{{count}} 个下属群体 · 点击探索',
         showOnMap: '在地图上显示',
         hideEvent: '从地图上移除',
+        eventFor: '对{{name}}而言：',
+        eventAlso: '也关系到：',
         eventKinds: {
             conflict: '冲突',
             treaty: '条约',

@@ -42,6 +42,7 @@ export const europeRelations: RelationsMap = {
         { with: 'germans', text: 'From Prussian partition to Nazi occupation, Germany was Poland\'s deadliest neighbour; postwar reconciliation has made it Poland\'s biggest trading partner.' },
         { with: 'russians', text: 'Partition, the 1940 Katyn massacre and Soviet domination leave deep distrust.' },
         { with: 'lithuanians', text: 'Allied for four centuries in the Commonwealth, then bitter rivals over Vilnius between the wars.' },
+        { with: 'jews', text: "Poland had Europe's largest Jewish community, about 3.3 million, before the Holocaust; the Nazis built their main death camps on occupied Polish soil." },
     ],
     'czechs': [
         { with: 'slovaks', text: 'Shared a state from 1918 to 1993 and split peacefully; relations remain warm.' },
@@ -105,6 +106,7 @@ export const europeRelations: RelationsMap = {
         { with: 'poles', text: 'Germany\'s World War II occupation killed about a fifth of Poland\'s population; reconciliation has been real but reparations claims resurface.' },
         { with: 'jews', text: 'German-speaking Jews were deeply integrated until the Holocaust; Germany treats responsibility for it as a core of national identity.' },
         { with: 'turks', text: 'About 3 million people of Turkish origin live in Germany, mostly descended from 1960s guest workers.' },
+        { with: 'czechs', text: "Hitler annexed the Sudetenland in 1938; after the war about 3 million Sudeten Germans were expelled, many settling in Bavaria." },
     ],
     'dutch': [
         { with: 'french', text: 'Belgium\'s Flemish and Walloons share a state uneasily; language disputes have repeatedly stalled government formation.' },
@@ -206,9 +208,10 @@ export const europeRelations: RelationsMap = {
     ],
     'french': [
         { with: 'germans', text: 'Three wars from 1870 to 1945, then the core partnership of the EU.' },
-        { with: 'english', text: 'The Hundred Years\' War and a long imperial rivalry, followed by the 1904 Entente Cordiale.' },
+        { with: 'english', text: 'Norman French ruled England from 1066; then came the Hundred Years\' War and a long imperial rivalry, followed by the 1904 Entente Cordiale.' },
         { with: 'maghrebis', text: 'France ruled Algeria (1830–1962) and protectorates in Tunisia and Morocco; about 5 million French have Maghrebi roots, and the Algerian war still strains relations.' },
         { with: 'bretons', text: 'Breton and other regional languages were suppressed in schools for over a century.' },
+        { with: 'vietnamese', text: "France ruled Indochina from the 1880s until its defeat at Dien Bien Phu in 1954." },
     ],
     'quebecois': [
         { with: 'anglo-canadians', text: 'Language laws (Bill 101) and two referendums show a nation defending French in an English-speaking continent.' },
@@ -273,6 +276,7 @@ export const europeRelations: RelationsMap = {
         { with: 'portuguese', text: 'Former colonizer; the Portuguese royal court moved to Rio in 1808.' },
         { with: 'amazonian', text: 'Deforestation, mining and ranching put pressure on Indigenous territories; the Yanomami suffered a humanitarian crisis in 2023.' },
         { with: 'rioplatenses', text: 'Friendly rivals, especially in football.' },
+        { with: 'paraguayans', text: "Brazil supplied most of the troops in the War of the Triple Alliance (1864–70) and occupied Asunción; Brazilian farmers now own much land in eastern Paraguay." },
     ],
 
     'celtic': [
@@ -299,7 +303,7 @@ export const europeRelations: RelationsMap = {
 
     'greeks': [
         { label: "Indo-European family", text: "Part of the Indo-European family: their language and those of most of Europe, Iran and northern India descend from Proto-Indo-European, spoken on the steppe north of the Black Sea about 6,000 years ago. The family is linguistic, not a shared identity or ancestry. Greek forms its own branch: patēr, mētēr and treis match Latin pater, mater and tres, and Sanskrit pitṛ, mātṛ and trayas." },
-        { with: 'turks', text: 'Four centuries of Ottoman rule, the 1821 independence war, the 1923 population exchange, and the 1974 Cyprus division; tension over the Aegean persists.' },
+        { with: 'turks', text: 'The fall of Constantinople in 1453, four centuries of Ottoman rule, the 1821 independence war, the 1923 population exchange, and the 1974 Cyprus division; tension over the Aegean persists.' },
         { with: 'macedonians', text: 'A long name dispute settled in 2018.' },
         { with: 'albanians', text: 'Hundreds of thousands of Albanians migrated to Greece after 1991; a Greek minority lives in southern Albania.' },
     ],
@@ -344,6 +348,7 @@ export const europeRelations: RelationsMap = {
         { with: 'kurds', text: 'Iranian Kurds face repression; Kurdish areas led the 2022 "Woman, Life, Freedom" protests after Mahsa Amini\'s death.' },
         { with: 'baloch', text: 'Sistan-Baluchestan is Iran\'s poorest province, with a Sunni insurgency and heavy executions.' },
         { with: 'tajiks', text: 'Share language and culture; Tajiks see Persian poets like Rumi and Ferdowsi as their own.' },
+        { with: 'han', text: "Persian was a common language of trade along the Silk Road; Persian merchants, Manichaeans and Nestorian Christians reached Tang China, and Chinese silk and paper came west." },
     ],
     'kurds': [
         { with: 'turks', text: 'Türkiye denied Kurdish identity for decades; the PKK insurgency since 1984 has killed about 40,000. The PKK announced its dissolution in 2025.' },
@@ -360,6 +365,7 @@ export const europeRelations: RelationsMap = {
         { with: 'pashtuns', text: 'Long contest for power in Afghanistan; Tajiks led resistance against the Taliban.' },
         { with: 'uzbeks', text: 'Samarkand and Bukhara are historically Tajik-speaking but were given to Uzbekistan in 1924; relations warmed after 2016.' },
         { with: 'kyrgyz', text: 'Border clashes in 2021 and 2022 killed about 100 people; a 2025 border treaty eased tensions.' },
+        { with: 'han', text: "Their Sogdian ancestors from the cities of Samarkand and Bukhara were the great merchants along the Silk Road, with trading colonies as far as the Tang capital Chang'an." },
     ],
     'baloch': [
         { with: 'punjabis', text: 'Baloch nationalists accuse the Punjabi-led state of exploiting their gas and minerals; insurgents attack Punjabi workers and Chinese projects.' },
@@ -395,11 +401,13 @@ export const europeRelations: RelationsMap = {
         { with: 'punjabis', text: 'West Pakistan\'s Punjabi-dominated army killed hundreds of thousands in 1971, leading to Bangladesh\'s independence.' },
         { with: 'assamese', text: 'Migration from Bangladesh into Assam has caused violence and citizenship disputes.' },
         { with: 'burmans', text: 'About 1 million Rohingya refugees from Myanmar live in camps in Bangladesh.' },
+        { label: "Across the border", text: "The 1947 Partition also split Bengal: the Muslim-majority east became East Pakistan until the 1971 war of independence." },
     ],
     'punjabis': [
         { with: 'bengalis', text: 'The 1971 war split Pakistan; Bangladesh still seeks an apology for wartime atrocities.' },
         { with: 'sindhis', text: 'Sindhis resent Punjabi control of Indus water and the army.' },
         { with: 'hindustanis', text: 'Sikh separatism in the 1980s ended with Operation Blue Star (1984) and anti-Sikh riots in Delhi that killed thousands.' },
+        { label: "Across the border", text: "The 1947 Partition split Punjab in two: Sikhs and Hindus fled east and Muslims west in one of history's largest migrations, with massacres on both sides." },
     ],
     'marathis': [
         { with: 'gujaratis', text: 'Bombay State was split into Maharashtra and Gujarat in 1960 after protests; Mumbai went to Maharashtra.' },
@@ -416,7 +424,7 @@ export const europeRelations: RelationsMap = {
     ],
     'sindhis': [
         { with: 'punjabis', text: 'Disputes over water, dams and power within Pakistan.' },
-        { label: 'Muhajirs', text: 'Urdu-speaking migrants from India dominate Karachi, a source of ethnic politics and 1990s violence.' },
+        { label: 'Muhajirs', text: 'Urdu-speaking migrants who came from India after the 1947 Partition dominate Karachi, a source of ethnic politics and 1990s violence.' },
     ],
     'assamese': [
         { with: 'bengalis', text: 'The 1979–85 Assam Movement against migrants, and the 2019 citizenship register that excluded about 1.9 million people.' },
@@ -428,7 +436,7 @@ export const europeRelations: RelationsMap = {
         { label: 'Lhotshampa', text: 'Bhutan expelled about 100,000 Nepali-speaking Lhotshampa in the early 1990s.' },
     ],
     'sinhalese': [
-        { with: 'tamils', text: 'Sinhala nationalism and Tamil separatism fueled the 1983–2009 civil war; reconciliation remains incomplete.' },
+        { with: 'tamils', text: 'Sinhala nationalism and Tamil separatism fueled the civil war, from the 1983 Black July pogrom to its bloody end in 2009; reconciliation remains incomplete.' },
         { label: 'Sri Lankan Muslims', text: 'Anti-Muslim riots in 2014 and 2018 and backlash after the 2019 Easter bombings.' },
     ],
     'dardic': [

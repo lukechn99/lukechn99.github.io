@@ -119,6 +119,8 @@ const es: Resources = {
         subgroupsTooltip: '{{count}} subgrupos · haz clic para explorar',
         showOnMap: 'Mostrar en el mapa',
         hideEvent: 'Quitar del mapa',
+        eventFor: 'Para {{name}}:',
+        eventAlso: 'También forma parte de la historia de:',
         eventKinds: {
             conflict: 'Conflicto',
             treaty: 'Tratado',

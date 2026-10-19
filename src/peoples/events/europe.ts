@@ -107,7 +107,7 @@ export const europeEvents: PeopleEvent[] = [
     {
         id: 'constantinople-1453', name: 'Fall of Constantinople', date: '1453', kind: 'conflict',
         summary: 'Mehmed II’s Ottoman army breached the land walls and ended the Byzantine Empire; the city became the Ottoman capital, Istanbul.',
-        match: ['From 1453'],
+        match: ['From 1453', 'The fall of Constantinople'],
         shapes: [{ point: [41.02, 28.93] }],
     },
     {
@@ -208,7 +208,7 @@ export const europeEvents: PeopleEvent[] = [
     {
         id: 'fall-of-granada', name: 'Al-Andalus and the fall of Granada', date: '711–1492', kind: 'conflict',
         summary: 'Muslim rule in Iberia began in 711 and ended when Granada surrendered to Ferdinand and Isabella in 1492; Jews were expelled the same year.',
-        match: ['Moorish rule (711–1492)', 'Al-Andalus'],
+        match: ['Moorish rule (711–1492)', 'Al-Andalus', 'the fall of Granada'],
         shapes: [{ point: [37.176, -3.588], label: 'Alhambra' }],
     },
     {

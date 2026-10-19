@@ -53,19 +53,19 @@ export const asiaEvents: PeopleEvent[] = [
     {
         id: 'silk-road', name: 'Silk Road', date: 'c. 130 BCE–1450s', kind: 'migration',
         summary: 'A web of caravan routes linking China to Persia and the Mediterranean, carrying silk, horses, religions and Turkic and Sogdian traders. This line follows the main northern route.',
-        match: ['along the Silk Road'],
+        match: ['along the Silk Road', 'the crossroads of the Silk Road'],
         shapes: [{ line: [[34.34, 108.94], [36.06, 103.83], [40.14, 94.66], [42.95, 89.19], [39.47, 75.99], [39.65, 66.96], [37.66, 62.19], [35.59, 51.44], [33.31, 44.36], [34.56, 38.27], [36.2, 36.16]] }],
     },
     {
         id: 'great-wall', name: 'Great Wall', date: '7th c. BCE–1600s', kind: 'place',
         summary: 'Successive dynasties built walls against steppe nomads; the surviving brick wall, shown here, is mostly Ming (1368–1644).',
-        match: ['The Great Wall'],
+        match: ['The Great Wall', 'the Great Wall'],
         shapes: [{ line: [[40.0, 119.75], [40.36, 116.02], [40.1, 113.3], [39.2, 111.6], [38.3, 109.7], [38.5, 106.2], [37.9, 102.6], [38.9, 100.4], [39.8, 98.2]] }],
     },
     {
         id: 'partition', name: 'Partition of India', date: '1947', kind: 'migration',
         summary: 'The Radcliffe Line split Punjab and Bengal between India and Pakistan; about 15 million people crossed and up to 1 million or more died in communal violence.',
-        match: ['shaped by Partition'],
+        match: ['shaped by Partition', 'the 1947 Partition', 'The 1947 Partition'],
         shapes: [
             { line: [[32.6, 74.7], [32.0, 75.2], [31.6, 74.6], [31.1, 74.6], [30.4, 73.9]] },
             { line: [[26.3, 88.2], [25.3, 88.9], [24.4, 88.7], [23.2, 88.9], [22.0, 89.0]] },

@@ -23,6 +23,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'kurds', text: 'Syria denied citizenship to many Kurds; Kurdish-led forces ran the northeast after 2012.' },
         { with: 'turks', text: 'Türkiye hosted about 3 million Syrian refugees and backs factions in northern Syria.' },
         { label: 'Alawites and Druze', text: 'After Assad\'s fall in December 2024, sectarian killings of Alawites and Druze in 2025 raised fears about minority safety.' },
+        { with: 'armenians', text: "Syria and Lebanon took in survivors of the 1915 genocide; Aleppo and Beirut's Bourj Hammoud became major Armenian centres." },
     ],
     'mesopotamian-arabs': [
         { with: 'kurds', text: 'Disputes over Kirkuk, oil revenue and the 2017 Kurdish independence referendum.' },
@@ -38,6 +39,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'french', text: 'The Algerian war of independence (1954–62) killed hundreds of thousands; migration and memory still strain relations.' },
         { with: 'amazigh', text: 'Shared ancestry; Arabization policies after independence sidelined Berber languages until recent recognition.' },
         { label: 'Sahrawis', text: 'Morocco and the Polisario Front dispute Western Sahara; Algeria backs Polisario, keeping Morocco–Algeria relations frozen.' },
+        { with: 'castilians', text: "Many Moroccans and Algerians descend in part from Andalusis who fled after the fall of Granada in 1492; Andalusi music and architecture survive in Fez, Tlemcen and Tetouan." },
     ],
     'sudanic-arabs': [
         { with: 'darfur', text: 'Arab militias (Janjaweed, then the RSF) waged campaigns against non-Arab Darfuris in 2003 and since 2023.' },
@@ -45,9 +47,10 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'sara', text: 'Chad\'s Arab and northern groups and the southern Sara have fought for control of the state.' },
     ],
     'jews': [
-        { with: 'levantine-arabs', text: 'The central conflict over the same land; Arab citizens of Israel are about a fifth of its population.' },
+        { with: 'levantine-arabs', text: 'The central conflict over the same land, now including the Gaza war that began in October 2023; Arab citizens of Israel are about a fifth of its population.' },
         { with: 'germans', text: 'Holocaust memory and reparations led to close postwar relations.' },
         { with: 'persians', text: 'Iran was an ally before 1979; since then a sworn enemy, culminating in direct strikes in 2024 and 2025.' },
+        { with: 'castilians', text: "Spain expelled its Jews in 1492, months after the fall of Granada; Sephardi Jews carried Ladino and Spanish culture to the Ottoman Empire, North Africa and the Netherlands." },
     ],
     'ethio-semitic': [
         { with: 'cushitic', text: 'Highland empires expanded south and east in the late 19th century, ruling Oromo, Somali and southern peoples.' },
@@ -56,6 +59,7 @@ export const africaMiddleEastRelations: RelationsMap = {
         { with: 'oromo', text: 'Oromo nationalism grew against Amhara-led imperial rule; land disputes and killings continue in border areas.' },
         { with: 'tigrinya', text: 'Allied against Tigray\'s forces in the 2020–22 war, and in dispute over western Tigray.' },
         { with: 'egyptians', text: 'Ethiopia\'s Nile dam is a point of national pride and a dispute with Egypt.' },
+        { with: 'somalis', text: "Ethiopia fought Somalia in the 1977–78 Ogaden War over the Somali-inhabited east, and Ethiopian troops have intervened in Somalia since 2006." },
     ],
     'tigrinya': [
         { with: 'amhara', text: 'Rivals for control of Ethiopia; Tigrayan leaders dominated the government from 1991 to 2018.' },

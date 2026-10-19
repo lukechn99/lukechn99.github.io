@@ -146,7 +146,7 @@ export const americasEvents: PeopleEvent[] = [
     {
         id: 'triple-alliance', name: 'War of the Triple Alliance', date: '1864–70', kind: 'conflict',
         summary: 'Paraguay fought Brazil, Argentina and Uruguay; the fortress of Humaitá held for years, but the war killed a large share of Paraguay’s population.',
-        match: ['devastated Paraguay in the 1864–70 war', 'The War of the Triple Alliance'],
+        match: ['devastated Paraguay in the 1864–70 war', 'The War of the Triple Alliance', 'the War of the Triple Alliance'],
         shapes: [{ point: [-27.07, -58.5], label: 'Humaitá' }],
     },
     {

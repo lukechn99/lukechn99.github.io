@@ -5,7 +5,7 @@ import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
 import { relationsOf } from "./peoples/relations/index.ts"
 import { LITERATURE } from "./peoples/literature.ts"
 import { localName, shortName } from "./peoples/names/index.ts"
-import { EVENT_BY_ID, linkEvents, type EventKind, type LatLng, type PeopleEvent } from "./peoples/events/index.ts"
+import { EVENT_BY_ID, EVENT_GROUPS, PERSPECTIVES, linkEvents, type EventKind, type LatLng, type PeopleEvent } from "./peoples/events/index.ts"
 import { localEventName } from "./peoples/events/names/index.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
 import type { GeometryCollection, MultiPolygon as TopoMultiPolygon, Polygon as TopoPolygon, Topology } from "topojson-specification"
@@ -357,7 +357,18 @@ export default function PeopleMapTab() {
     /** The event shown on the map, and which note it was opened from. Tied to the focused region. */
     const [activeEvent, setActiveEvent] = useState<{ id: string, note: number } | null>(null)
     const eventLayer = useRef<Layer | null>(null)
-    useEffect(() => { setActiveEvent(null) }, [selectedId])
+    /** Set when jumping from an event card to another group, so the event stays open there. */
+    const carryEvent = useRef<{ group: string, id: string } | null>(null)
+    useEffect(() => {
+        const carry = carryEvent.current
+        if (carry && carry.group === selectedId) {
+            const note = EVENT_GROUPS.get(carry.id)?.get(carry.group)
+            setActiveEvent(note === undefined ? null : { id: carry.id, note })
+        } else {
+            setActiveEvent(null)
+        }
+        carryEvent.current = null
+    }, [selectedId])
     const [viewTick, setViewTick] = useState(0)
     /** Previously explored groups, for the panel's close (back) button. */
     const history = useRef<(string | null)[]>([])
@@ -548,10 +559,10 @@ export default function PeopleMapTab() {
 
     /* ---- Navigation: select a group and frame it ---- */
     /** Ask for the view to be framed on a group (or the world) once the layout has settled. */
-    const pendingFrame = useRef<{ id: string | null } | null>(null)
+    const pendingFrame = useRef<{ id: string | null, carryEventId?: string } | null>(null)
     const [frameTick, setFrameTick] = useState(0)
-    const frame = useCallback((id: string | null) => {
-        pendingFrame.current = { id }
+    const frame = useCallback((id: string | null, carryEventId?: string) => {
+        pendingFrame.current = carryEventId ? { id, carryEventId } : { id }
         setFrameTick(t => t + 1)
     }, [])
 
@@ -571,10 +582,26 @@ export default function PeopleMapTab() {
                 map.flyToBounds(WORLD_VIEW, { duration: 0.8 })
                 return
             }
-            map.flyToBounds(L.latLngBounds(box), { padding: L.point(48, 48), maxZoom: 6, duration: 0.8 })
+            let target = L.latLngBounds(box)
+            // Arriving from another group's event card: keep that event in view too.
+            const carried = req.carryEventId ? EVENT_BY_ID.get(req.carryEventId) : undefined
+            if (carried) {
+                const both = L.latLngBounds(box).extend(L.latLngBounds(eventGeometry(carried).bounds))
+                if (both.getEast() - both.getWest() < 160 && both.getNorth() - both.getSouth() < 90) target = both
+            }
+            map.flyToBounds(target, { padding: L.point(48, 48), maxZoom: 6, duration: 0.8 })
         })
         return () => cancelAnimationFrame(raf)
     }, [ready, frameTick, featureFor])
+
+    /** Jump to another group from an event card, keeping the event open and in view there. */
+    const exploreWithEvent = useCallback((id: string, eventId: string) => {
+        setSelectedId(prev => {
+            if (prev !== id) history.current.push(prev)
+            return id
+        })
+        frame(id, eventId)
+    }, [frame])
 
     /** Explore a group, remembering where we came from. */
     const explore = useCallback((id: string) => {
@@ -982,6 +1009,33 @@ export default function PeopleMapTab() {
                                                                 </ActionIcon>
                                                             </Group>
                                                             <Text size="sm" mt={2}>{ev.summary}</Text>
+                                                            {selected && PERSPECTIVES[ev.id]?.[selected.id] && (
+                                                                <Text size="sm" mt={6}>
+                                                                    <Text span fw={700} size="sm">{t('people.eventFor', { name: shortName(nameOf(selected)) })}</Text>{' '}
+                                                                    {PERSPECTIVES[ev.id]![selected.id]}
+                                                                </Text>
+                                                            )}
+                                                            {(() => {
+                                                                const others = [...(EVENT_GROUPS.get(ev.id)?.keys() ?? [])].filter(g => g !== selected?.id && NODE_BY_ID.has(g))
+                                                                if (!others.length) return null
+                                                                return (
+                                                                    <Group gap={6} mt={8} align="center">
+                                                                        <Text span size="xs" c="dimmed">{t('people.eventAlso')}</Text>
+                                                                        {others.map(g => (
+                                                                            <Button
+                                                                                key={g} size="compact-xs" radius="xl" variant="light" color="gray"
+                                                                                onClick={() => {
+                                                                                    carryEvent.current = { group: g, id: ev.id }
+                                                                                    exploreWithEvent(g, ev.id)
+                                                                                }}
+                                                                                leftSection={<span style={{ width: 8, height: 8, borderRadius: 4, background: colorOf(g), display: 'inline-block' }} />}
+                                                                            >
+                                                                                {shortName(nameOf(NODE_BY_ID.get(g)!))}
+                                                                            </Button>
+                                                                        ))}
+                                                                    </Group>
+                                                                )
+                                                            })()}
                                                         </Paper>
                                                     ) : null
                                                 })()}

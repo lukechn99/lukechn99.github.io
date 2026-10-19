@@ -117,6 +117,8 @@ const en = {
         subgroupsTooltip: '{{count}} subgroups · click to explore',
         showOnMap: 'Show on map',
         hideEvent: 'Remove from map',
+        eventFor: 'For {{name}}:',
+        eventAlso: 'Also part of the story of:',
         eventKinds: {
             conflict: 'Conflict',
             treaty: 'Treaty',

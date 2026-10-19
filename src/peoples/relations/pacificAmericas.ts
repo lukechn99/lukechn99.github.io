@@ -80,7 +80,7 @@ export const pacificAmericasRelations: RelationsMap = {
         { with: 'papuans', text: 'Bougainville\'s war against Papua New Guinea (1988–98) killed up to 20,000.' },
     ],
     'polynesians': [
-        { with: 'australians-nzers', text: 'Māori and the Crown dispute land and treaty rights; Pacific Islanders are a fifth of Auckland.' },
+        { with: 'australians-nzers', text: 'Māori and the Crown dispute land and rights under the Treaty of Waitangi; Pacific Islanders are a fifth of Auckland.' },
         { with: 'americans', text: 'Native Hawaiians seek redress for the 1893 overthrow; tourism and housing costs push many out.' },
         { with: 'french', text: 'France tested nuclear weapons in French Polynesia from 1966 to 1996.' },
     ],
@@ -113,6 +113,7 @@ export const pacificAmericasRelations: RelationsMap = {
     'aymara': [
         { with: 'andean-mestizos', text: 'Aymara movements led the 2003 "gas war" and brought Evo Morales to power; lowland Santa Cruz elites opposed him.' },
         { with: 'quechua', text: 'Close neighbours who share many customs.' },
+        { with: 'chileans', text: "Bolivia's loss of its coast in the War of the Pacific is still mourned every 23 March, the Day of the Sea." },
     ],
     'mesoamerican': [
         { with: 'mexicans', text: 'Mexico celebrates its Aztec past while Indigenous people remain among its poorest.' },

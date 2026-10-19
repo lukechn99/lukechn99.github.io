@@ -6,8 +6,8 @@ export const asiaRelations: RelationsMap = {
         { with: 'tibetans', text: 'China took control of Tibet in 1950; Han migration, restrictions on religion and boarding schools fuel resentment.' },
         { with: 'uyghurs', text: 'Han settlement and mass internment since 2017 define the relationship in Xinjiang.' },
         { with: 'mongols', text: 'The Great Wall was built against northern nomads, and Mongols ruled all of China as the Yuan dynasty (1271–1368). Han now outnumber Mongols about 4 to 1 in Inner Mongolia; cuts to Mongolian-language schooling sparked protests in 2020.' },
-        { with: 'turkic', text: 'Chinese dynasties fought and traded with Turkic steppe empires for 1,500 years, from the Göktürk khaganates to the Tang dynasty\'s alliance with the Uyghur Khaganate.' },
-        { with: 'koreans', text: 'Korea and Vietnam absorbed Chinese script and Confucian statecraft while resisting Chinese rule.' },
+        { with: 'turkic', text: 'Chinese dynasties fought and traded with Turkic steppe empires for 1,500 years, from the Göktürk khaganates to the Tang dynasty\'s alliance with the Uyghur Khaganate, and shared the trade along the Silk Road.' },
+        { with: 'koreans', text: 'Korea and Vietnam absorbed Chinese script and Confucian statecraft while resisting Chinese rule; China saved North Korea in the Korean War (1950–53).' },
         { with: 'japanese', text: 'Japan\'s invasion (1937–45), including the Nanjing Massacre, still shapes Chinese views of Japan.' },
         { label: 'Overseas Chinese and Southeast Asians', text: 'Chinese commercial minorities have faced periodic violence, notably in Indonesia in 1965 and 1998.' },
     ],
@@ -40,7 +40,7 @@ export const asiaRelations: RelationsMap = {
     'burmans': [
         { label: "Sino-Tibetan family", text: "Chinese, Tibetan and Burmese descend from a common Sino-Tibetan ancestor, probably spoken in northern China over 6,000 years ago; they are no longer mutually intelligible. Burmese is closest to the other Tibeto-Burman languages; ngá (both five and fish) and thóun (three) match Tibetan lnga, nya and gsum." },
         { with: 'karen', text: 'The army has fought Karen forces since 1949, burning villages and creating refugee camps in Thailand.' },
-        { with: 'shan', text: 'Shan princes lost autonomy after the 1962 coup; several Shan armies still fight or bargain with the junta.' },
+        { with: 'shan', text: 'Shan princes, who joined Burma at the 1947 Panglong conference, lost autonomy after the 1962 coup; several Shan armies still fight or bargain with the junta.' },
         { label: 'Rohingya', text: 'Burman nationalists deny the Muslim Rohingya are a native people; the army\'s 2017 clearance operations drove about 700,000 into Bangladesh.' },
         { with: 'thai', text: 'Burma destroyed the Thai capital Ayutthaya in 1767, a lasting memory in Thailand.' },
     ],
@@ -108,16 +108,19 @@ export const asiaRelations: RelationsMap = {
     'karluk': [
         { with: 'iranian', text: 'Turkic Uzbeks and Persian-speaking Tajiks share cities like Samarkand and Bukhara, mixing for centuries.' },
         { with: 'han', text: 'Uyghurs face Chinese assimilation campaigns; Uzbekistan stays quiet on the issue.' },
+        { label: "Silk Road oases", text: "Kashgar, Turpan, Samarkand and Bukhara grew rich as caravan stops along the Silk Road, where Turkic, Sogdian, Persian and Chinese traders met." },
     ],
     'uzbeks': [
         { with: 'tajiks', text: 'Rival claims to Samarkand and Bukhara\'s heritage; relations have improved since 2016.' },
         { with: 'kyrgyz', text: 'The 2010 Osh violence displaced hundreds of thousands of Uzbeks.' },
         { with: 'russians', text: 'Millions of Uzbek migrant workers send money home from Russia.' },
+        { with: 'persians', text: "Timur made Samarkand his capital at the crossroads of the Silk Road, filling it with craftsmen taken from Persia, India and beyond." },
     ],
     'uyghurs': [
         { with: 'han', text: 'Riots in Ürümqi in 2009 were followed by sweeping surveillance and internment since 2017.' },
         { with: 'kazakhs', text: 'Close cousins; many Uyghurs live in Kazakhstan.' },
         { with: 'turks', text: 'Türkiye hosts a large Uyghur diaspora.' },
+        { label: "Kashgar and Turpan", text: "Uyghur oasis towns were key stations along the Silk Road; the Uyghur Khaganate traded horses for Chinese silk in the 8th–9th centuries." },
     ],
     'siberian-turks': [
         { with: 'russians', text: 'Sakha cooperate with Moscow but guard their diamond wealth and language; Tuva joined the USSR only in 1944.' },
@@ -147,9 +150,10 @@ export const asiaRelations: RelationsMap = {
     ],
 
     'mongols': [
-        { with: 'han', text: 'Mongols ruled China, then were ruled by the Manchu Qing; Mongolia broke away in 1911, while Inner Mongolia stayed Chinese.' },
+        { with: 'han', text: 'Chinese dynasties built the Great Wall against Mongol and earlier steppe raiders. Mongols ruled China, then were ruled by the Manchu Qing; Mongolia broke away in 1911, while Inner Mongolia stayed Chinese.' },
         { with: 'russians', text: 'Mongolia was a Soviet satellite from 1924 to 1990; Russia remains its main fuel supplier.' },
         { with: 'kazakhs', text: 'Kazakhs form a minority of about 4% in western Mongolia.' },
+        { with: 'persians', text: "The Mongols sacked Baghdad in 1258 and ruled Iran as the Ilkhanate, but their peace also reopened trade along the Silk Road, the route Marco Polo took." },
     ],
 
     'georgians': [
@@ -234,7 +238,7 @@ export const asiaRelations: RelationsMap = {
         { with: 'lao', text: 'Bangkok ruled Laos in the 19th century; Thais sometimes look down on Lao and Isan people, while Isan identity has grown in pride.' },
         { with: 'malays', text: 'Insurgency in the Malay-Muslim south since 2004 has killed over 7,000.' },
         { with: 'khmer', text: 'Border disputes over temples; occasional nationalist clashes.' },
-        { with: 'burmans', text: 'Historic enemies; millions of Myanmar migrants now work in Thailand.' },
+        { with: 'burmans', text: 'Historic enemies since Burma destroyed the Thai capital Ayutthaya in 1767; millions of Myanmar migrants now work in Thailand.' },
     ],
     'lao': [
         { with: 'thai', text: 'The Thai-Lao relationship is close but unequal; Isan Lao in Thailand are a large but politically marginal population.' },
@@ -253,8 +257,8 @@ export const asiaRelations: RelationsMap = {
     ],
     'japanese': [
         { with: 'koreans', text: 'Colonial rule, forced labor and wartime sexual slavery remain sore points; pop culture exchange flourishes.' },
-        { with: 'han', text: 'The 1937–45 war and the Senkaku islands dispute.' },
-        { with: 'ryukyuans', text: 'Okinawans resent bearing most US bases in Japan.' },
+        { with: 'han', text: 'The 1937–45 war, including the Nanjing Massacre, and the Senkaku islands dispute.' },
+        { with: 'ryukyuans', text: 'Okinawa was sacrificed in the 1945 battle to delay an invasion of the main islands; Okinawans resent bearing most US bases in Japan.' },
         { label: 'Ainu', text: 'Assimilation policies nearly erased Ainu language; Japan recognized the Ainu as Indigenous in 2019.' },
     ],
     'ryukyuans': [

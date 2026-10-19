@@ -119,6 +119,8 @@ const vi: Resources = {
         subgroupsTooltip: '{{count}} nhóm con · nhấn để khám phá',
         showOnMap: 'Hiển thị trên bản đồ',
         hideEvent: 'Gỡ khỏi bản đồ',
+        eventFor: 'Với {{name}}:',
+        eventAlso: 'Cũng là một phần lịch sử của:',
         eventKinds: {
             conflict: 'Xung đột',
             treaty: 'Hiệp ước',
