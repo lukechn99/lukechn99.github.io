@@ -44,11 +44,15 @@ export default function Works() {
         >
             <IconChevronLeft size={22} />
         </ActionIcon>
+        {/* Wider than the page's 1280px column: centre on the viewport instead of the column,
+            so the tabs and maps don't spill off to the right on wide screens. */}
         <Stack
             align="stretch"
-            w="80vw"
-            mx="auto"
-            style={{ overflow: 'hidden' }}
+            style={{
+                overflow: 'hidden',
+                width: 'min(80vw, 1800px)',
+                marginLeft: 'calc(50% - min(40vw, 900px))',
+            }}
             gap="xs"
         >
             <Tabs variant="none" value={value} onChange={v => { if (v) navigate(`/works/${v}`) }} keepMounted={false}>
