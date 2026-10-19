@@ -48,7 +48,7 @@ export default function Contact() {
         <Stack
         bg="var(--mantine-color-body)"
         p="md" gap="md"
-        w="80vw"
+        w="min(80vw, 1800px)"
         mx="auto"
         align="center"
     >

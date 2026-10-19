@@ -32,7 +32,7 @@ function App() {
     showNextMessage()
   }, [currentMessageIndex, messages.length])
 
-  return <Center maw="80vw">
+  return <Center maw="80vw" mx="auto">
     <Stack
       bg="var(--mantine-color-body)"
       align="stretch"

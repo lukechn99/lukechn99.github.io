@@ -13,8 +13,11 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
+/* Full-width column: each page sets its own width and centres itself (mx auto).
+   A capped column here made 80vw pages spill off to the right on wide screens. */
 #root {
-  max-width: 1280px;
+  width: 100%;
+  box-sizing: border-box;
   margin: 0 auto;
   padding: 2rem;
   text-align: center;
