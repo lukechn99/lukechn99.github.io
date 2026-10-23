@@ -93,7 +93,8 @@ export const americasEvents: PeopleEvent[] = [
         id: 'james-bay', name: 'James Bay Agreement', date: '1975', kind: 'treaty',
         summary: 'Canada’s first modern land claims deal: the Cree and Inuit of northern Quebec gave up title for money, hunting rights and self-government, clearing the way for huge dams.',
         match: ['the James Bay Agreement of 1975'],
-        shapes: [{ area: [53.0, -76.0], km: 300 }],
+        // The territory of the 1975 agreement: Quebec north of the 49th parallel, east of James Bay.
+        shapes: [{ poly: [[49.0, -79.5], [51.3, -79.5], [52.5, -78.8], [54.6, -79.6], [55.3, -77.6], [55.0, -73.0], [53.5, -70.0], [51.5, -70.5], [50.0, -72.5], [49.0, -75.0]] }],
     },
     {
         id: 'high-arctic-relocation', name: 'High Arctic relocation', date: '1953–55', kind: 'migration',

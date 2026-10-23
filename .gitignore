@@ -26,3 +26,4 @@ dist-ssr
 # People map build inputs
 scripts/peoples/ne_admin1.geojson
 scripts/peoples/.assigned.geojson
+scripts/peoples/.ne-cache/

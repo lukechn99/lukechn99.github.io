@@ -54,13 +54,13 @@ export const asiaEvents: PeopleEvent[] = [
         id: 'silk-road', name: 'Silk Road', date: 'c. 130 BCE–1450s', kind: 'migration',
         summary: 'A web of caravan routes linking China to Persia and the Mediterranean, carrying silk, horses, religions and Turkic and Sogdian traders. This line follows the main northern route.',
         match: ['along the Silk Road', 'the crossroads of the Silk Road'],
-        shapes: [{ line: [[34.34, 108.94], [36.06, 103.83], [40.14, 94.66], [42.95, 89.19], [39.47, 75.99], [39.65, 66.96], [37.66, 62.19], [35.59, 51.44], [33.31, 44.36], [34.56, 38.27], [36.2, 36.16]] }],
+        shapes: [{ line: [[34.34, 108.94], [34.58, 105.72], [36.06, 103.83], [37.93, 102.64], [38.93, 100.45], [39.73, 98.5], [40.14, 94.66], [42.82, 93.51], [42.95, 89.19], [41.72, 82.96], [41.17, 80.26], [39.47, 75.99], [40.53, 72.8], [39.65, 66.96], [39.77, 64.43], [37.66, 62.19], [36.21, 58.8], [35.59, 51.44], [34.8, 48.51], [33.31, 44.36], [34.56, 38.27], [36.2, 36.16]] }],
     },
     {
         id: 'great-wall', name: 'Great Wall', date: '7th c. BCE–1600s', kind: 'place',
         summary: 'Successive dynasties built walls against steppe nomads; the surviving brick wall, shown here, is mostly Ming (1368–1644).',
         match: ['The Great Wall', 'the Great Wall'],
-        shapes: [{ line: [[40.0, 119.75], [40.36, 116.02], [40.1, 113.3], [39.2, 111.6], [38.3, 109.7], [38.5, 106.2], [37.9, 102.6], [38.9, 100.4], [39.8, 98.2]] }],
+        shapes: [{ line: [[39.97, 119.8], [40.0, 119.75], [40.36, 118.3], [40.68, 117.24], [40.43, 116.56], [40.36, 116.02], [40.82, 114.88], [40.5, 114.0], [40.08, 113.3], [39.43, 111.5], [38.83, 110.5], [38.29, 109.73], [37.59, 107.6], [37.78, 107.4], [38.48, 106.23], [37.5, 105.2], [37.93, 102.64], [38.93, 100.45], [39.8, 98.21]] }],
     },
     {
         id: 'partition', name: 'Partition of India', date: '1947', kind: 'migration',

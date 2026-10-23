@@ -208,7 +208,7 @@ export const southernFeatures: GeoFeature[] = [
     {
         id: 'polynesian-triangle', name: 'Polynesian Triangle', kind: 'water',
         at: [-15.0, -150.0],
-        shapes: [{ line: [[21.3, -157.8], [-36.8, 174.8], [-27.1, -109.4], [21.3, -157.8]] }],
+        shapes: [{ line: [[21.3, -157.8], [-36.8, 174.8], [-27.1, -109.4], [21.3, -157.8]], straight: true }],
         summary: 'The vast ocean region between Hawaiʻi, New Zealand (Aotearoa) and Rapa Nui (Easter Island).',
         importance: 'Polynesians settled this whole triangle, the largest area ever settled by one culture before modern times, by voyaging canoe and star navigation, most of it between about 1000 and 1300 CE.',
         peoples: {

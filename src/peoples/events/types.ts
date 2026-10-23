@@ -1,10 +1,17 @@
 /** [latitude, longitude] */
 export type LatLng = [number, number]
 
-/** One drawable piece of an event: a pin, a route or border, or a rough circular area. */
+/**
+ * One drawable piece of an event or feature: a pin, a route or border, a hand-drawn
+ * outline, or a rough circular area. Where public/peoples/shapes.json has a real outline
+ * for the item, that replaces its areas/outlines (and its lines, if it has real lines).
+ * Hand-drawn lines are smoothed when drawn unless `straight` is set.
+ */
 export type EventShape =
     | { point: LatLng, label?: string }
-    | { line: LatLng[] }
+    /** `keep`: a route that stays even when a real outline replaces the item's other shapes. */
+    | { line: LatLng[], straight?: boolean, keep?: boolean }
+    | { poly: LatLng[] }
     | { area: LatLng, km: number }
 
 export type EventKind = 'conflict' | 'treaty' | 'migration' | 'place'

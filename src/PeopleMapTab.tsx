@@ -9,6 +9,7 @@ import { EVENT_BY_ID, EVENT_GROUPS, PERSPECTIVES, linkEvents, type EventKind, ty
 import { localEventName } from "./peoples/events/names/index.ts"
 import { GEO_BY_ID, GEO_FEATURES, type FeatureKind, type GeoFeature } from "./peoples/geography/index.ts"
 import { localGeoName } from "./peoples/geography/names/index.ts"
+import { loadPreciseShapes, preciseBounds, smoothLine, type PreciseShape, type PreciseShapes } from "./peoples/shapes.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
 import type { GeometryCollection, MultiPolygon as TopoMultiPolygon, Polygon as TopoPolygon, Topology } from "topojson-specification"
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, Path } from "leaflet"
@@ -299,6 +300,7 @@ function eventGeometry(e: PeopleEvent): { anchor: LatLng, bounds: [LatLng, LatLn
     for (const sh of e.shapes) {
         if ('point' in sh) pts.push(sh.point)
         else if ('line' in sh) pts.push(...sh.line)
+        else if ('poly' in sh) pts.push(...sh.poly)
         else {
             const dLat = sh.km / 111
             const dLng = sh.km / (111 * Math.max(0.2, Math.cos(sh.area[0] * Math.PI / 180)))
@@ -309,8 +311,57 @@ function eventGeometry(e: PeopleEvent): { anchor: LatLng, bounds: [LatLng, LatLn
     const first = e.shapes[0]!
     const anchor: LatLng = 'point' in first ? first.point
         : 'area' in first ? first.area
+        : 'poly' in first ? [(Math.min(...first.poly.map(p => p[0])) + Math.max(...first.poly.map(p => p[0]))) / 2,
+            (Math.min(...first.poly.map(p => p[1])) + Math.max(...first.poly.map(p => p[1]))) / 2]
         : first.line[Math.floor(first.line.length / 2)]!
     return { anchor, bounds: [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]] }
+}
+
+/** Framing box: the real outline's extent when we have one, else the hand-drawn shapes'. */
+function itemBounds(precise: PreciseShape | undefined, shapes: PeopleEvent['shapes']): [LatLng, LatLng] {
+    const hand = eventGeometry({ shapes } as PeopleEvent).bounds
+    const real = preciseBounds(precise)
+    if (!real) return hand
+    // Points (e.g. a labelled city) still count, so the frame includes them.
+    const pts = shapes.flatMap(sh => ('point' in sh ? [sh.point] : []))
+    const lats = [real[0][0], real[1][0], ...pts.map(p => p[0])], lngs = [real[0][1], real[1][1], ...pts.map(p => p[1])]
+    return [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]]
+}
+
+interface ItemStyle {
+    area: import("leaflet").PathOptions
+    lineHalo: import("leaflet").PathOptions
+    line: import("leaflet").PathOptions
+}
+
+/**
+ * Draw an event's or feature's areas and lines into a layer group: real outlines where
+ * shapes.json has them, otherwise the hand-drawn shapes (routes smoothed). Points are
+ * left to the caller.
+ */
+function drawItemShapes(
+    L: typeof import("leaflet"), group: import("leaflet").LayerGroup,
+    common: { pane: string, renderer: import("leaflet").Renderer, interactive: boolean },
+    precise: PreciseShape | undefined, shapes: PeopleEvent['shapes'], style: ItemStyle,
+) {
+    if (precise?.polys) L.geoJSON(precise.polys as GeoJSON.GeoJsonObject, { ...common, style: () => style.area }).addTo(group)
+    if (precise?.lines) {
+        L.geoJSON(precise.lines as GeoJSON.GeoJsonObject, { ...common, style: () => style.lineHalo }).addTo(group)
+        L.geoJSON(precise.lines as GeoJSON.GeoJsonObject, { ...common, style: () => style.line }).addTo(group)
+    }
+    for (const sh of shapes) {
+        // A real outline replaces every hand-drawn area and line, except routes marked `keep`.
+        const replaced = !!(precise?.polys || precise?.lines)
+        if ('area' in sh && !replaced) {
+            L.circle(sh.area, { ...common, ...style.area, radius: sh.km * 1000 }).addTo(group)
+        } else if ('poly' in sh && !replaced) {
+            L.polygon(sh.poly, { ...common, ...style.area, smoothFactor: 1 }).addTo(group)
+        } else if ('line' in sh && (!replaced || sh.keep)) {
+            const pts = sh.straight ? sh.line : smoothLine(sh.line)
+            L.polyline(pts, { ...common, ...style.lineHalo }).addTo(group)
+            L.polyline(pts, { ...common, ...style.line }).addTo(group)
+        }
+    }
 }
 
 /** Geography overlay: one colour and a small SVG glyph per kind of feature. */
@@ -388,6 +439,8 @@ export default function PeopleMapTab() {
     const [activeFeature, setActiveFeature] = useState<string | null>(null)
     const geoMarkers = useRef<Layer | null>(null)
     const geoShape = useRef<Layer | null>(null)
+    /** Real outlines (shapes.json), loaded once the map is up. */
+    const [precise, setPrecise] = useState<PreciseShapes>({})
     const toggleGeo = useCallback(() => {
         setShowGeo(on => {
             try { localStorage.setItem(GEO_STORAGE_KEY, on ? '0' : '1') } catch { /* storage unavailable */ }
@@ -628,7 +681,7 @@ export default function PeopleMapTab() {
             // Arriving from another group's event card: keep that event in view too.
             const carried = req.carryEventId ? EVENT_BY_ID.get(req.carryEventId) : undefined
             if (carried) {
-                const both = L.latLngBounds(box).extend(L.latLngBounds(eventGeometry(carried).bounds))
+                const both = L.latLngBounds(box).extend(L.latLngBounds(itemBounds(precise[`event:${carried.id}`], carried.shapes)))
                 if (both.getEast() - both.getWest() < 160 && both.getNorth() - both.getSouth() < 90) target = both
             }
             map.flyToBounds(target, { padding: L.point(48, 48), maxZoom: 6, duration: 0.8 })
@@ -787,6 +840,13 @@ export default function PeopleMapTab() {
         labelLayer.current = group
     }, [ready, visible, featureFor, viewTick, nameOf])
 
+    useEffect(() => {
+        if (!ready) return
+        let alive = true
+        void loadPreciseShapes().then(s => { if (alive) setPrecise(s) })
+        return () => { alive = false }
+    }, [ready])
+
     /* ---- The event opened from a note ---- */
     const activeEventId = activeEvent?.id ?? null
     useEffect(() => {
@@ -810,14 +870,11 @@ export default function PeopleMapTab() {
                 iconSize: [180, 0],
             }),
         }).addTo(group)
-        for (const sh of ev.shapes) {
-            if ('area' in sh) {
-                L.circle(sh.area, { ...common, radius: sh.km * 1000, color, weight: 2, dashArray: '6 5', fillColor: color, fillOpacity: 0.14 }).addTo(group)
-            } else if ('line' in sh) {
-                L.polyline(sh.line, { ...common, color: halo, weight: 7, opacity: 0.85, lineJoin: 'round', lineCap: 'round' }).addTo(group)
-                L.polyline(sh.line, { ...common, color, weight: 3.5, dashArray: '9 6', lineJoin: 'round', lineCap: 'round' }).addTo(group)
-            }
-        }
+        drawItemShapes(L, group, common, precise[`event:${ev.id}`], ev.shapes, {
+            area: { color, weight: 2, dashArray: '6 5', fillColor: color, fillOpacity: 0.16 },
+            lineHalo: { color: halo, weight: 7, opacity: 0.85, lineJoin: 'round', lineCap: 'round' },
+            line: { color, weight: 3.5, dashArray: '9 6', lineJoin: 'round', lineCap: 'round' },
+        })
         // Pins on top of lines and areas.
         for (const sh of ev.shapes) {
             if (!('point' in sh)) continue
@@ -828,7 +885,7 @@ export default function PeopleMapTab() {
         label(eventGeometry(ev).anchor, localEventName(ev, lang), true)
         group.addTo(map)
         eventLayer.current = group
-    }, [ready, activeEventId, isDark, lang])
+    }, [ready, activeEventId, isDark, lang, precise])
 
     // Bring the event into view alongside the focused region (or alone, if they are far apart).
     useEffect(() => {
@@ -836,7 +893,7 @@ export default function PeopleMapTab() {
         const L = leafletRef.current
         const ev = activeEventId ? EVENT_BY_ID.get(activeEventId) : undefined
         if (!ready || !map || !L || !ev) return
-        const box = L.latLngBounds(eventGeometry(ev).bounds)
+        const box = L.latLngBounds(itemBounds(precise[`event:${ev.id}`], ev.shapes))
         const feature = selectedId ? featureFor(selectedId) : null
         const region = feature ? focusBounds(feature.geometry) : null
         let target = box
@@ -899,19 +956,14 @@ export default function PeopleMapTab() {
         const renderer = L.canvas({ pane: 'peoples-geo-shapes', padding: 0.5 })
         const common = { pane: 'peoples-geo-shapes', renderer, interactive: false }
         const group = L.layerGroup()
+        const wide = f.kind === 'mountains' ? 8 : f.kind === 'river' ? 4 : 4
+        drawItemShapes(L, group, common, precise[`geo:${f.id}`], f.shapes, {
+            area: { color, weight: 1.5, fillColor: color, fillOpacity: 0.3, lineJoin: 'round' },
+            lineHalo: { color: halo, weight: wide + 3, opacity: 0.8, lineJoin: 'round', lineCap: 'round' },
+            line: { color, weight: wide, opacity: 0.95, lineJoin: 'round', lineCap: 'round', ...(f.kind === 'water' ? { dashArray: '10 7' } : {}) },
+        })
         for (const sh of f.shapes) {
-            if ('area' in sh) {
-                L.circle(sh.area, { ...common, radius: sh.km * 1000, color, weight: 2, dashArray: '4 4', fillColor: color, fillOpacity: 0.18 }).addTo(group)
-            } else if ('line' in sh) {
-                const wide = f.kind === 'mountains' ? 9 : f.kind === 'river' ? 6 : 5
-                L.polyline(sh.line, { ...common, color: halo, weight: wide + 4, opacity: 0.8, lineJoin: 'round', lineCap: 'round' }).addTo(group)
-                L.polyline(sh.line, {
-                    ...common, color, weight: wide, opacity: 0.9, lineJoin: 'round', lineCap: 'round',
-                    ...(f.kind === 'water' ? { dashArray: '10 7' } : {}),
-                }).addTo(group)
-            } else {
-                L.circleMarker(sh.point, { ...common, radius: 7, color: halo, weight: 2, fillColor: color, fillOpacity: 1 }).addTo(group)
-            }
+            if ('point' in sh) L.circleMarker(sh.point, { ...common, radius: 7, color: halo, weight: 2, fillColor: color, fillOpacity: 1 }).addTo(group)
         }
         L.marker(featureGeometry(f).anchor, {
             pane: 'peoples-events', interactive: false,
@@ -920,7 +972,7 @@ export default function PeopleMapTab() {
         }).addTo(group)
         group.addTo(map)
         geoShape.current = group
-    }, [ready, activeFeature, isDark, lang])
+    }, [ready, activeFeature, isDark, lang, precise])
 
     // Bring a newly opened feature into view.
     useEffect(() => {
@@ -928,7 +980,7 @@ export default function PeopleMapTab() {
         const L = leafletRef.current
         const f = activeFeature ? GEO_BY_ID.get(activeFeature) : undefined
         if (!ready || !map || !L || !f) return
-        map.flyToBounds(L.latLngBounds(featureGeometry(f).bounds), { padding: L.point(60, 60), maxZoom: 5.5, duration: 0.8 })
+        map.flyToBounds(L.latLngBounds(itemBounds(precise[`geo:${f.id}`], f.shapes)), { padding: L.point(60, 60), maxZoom: 5.5, duration: 0.8 })
     }, [ready, activeFeature])
 
     const feature = activeFeature ? GEO_BY_ID.get(activeFeature) : undefined

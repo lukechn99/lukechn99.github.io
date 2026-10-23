@@ -10,7 +10,8 @@
     "preview": "vite preview",
     "predeploy": "npm install && npm run build",
     "deploy": "gh-pages -d dist",
-    "build:peoples": "node --experimental-strip-types scripts/peoples/build-geo.mjs"
+    "build:peoples": "node --experimental-strip-types scripts/peoples/build-geo.mjs",
+    "build:shapes": "node scripts/peoples/build-shapes.mjs"
   },
   "dependencies": {
     "@dnd-kit/core": "^6.3.1",

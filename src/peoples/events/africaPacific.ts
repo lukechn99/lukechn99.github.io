@@ -102,7 +102,7 @@ export const africaPacificEvents: PeopleEvent[] = [
         id: 'central-kalahari', name: 'Central Kalahari Game Reserve', date: '1997–2006', kind: 'place',
         summary: 'Botswana moved most San out of their ancestral reserve; the High Court ruled in 2006 that the evictions were unconstitutional.',
         match: ['evicted from the Central Kalahari reserve'],
-        shapes: [{ area: [-21.7, 23.8], km: 170 }],
+        shapes: [{ poly: [[-20.9, 23.0], [-20.9, 24.6], [-21.8, 25.0], [-22.9, 24.9], [-23.0, 23.6], [-22.4, 22.6], [-21.4, 22.7]] }],
     },
     {
         id: 'waitangi', name: 'Treaty of Waitangi', date: '1840', kind: 'treaty',
@@ -133,7 +133,7 @@ export const africaPacificEvents: PeopleEvent[] = [
         summary: 'Each monsoon, fleets from Makassar sailed to Arnhem Land to harvest sea cucumber for China, leaving words, art and families among the Yolŋu.',
         match: ['Makassan sailors from Sulawesi'],
         shapes: [
-            { line: [[-5.14, 119.42], [-8.0, 121.5], [-9.6, 127.5], [-11.0, 132.0], [-12.25, 136.89]] },
+            { line: [[-5.14, 119.42], [-6.5, 120.5], [-8.3, 123.5], [-9.0, 126.5], [-10.0, 129.5], [-11.0, 132.0], [-11.6, 134.5], [-12.25, 136.89]] },
             { point: [-12.25, 136.89], label: 'Arnhem Land' },
         ],
     },

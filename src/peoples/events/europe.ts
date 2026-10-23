@@ -31,7 +31,7 @@ export const europeEvents: PeopleEvent[] = [
         summary: 'In May 1944 Stalin deported the entire Crimean Tatar people, about 190,000, to Uzbekistan and elsewhere; a large share died in the first years. They could return only from 1989.',
         match: ['Deported en masse by Stalin in 1944', 'Crimean Tatars, deported by Stalin in 1944'],
         shapes: [
-            { line: [[44.95, 34.1], [47.24, 39.71], [51.53, 46.03], [51.77, 55.1], [50.28, 57.17], [44.85, 65.51], [41.3, 69.24]] },
+            { line: [[44.95, 34.1], [45.71, 34.39], [46.84, 35.37], [47.24, 39.71], [48.71, 44.51], [51.53, 46.03], [53.2, 50.15], [51.77, 55.1], [50.28, 57.17], [46.8, 61.67], [44.85, 65.51], [43.3, 68.25], [41.3, 69.24]] },
             { point: [44.95, 34.1], label: 'Crimea' },
         ],
     },
@@ -40,7 +40,7 @@ export const europeEvents: PeopleEvent[] = [
         summary: 'In February 1944 about 500,000 Chechens and Ingush were loaded onto trains and sent to Kazakhstan and Kyrgyzstan; perhaps a quarter died. They were allowed back in 1957.',
         match: ["Stalin's 1944 deportation", 'Deportation in 1944'],
         shapes: [
-            { line: [[43.32, 45.69], [46.35, 48.04], [47.1, 51.9], [50.28, 57.17], [49.8, 73.1]] },
+            { line: [[43.32, 45.69], [44.5, 46.4], [46.35, 48.04], [47.1, 51.9], [50.28, 57.17], [51.2, 58.57], [53.05, 60.65], [52.3, 66.0], [51.17, 71.43], [49.8, 73.1]] },
             { point: [43.32, 45.69], label: 'Grozny' },
         ],
     },
@@ -115,8 +115,8 @@ export const europeEvents: PeopleEvent[] = [
         summary: 'Agreed at Lausanne, it swapped about 1.2 million Orthodox Christians from Anatolia for about 400,000 Muslims from Greece, defined by religion rather than language.',
         match: ['the 1923 population exchange'],
         shapes: [
-            { line: [[38.42, 27.14], [37.94, 23.65]] },
-            { line: [[40.64, 22.94], [41.01, 28.98]] },
+            { line: [[38.42, 27.14], [38.6, 26.6], [38.4, 25.6], [37.95, 24.6], [37.94, 23.65]] },
+            { line: [[40.64, 22.94], [40.94, 24.41], [40.85, 25.87], [41.68, 26.56], [41.01, 28.98]] },
         ],
     },
     {
@@ -131,7 +131,7 @@ export const europeEvents: PeopleEvent[] = [
         match: ['The 1915 genocide', 'the 1915 genocide'],
         shapes: [
             { area: [39.2, 40.0], km: 320 },
-            { line: [[39.9, 41.27], [38.35, 38.31], [37.16, 38.79], [35.33, 40.14]] },
+            { line: [[39.9, 41.27], [39.75, 39.5], [38.68, 39.22], [38.35, 38.31], [37.76, 38.28], [37.16, 38.79], [36.5, 38.9], [35.95, 39.0], [35.33, 40.14]], keep: true },
             { point: [35.33, 40.14], label: 'Deir ez-Zor' },
         ],
     },
@@ -251,7 +251,8 @@ export const europeEvents: PeopleEvent[] = [
         id: 'winter-war', name: 'Winter War', date: '1939–40', kind: 'conflict',
         summary: 'The USSR invaded Finland and met fierce resistance; Finland kept its independence but lost Karelia, and over 400,000 Karelians were evacuated.',
         match: ['The 1939–40 Winter War', 'fought the USSR in 1939–44'],
-        shapes: [{ area: [61.0, 30.0], km: 160 }],
+        // The ceded lands: the Karelian Isthmus and Ladoga Karelia.
+        shapes: [{ poly: [[60.15, 28.6], [60.55, 27.8], [61.15, 28.8], [61.6, 29.9], [62.2, 30.8], [62.3, 31.6], [62.0, 32.6], [61.4, 32.7], [61.2, 31.5], [60.9, 30.4], [60.6, 30.0], [60.1, 29.7]] }],
     },
     {
         id: 'vilnius-1991', name: 'January Events in Vilnius', date: '1991', kind: 'conflict',
