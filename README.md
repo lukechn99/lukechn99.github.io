@@ -31,6 +31,7 @@ The **People Groups Map** tab (Works → People Groups Map, at `/#/works/people-
 
 - `src/peoples/data/*.ts` — the tree and the text for every group
 - `src/peoples/relations/*.ts` — "Relations with neighbours" notes for every group
+- `src/peoples/geography/*.ts` — the Geography overlay: 50 mountain ranges, rivers, deserts, straits and plains, each with its shape, why it matters, and how it shaped each people around it (names translated in `geography/names/`)
 - `src/peoples/literature.ts` — a formative text for every group: original passage, romanization, English translation and why it matters (quotes limited to pre-1929 works, oral tradition and public documents)
 - `src/peoples/events/*.ts` — linked events and landmarks: shape (point, line or area), date, summary, and the exact note phrases that link to each
 - `src/peoples/names/`, `src/peoples/events/names/` — group and event names in Spanish, Vietnamese and Chinese

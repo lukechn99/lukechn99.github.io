@@ -1,12 +1,14 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type CSSProperties } from "react"
 import { ActionIcon, Anchor, Badge, Breadcrumbs, Button, Group, Paper, SimpleGrid, Stack, Text, Title, Tooltip, useComputedColorScheme } from "@mantine/core"
 import { useTranslation } from "react-i18next"
-import { IconArrowUp, IconWorld, IconX } from "@tabler/icons-react"
+import { IconArrowUp, IconMountain, IconWorld, IconX } from "@tabler/icons-react"
 import { relationsOf } from "./peoples/relations/index.ts"
 import { LITERATURE } from "./peoples/literature.ts"
 import { localName, shortName } from "./peoples/names/index.ts"
 import { EVENT_BY_ID, EVENT_GROUPS, PERSPECTIVES, linkEvents, type EventKind, type LatLng, type PeopleEvent } from "./peoples/events/index.ts"
 import { localEventName } from "./peoples/events/names/index.ts"
+import { GEO_BY_ID, GEO_FEATURES, type FeatureKind, type GeoFeature } from "./peoples/geography/index.ts"
+import { localGeoName } from "./peoples/geography/names/index.ts"
 import type { Feature, FeatureCollection, MultiPolygon, Polygon, Position } from "geojson"
 import type { GeometryCollection, MultiPolygon as TopoMultiPolygon, Polygon as TopoPolygon, Topology } from "topojson-specification"
 import type { GeoJSON as LeafletGeoJSON, Layer, Map as LeafletMap, Path } from "leaflet"
@@ -311,6 +313,30 @@ function eventGeometry(e: PeopleEvent): { anchor: LatLng, bounds: [LatLng, LatLn
     return { anchor, bounds: [[Math.min(...lats), Math.min(...lngs)], [Math.max(...lats), Math.max(...lngs)]] }
 }
 
+/** Geography overlay: one colour and a small SVG glyph per kind of feature. */
+const GEO_COLORS: Record<FeatureKind, string> = {
+    mountains: '#8d6e63', river: '#1c7ed6', water: '#1098ad', desert: '#e8a33d',
+    plain: '#74b816', forest: '#2f9e44', plateau: '#9c36b5',
+}
+const GEO_GLYPHS: Record<FeatureKind, string> = {
+    mountains: '<path d="M1.5 13 L6 5.5 L8.8 9.6 L10.8 7 L14.5 13 Z" fill="currentColor"/>',
+    river: '<path d="M2 6.5c2-2 4 2 6 0s4-2 6 0M2 10.5c2-2 4 2 6 0s4-2 6 0" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    water: '<path d="M2 5c2-2 4 2 6 0s4-2 6 0M2 8.5c2-2 4 2 6 0s4-2 6 0M2 12c2-2 4 2 6 0s4-2 6 0" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/>',
+    desert: '<circle cx="11" cy="4.8" r="2" fill="currentColor"/><path d="M1.5 13c3-4.5 6-4.5 8-2.3s3.6.2 5-1" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    plain: '<path d="M2 13h12M4.5 13l1-4.5M8 13V7.5M11.5 13l-1-4.5" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>',
+    forest: '<path d="M8 1.8 L12.2 7.6 H10.2 L13.2 12 H2.8 L5.8 7.6 H3.8 Z" fill="currentColor"/><path d="M8 12v2.4" stroke="currentColor" stroke-width="1.6"/>',
+    plateau: '<path d="M1.5 13 L4.5 6.5 H11.5 L14.5 13 Z" fill="currentColor"/>',
+}
+
+/** Marker position and framing box for a feature (reuses the event shape helpers). */
+function featureGeometry(f: GeoFeature): { anchor: LatLng, bounds: [LatLng, LatLng] } {
+    const g = eventGeometry({ shapes: f.shapes } as PeopleEvent)
+    return { anchor: f.at ?? g.anchor, bounds: g.bounds }
+}
+
+const GEO_STORAGE_KEY = 'people-map-geography'
+const readGeoPref = () => { try { return localStorage.getItem(GEO_STORAGE_KEY) === '1' } catch { return false } }
+
 const INFO_FIELDS = ['language', 'religion', 'food', 'etymology', 'homeland', 'history'] as const
 
 export default function PeopleMapTab() {
@@ -357,6 +383,18 @@ export default function PeopleMapTab() {
     /** The event shown on the map, and which note it was opened from. Tied to the focused region. */
     const [activeEvent, setActiveEvent] = useState<{ id: string, note: number } | null>(null)
     const eventLayer = useRef<Layer | null>(null)
+    /** Geography overlay: on/off (remembered per browser) and the feature whose card is open. */
+    const [showGeo, setShowGeo] = useState(readGeoPref)
+    const [activeFeature, setActiveFeature] = useState<string | null>(null)
+    const geoMarkers = useRef<Layer | null>(null)
+    const geoShape = useRef<Layer | null>(null)
+    const toggleGeo = useCallback(() => {
+        setShowGeo(on => {
+            try { localStorage.setItem(GEO_STORAGE_KEY, on ? '0' : '1') } catch { /* storage unavailable */ }
+            if (on) setActiveFeature(null)
+            return !on
+        })
+    }, [])
     /** Set when jumping from an event card to another group, so the event stays open there. */
     const carryEvent = useRef<{ group: string, id: string } | null>(null)
     useEffect(() => {
@@ -508,6 +546,10 @@ export default function PeopleMapTab() {
                 map.getPane('peoples-labels')!.style.pointerEvents = 'none'
                 // Events linked from the notes draw above the region labels.
                 map.createPane('peoples-events').style.zIndex = '460'
+                // Geography: the selected feature's shape under the labels, clickable markers on top.
+                map.createPane('peoples-geo-shapes').style.zIndex = '440'
+                map.getPane('peoples-geo-shapes')!.style.pointerEvents = 'none'
+                map.createPane('peoples-geo').style.zIndex = '470'
                 map.getPane('peoples-events')!.style.pointerEvents = 'none'
 
                 // React hears about the view only once it settles: the detail level and the
@@ -811,6 +853,122 @@ export default function PeopleMapTab() {
         setActiveEvent(cur => (cur?.id === id && cur.note === note ? null : { id, note }))
     }, [])
 
+    /* ---- Geography overlay: markers ---- */
+    useEffect(() => {
+        const map = mapRef.current
+        const L = leafletRef.current
+        geoMarkers.current?.remove()
+        geoMarkers.current = null
+        if (!ready || !map || !L || !showGeo) return
+        const group = L.layerGroup()
+        for (const f of GEO_FEATURES) {
+            const active = f.id === activeFeature
+            const marker = L.marker(featureGeometry(f).anchor, {
+                pane: 'peoples-geo',
+                keyboard: true,
+                title: localGeoName(f, lang),
+                icon: L.divIcon({
+                    className: '',
+                    html: `<div class="peoples-geo-marker${active ? ' is-active' : ''}" style="--geo-color:${GEO_COLORS[f.kind]}"><svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true">${GEO_GLYPHS[f.kind]}</svg></div>`,
+                    iconSize: [26, 26],
+                    iconAnchor: [13, 13],
+                }),
+            })
+            marker.bindTooltip(localGeoName(f, lang), { direction: 'top', offset: [0, -12] })
+            marker.on('click', e => {
+                L.DomEvent.stopPropagation(e)
+                regionClickAt.current = Date.now()   // not an empty-map click
+                setActiveFeature(cur => (cur === f.id ? null : f.id))
+            })
+            marker.addTo(group)
+        }
+        group.addTo(map)
+        geoMarkers.current = group
+    }, [ready, showGeo, activeFeature, lang])
+
+    /* ---- Geography overlay: the selected feature ---- */
+    useEffect(() => {
+        const map = mapRef.current
+        const L = leafletRef.current
+        geoShape.current?.remove()
+        geoShape.current = null
+        const f = activeFeature ? GEO_BY_ID.get(activeFeature) : undefined
+        if (!ready || !map || !L || !f) return
+        const color = GEO_COLORS[f.kind]
+        const halo = isDark ? '#1a1b1e' : '#ffffff'
+        const renderer = L.canvas({ pane: 'peoples-geo-shapes', padding: 0.5 })
+        const common = { pane: 'peoples-geo-shapes', renderer, interactive: false }
+        const group = L.layerGroup()
+        for (const sh of f.shapes) {
+            if ('area' in sh) {
+                L.circle(sh.area, { ...common, radius: sh.km * 1000, color, weight: 2, dashArray: '4 4', fillColor: color, fillOpacity: 0.18 }).addTo(group)
+            } else if ('line' in sh) {
+                const wide = f.kind === 'mountains' ? 9 : f.kind === 'river' ? 6 : 5
+                L.polyline(sh.line, { ...common, color: halo, weight: wide + 4, opacity: 0.8, lineJoin: 'round', lineCap: 'round' }).addTo(group)
+                L.polyline(sh.line, {
+                    ...common, color, weight: wide, opacity: 0.9, lineJoin: 'round', lineCap: 'round',
+                    ...(f.kind === 'water' ? { dashArray: '10 7' } : {}),
+                }).addTo(group)
+            } else {
+                L.circleMarker(sh.point, { ...common, radius: 7, color: halo, weight: 2, fillColor: color, fillOpacity: 1 }).addTo(group)
+            }
+        }
+        L.marker(featureGeometry(f).anchor, {
+            pane: 'peoples-events', interactive: false,
+            // Anchored well above the point so the name clears the marker itself.
+            icon: L.divIcon({ className: 'peoples-geo-label', html: `<span>${localGeoName(f, lang)}</span>`, iconSize: [200, 16], iconAnchor: [100, 36] }),
+        }).addTo(group)
+        group.addTo(map)
+        geoShape.current = group
+    }, [ready, activeFeature, isDark, lang])
+
+    // Bring a newly opened feature into view.
+    useEffect(() => {
+        const map = mapRef.current
+        const L = leafletRef.current
+        const f = activeFeature ? GEO_BY_ID.get(activeFeature) : undefined
+        if (!ready || !map || !L || !f) return
+        map.flyToBounds(L.latLngBounds(featureGeometry(f).bounds), { padding: L.point(60, 60), maxZoom: 5.5, duration: 0.8 })
+    }, [ready, activeFeature])
+
+    const feature = activeFeature ? GEO_BY_ID.get(activeFeature) : undefined
+    const featureCard = feature ? (
+        <Paper withBorder radius="md" p="sm" mb="md" style={{ borderLeft: `4px solid ${GEO_COLORS[feature.kind]}` }}>
+            <Group justify="space-between" wrap="nowrap" align="flex-start" gap="xs">
+                <div>
+                    <Text size="xs" c="dimmed" tt="uppercase" fw={700} style={{ letterSpacing: 0.4 }}>{t(`people.geoKinds.${feature.kind}`)}</Text>
+                    <Title order={4}>{localGeoName(feature, lang)}</Title>
+                </div>
+                <ActionIcon size="sm" variant="subtle" color="gray" onClick={() => setActiveFeature(null)} aria-label={t('people.geoClose')}>
+                    <IconX size={14} />
+                </ActionIcon>
+            </Group>
+            <Text size="sm" mt={4}>{feature.summary}</Text>
+            <Text size="xs" fw={700} tt="uppercase" c="dimmed" mt="sm" style={{ letterSpacing: 0.4 }}>{t('people.geoWhy')}</Text>
+            <Text size="sm">{feature.importance}</Text>
+            <Text size="xs" fw={700} tt="uppercase" c="dimmed" mt="sm" mb={4} style={{ letterSpacing: 0.4 }}>{t('people.geoPeoples')}</Text>
+            <Stack gap={6}>
+                {Object.entries(feature.peoples).map(([g, text]) => {
+                    const node = NODE_BY_ID.get(g)
+                    if (!node) return null
+                    return (
+                        <Text key={g} size="sm">
+                            <Anchor
+                                component="button" type="button" fw={selected?.id === g ? 800 : 600}
+                                onClick={() => explore(g)}
+                                style={{ font: 'inherit', fontWeight: selected?.id === g ? 800 : 600 }}
+                            >
+                                <span style={{ width: 8, height: 8, borderRadius: 4, background: colorOf(g), display: 'inline-block', marginRight: 6, verticalAlign: 'middle' }} />
+                                {shortName(nameOf(node))}
+                            </Anchor>
+                            {': '}{text}
+                        </Text>
+                    )
+                })}
+            </Stack>
+        </Paper>
+    ) : null
+
     /* ---- Info panel ---- */
     const path = selected ? pathTo(selected.id) : []
     const subgroups = selected ? childrenOf(selected.id) : []
@@ -827,6 +985,18 @@ export default function PeopleMapTab() {
         <Stack gap="sm" style={{ textAlign: 'left' }}>
             <style>{`
                 .peoples-label { display:flex; justify-content:center; pointer-events:none; }
+                .peoples-geo-label { display:flex; justify-content:center; pointer-events:none; }
+                .peoples-geo-label span {
+                    font: 700 13px/1.2 system-ui, sans-serif; white-space: nowrap;
+                    color: var(--peoples-label-color); text-shadow: var(--peoples-label-halo);
+                }
+                .peoples-geo-marker {
+                    width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+                    background: var(--geo-color); color: #fff; border: 2px solid #fff; box-sizing: border-box;
+                    box-shadow: 0 1px 4px rgba(0,0,0,.35); cursor: pointer; transition: transform .12s;
+                }
+                .peoples-geo-marker:hover { transform: scale(1.15); }
+                .peoples-geo-marker.is-active { transform: scale(1.25); box-shadow: 0 0 0 3px var(--geo-color), 0 1px 6px rgba(0,0,0,.4); }
                 .peoples-lit-quote {
                     margin-top: 8px; padding: 8px 14px; white-space: pre-line;
                     border-left: 3px solid var(--mantine-color-default-border);
@@ -885,6 +1055,15 @@ export default function PeopleMapTab() {
                                     <IconWorld size={16} />
                                 </ActionIcon>
                             </Tooltip>
+                            <Button
+                                size="compact-xs" radius="xl"
+                                variant={showGeo ? 'filled' : 'light'} color={showGeo ? 'teal' : 'gray'}
+                                leftSection={<IconMountain size={14} />}
+                                onClick={toggleGeo}
+                                aria-pressed={showGeo}
+                            >
+                                {t('people.geography')}
+                            </Button>
                         </Group>
                     </Paper>
                 )}
@@ -892,6 +1071,7 @@ export default function PeopleMapTab() {
 
             {/* Info section: the selected group's profile, or what the map shows */}
             <Paper radius="lg" withBorder p="md">
+                {featureCard}
                 {!selected ? (
                     <Stack gap="xs">
                         <Title order={4}>{t('people.aboutTitle')}</Title>
