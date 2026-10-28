@@ -3,3 +3,12 @@
   height: auto;
   aspect-ratio: 16 / 9;
 }
+.feature {
+  width: 100%;
+  max-width: 720px;
+}
+
+.shot {
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}

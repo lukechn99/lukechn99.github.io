@@ -33,6 +33,11 @@ const es: Resources = {
         awsBlurb: 'La sección de AWS podría incluir arquitecturas, aprendizajes y buenas prácticas.',
     },
     games: {
+        bulwarkTitle: 'Bulwark',
+        bulwarkBlurb: 'Un prototipo de shooter en tercera persona a bordo de un crucero estelar original, hecho con Godot 4 y jugable en el navegador. Explora el hangar, el pasillo y el puente, y enfréntate a drones centinela.',
+        bulwarkPlay: 'Jugar Bulwark',
+        bulwarkSource: 'Código fuente',
+        bulwarkNote: 'Se juega mejor con ratón y teclado en un navegador de escritorio.',
         intro: 'Cuando termine los juegos con WebRTC, también compartiré aquí lo que aprendí. Todavía está en desarrollo.',
         visit: 'Visitar el sitio de juegos',
     },

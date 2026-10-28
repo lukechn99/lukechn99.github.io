@@ -33,6 +33,11 @@ const zh: Resources = {
         awsBlurb: 'AWS 部分可以包括架构、经验总结和最佳实践等内容。',
     },
     games: {
+        bulwarkTitle: 'Bulwark',
+        bulwarkBlurb: '一款第三人称射击游戏原型，舞台是一艘原创的星际巡洋舰，使用 Godot 4 制作，可直接在浏览器中运行。探索机库、走廊和舰桥，击退哨兵无人机。',
+        bulwarkPlay: '开始游戏',
+        bulwarkSource: '源代码',
+        bulwarkNote: '建议在电脑浏览器上使用鼠标和键盘游玩。',
         intro: '完成 WebRTC 游戏后，我也会在这里分享一些心得。该部分仍在开发中。',
         visit: '访问游戏网站',
     },

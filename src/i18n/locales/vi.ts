@@ -33,6 +33,11 @@ const vi: Resources = {
         awsBlurb: 'Phần AWS có thể gồm kiến trúc, bài học kinh nghiệm và các phương pháp tốt nhất.',
     },
     games: {
+        bulwarkTitle: 'Bulwark',
+        bulwarkBlurb: 'Bản thử nghiệm game bắn súng góc nhìn thứ ba trên một tuần dương hạm không gian nguyên bản, làm bằng Godot 4 và chạy ngay trên trình duyệt. Khám phá khoang chứa tàu, hành lang và đài chỉ huy, và chiến đấu với các drone canh gác.',
+        bulwarkPlay: 'Chơi Bulwark',
+        bulwarkSource: 'Mã nguồn',
+        bulwarkNote: 'Chơi tốt nhất bằng chuột và bàn phím trên trình duyệt máy tính.',
         intro: 'Khi hoàn thành các trò chơi WebRTC, tôi sẽ chia sẻ thêm những điều đã học được ở đây. Phần này vẫn đang được phát triển.',
         visit: 'Truy cập trang trò chơi',
     },
