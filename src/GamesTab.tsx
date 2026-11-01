@@ -1,12 +1,13 @@
-import { Anchor, Box, Card, Group, Image, Stack, Text, Title } from "@mantine/core"
+import { Anchor, Card, Group, Image, Stack, Text, Title } from "@mantine/core"
 import classes from './GamesTab.module.css'
 import { useTranslation } from 'react-i18next'
 
 const BULWARK_URL = "https://lukechn99.github.io/bulwark/"
 const BULWARK_SOURCE = "https://github.com/lukechn99/bulwark"
+const GAME_NIGHT_URL = "https://lukechn99.github.io/games/"
+const GAME_NIGHT_SOURCE = "https://github.com/lukechn99/games"
 
 export default function GamesTab() {
-    const gamesLink = "https://games-alpha-rouge.vercel.app/"
     const { t } = useTranslation()
 
     return <Stack align="center">
@@ -25,11 +26,19 @@ export default function GamesTab() {
             </Stack>
         </Card>
 
-        {t('games.intro')}
-
-        <iframe src={gamesLink} title="Vercel Games" className={classes.iframe}></iframe>
-        <Box p="xs" aria-label="LinkedIn" component="a" href={gamesLink} target="_blank" rel="noopener noreferrer">  
-            {t('games.visit')}
-        </Box>
+        <Card withBorder radius="md" padding="lg" className={classes.feature}>
+            <Card.Section component="a" href={GAME_NIGHT_URL} target="_blank" rel="noopener noreferrer">
+                <Image src={`${import.meta.env.BASE_URL}games/game-night.jpg`} alt={t('games.gameNightTitle')} className={classes.shot} />
+            </Card.Section>
+            <Stack gap="xs" mt="md">
+                <Title order={3}>{t('games.gameNightTitle')}</Title>
+                <Text>{t('games.gameNightBlurb')}</Text>
+                <Text size="sm" c="dimmed">{t('games.gameNightNote')}</Text>
+                <Group gap="lg" justify="center">
+                    <Anchor href={GAME_NIGHT_URL} target="_blank" rel="noopener noreferrer" fw={600}>{t('games.gameNightPlay')}</Anchor>
+                    <Anchor href={GAME_NIGHT_SOURCE} target="_blank" rel="noopener noreferrer">{t('games.gameNightSource')}</Anchor>
+                </Group>
+            </Stack>
+        </Card>
     </Stack>
 }

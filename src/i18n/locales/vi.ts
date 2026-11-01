@@ -38,8 +38,11 @@ const vi: Resources = {
         bulwarkPlay: 'Chơi Bulwark',
         bulwarkSource: 'Mã nguồn',
         bulwarkNote: 'Chơi tốt nhất bằng chuột và bàn phím trên trình duyệt máy tính.',
-        intro: 'Khi hoàn thành các trò chơi WebRTC, tôi sẽ chia sẻ thêm những điều đã học được ở đây. Phần này vẫn đang được phát triển.',
-        visit: 'Truy cập trang trò chơi',
+        gameNightTitle: 'Game Night',
+        gameNightBlurb: 'Các trò chơi nhóm cùng chơi, mỗi người trên điện thoại của mình. Một người mở phòng, mọi người vào bằng mã năm ký tự, và các trình duyệt kết nối trực tiếp với nhau qua WebRTC, không cần máy chủ trò chơi. Spyfall đã chơi được; Secret Hitler, Codenames và Betrayal sắp ra mắt.',
+        gameNightPlay: 'Chơi Game Night',
+        gameNightSource: 'Mã nguồn',
+        gameNightNote: 'Chơi vui nhất khi có từ 3 người trở lên trong cùng một phòng, mỗi người một điện thoại.',
     },
     contact: {
         name: 'Tên',

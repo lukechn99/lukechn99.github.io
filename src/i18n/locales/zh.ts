@@ -38,8 +38,11 @@ const zh: Resources = {
         bulwarkPlay: '开始游戏',
         bulwarkSource: '源代码',
         bulwarkNote: '建议在电脑浏览器上使用鼠标和键盘游玩。',
-        intro: '完成 WebRTC 游戏后，我也会在这里分享一些心得。该部分仍在开发中。',
-        visit: '访问游戏网站',
+        gameNightTitle: 'Game Night',
+        gameNightBlurb: '用各自的手机一起玩的聚会游戏。一个人开房间，其他人输入五位房间码加入，浏览器之间通过 WebRTC 直接连接，中间没有游戏服务器。《Spyfall》现已上线，《Secret Hitler》《Codenames》和《Betrayal》即将推出。',
+        gameNightPlay: '开始 Game Night',
+        gameNightSource: '源代码',
+        gameNightNote: '最适合 3 人以上在同一房间、各用一部手机游玩。',
     },
     contact: {
         name: '姓名',

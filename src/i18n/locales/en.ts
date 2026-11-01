@@ -36,8 +36,11 @@ const en = {
         bulwarkPlay: 'Play Bulwark',
         bulwarkSource: 'Source code',
         bulwarkNote: 'Best with a mouse and keyboard on a desktop browser.',
-        intro: 'After I finish the WebRTC games I can showcase some learnings there too. This is still a work in progress.',
-        visit: 'Visit the game site',
+        gameNightTitle: 'Game Night',
+        gameNightBlurb: 'Party games you play together from your own phones. One person opens a room, everyone joins with a five-letter code, and the browsers connect to each other directly over WebRTC, with no game server in between. Spyfall is live; Secret Hitler, Codenames and Betrayal are on the way.',
+        gameNightPlay: 'Play Game Night',
+        gameNightSource: 'Source code',
+        gameNightNote: 'Best with 3 or more people in the same room, each on their own phone.',
     },
     contact: {
         name: 'Name',
