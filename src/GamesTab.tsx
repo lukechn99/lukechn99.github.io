@@ -13,7 +13,7 @@ export default function GamesTab() {
     return <Stack align="center">
         <Card withBorder radius="md" padding="lg" className={classes.feature}>
             <Card.Section component="a" href={BULWARK_URL} target="_blank" rel="noopener noreferrer">
-                <Image src={`${import.meta.env.BASE_URL}games/bulwark.jpg`} alt={t('games.bulwarkTitle')} className={classes.shot} />
+                <Image src={`${import.meta.env.BASE_URL}game-art/bulwark.jpg`} alt={t('games.bulwarkTitle')} className={classes.shot} />
             </Card.Section>
             <Stack gap="xs" mt="md">
                 <Title order={3}>{t('games.bulwarkTitle')}</Title>
@@ -28,7 +28,7 @@ export default function GamesTab() {
 
         <Card withBorder radius="md" padding="lg" className={classes.feature}>
             <Card.Section component="a" href={GAME_NIGHT_URL} target="_blank" rel="noopener noreferrer">
-                <Image src={`${import.meta.env.BASE_URL}games/game-night.jpg`} alt={t('games.gameNightTitle')} className={classes.shot} />
+                <Image src={`${import.meta.env.BASE_URL}game-art/game-night.jpg`} alt={t('games.gameNightTitle')} className={classes.shot} />
             </Card.Section>
             <Stack gap="xs" mt="md">
                 <Title order={3}>{t('games.gameNightTitle')}</Title>
