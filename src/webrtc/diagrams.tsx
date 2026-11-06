@@ -46,7 +46,7 @@ export function ServerDiagram({ c }: { c: Copy }) {
         setTrips((t) => t + 1)
         setChecking(true)
         setServerScreen(color)
-        await wait(600)
+        await wait(1000)
         setChecking(false)
         // Stage 2: the server tells everyone else.
         await Promise.all(phones.map((p, j) => (j === i ? Promise.resolve() : send([up, p], { color, dur: 1100 }).then(() => paint(j, color)))))
@@ -109,7 +109,7 @@ export function HostDiagram({ c }: { c: Copy }) {
         await send([PLAYERS[i]!, HOST], { color, dur: 750 })
         setChecking('ok')
         setHostScreen(color)
-        await wait(600)
+        await wait(1000)
         setChecking(null)
         // Stage 2: the host sends each other player their update.
         await Promise.all(
@@ -228,7 +228,7 @@ export function HostAmbient({ c }: { c: Copy }) {
                 if (stop) break
                 setPulse(true)
                 setHostScreen(color)
-                await wait(550)
+                await wait(1000)
                 setPulse(false)
                 await Promise.all(PLAYERS.map((p, j) => (j === i ? Promise.resolve() : send([HOST, p], { color, dur: 750 }).then(() => paint(j)))))
                 await wait(1100)
