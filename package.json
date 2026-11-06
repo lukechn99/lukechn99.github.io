@@ -9,7 +9,7 @@
     "build": "vite build",
     "preview": "vite preview",
     "predeploy": "npm install && npm run build",
-    "deploy": "gh-pages -d dist",
+    "deploy": "gh-pages -d dist --add",
     "build:peoples": "node --experimental-strip-types scripts/peoples/build-geo.mjs",
     "build:shapes": "node scripts/peoples/build-shapes.mjs"
   },

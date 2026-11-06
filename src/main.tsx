@@ -11,7 +11,33 @@ import Contact from './Contact.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import SiteHeader from './components/SiteHeader.tsx'
 
-const WebRTCPage = lazy(() => import('./webrtc/WebRTCPage.tsx'))
+/**
+ * After a deploy, a browser holding a cached copy of the old index.html may ask
+ * for a page chunk that no longer exists. Reload once to pick up the new build
+ * (guarded so a real outage can't cause a reload loop).
+ */
+function reloadForNewBuild() {
+  try {
+    const key = 'site-reloaded-for-build'
+    const last = Number(sessionStorage.getItem(key) || 0)
+    if (Date.now() - last < 15000) return false
+    sessionStorage.setItem(key, String(Date.now()))
+  } catch {
+    /* storage unavailable; reload anyway */
+  }
+  window.location.reload()
+  return true
+}
+window.addEventListener('vite:preloadError', (event) => {
+  if (reloadForNewBuild()) event.preventDefault()
+})
+
+const WebRTCPage = lazy(() =>
+  import('./webrtc/WebRTCPage.tsx').catch((err: unknown) => {
+    if (reloadForNewBuild()) return new Promise<never>(() => {}) // wait for the reload
+    throw err
+  }),
+)
 
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
