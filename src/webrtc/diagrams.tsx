@@ -29,11 +29,15 @@ export function ServerDiagram({ c }: { c: Copy }) {
     const [trips, setTrips] = useState(0)
     const [bytes, setBytes] = useState(0)
     const [checking, setChecking] = useState(false)
+    const [serverScreen, setServerScreen] = useState<string>(C.line)
     const moves = useRef(0)
+    const paint = (j: number, color: string) => setScreens((s) => s.map((x, k) => (k === j ? color : x)))
 
     async function move(i: number) {
         const color = pick(moves.current++)
         const up = { x: server.x, y: server.y + 24 }
+        // Stage 1: the move leaves your phone and reaches the server.
+        paint(i, color)
         if (down) {
             await send([phones[i]!, up], { color, dur: 1200, fade: true })
             return
@@ -41,14 +45,12 @@ export function ServerDiagram({ c }: { c: Copy }) {
         await send([phones[i]!, up], { color, dur: 1100 })
         setTrips((t) => t + 1)
         setChecking(true)
-        await wait(300)
+        setServerScreen(color)
+        await wait(600)
         setChecking(false)
-        await Promise.all(
-            phones.map((p, j) =>
-                send([up, p], { color, dur: 1100 }).then(() => setScreens((s) => s.map((x, k) => (k === j ? color : x)))),
-            ),
-        )
-        setBytes((b) => b + 0.3 * (1 + phones.length))
+        // Stage 2: the server tells everyone else.
+        await Promise.all(phones.map((p, j) => (j === i ? Promise.resolve() : send([up, p], { color, dur: 1100 }).then(() => paint(j, color)))))
+        setBytes((b) => b + 0.3 * phones.length)
     }
 
     return (
@@ -60,7 +62,7 @@ export function ServerDiagram({ c }: { c: Copy }) {
                 <text x={200} y={150} textAnchor="middle" fontSize={11} fill={C.dim} fontStyle="italic">
                     {c.server.far}
                 </text>
-                <Box at={server} w={150} h={46} label={c.server.serverLabel} sub={c.server.serverSub} color={checking ? C.host : C.server} dim={down} />
+                <Box at={server} w={170} h={46} label={c.server.serverLabel} sub={c.server.serverSub} color={checking ? C.ok : C.server} dim={down} swatch={serverScreen} />
                 {down && <Mark ok={false} at={{ x: 282, y: 34 }} />}
                 {dots}
                 {phones.map((p, i) => (
@@ -97,21 +99,28 @@ export function HostDiagram({ c }: { c: Copy }) {
     const [note, setNote] = useState<string | null>(null)
     const moves = useRef(0)
 
+    const paint = (j: number, color: string) => setScreens((s) => s.map((x, k) => (k === j ? color : x)))
+
     async function move(i: number) {
         if (away) return
         const color = pick(moves.current++)
-        await send([PLAYERS[i]!, HOST], { color, dur: 650 })
+        // Stage 1: the move goes to the host, who checks it and updates the game.
+        paint(i, color)
+        await send([PLAYERS[i]!, HOST], { color, dur: 750 })
         setChecking('ok')
-        await wait(320)
-        setChecking(null)
         setHostScreen(color)
+        await wait(600)
+        setChecking(null)
+        // Stage 2: the host sends each other player their update.
         await Promise.all(
             PLAYERS.map((p, j) =>
-                send([HOST, p], {
-                    color: secret && j === SPY ? C.server : color,
-                    label: secret ? (j === SPY ? '?' : '✓') : undefined,
-                    dur: 650,
-                }).then(() => setScreens((s) => s.map((x, k) => (k === j ? color : x)))),
+                j === i
+                    ? Promise.resolve()
+                    : send([HOST, p], {
+                          color: secret && j === SPY ? C.server : color,
+                          label: secret ? (j === SPY ? '?' : '✓') : undefined,
+                          dur: 750,
+                      }).then(() => paint(j, color)),
             ),
         )
     }
@@ -213,14 +222,16 @@ export function HostAmbient({ c }: { c: Copy }) {
             while (!stop) {
                 const i = Math.floor(Math.random() * PLAYERS.length)
                 const color = pick(n++)
-                await send([PLAYERS[i]!, HOST], { color, dur: 700 })
+                const paint = (j: number) => !stop && setScreens((s) => s.map((x, k) => (k === j ? color : x)))
+                paint(i)
+                await send([PLAYERS[i]!, HOST], { color, dur: 750 })
                 if (stop) break
                 setPulse(true)
-                await wait(250)
-                setPulse(false)
                 setHostScreen(color)
-                await Promise.all(PLAYERS.map((p, j) => send([HOST, p], { color, dur: 700 }).then(() => !stop && setScreens((s) => s.map((x, k) => (k === j ? color : x))))))
-                await wait(900)
+                await wait(550)
+                setPulse(false)
+                await Promise.all(PLAYERS.map((p, j) => (j === i ? Promise.resolve() : send([HOST, p], { color, dur: 750 }).then(() => paint(j)))))
+                await wait(1100)
             }
         })()
         return () => {

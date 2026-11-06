@@ -164,13 +164,16 @@ export function Phone({ at, name, screen, badge, dim, ring, children }: {
     )
 }
 
-export function Box({ at, w, h, label, sub, color, dim, icon }: {
+export function Box({ at, w, h, label, sub, color, dim, icon, swatch }: {
     at: Pt; w: number; h: number; label: string; sub?: string | undefined; color: string; dim?: boolean | undefined; icon?: ReactNode
+    /** A little "screen" on the right showing this box's current game state. */
+    swatch?: string | undefined
 }) {
     return (
         <g transform={`translate(${at.x} ${at.y})`} opacity={dim ? 0.3 : 1} style={{ transition: 'opacity 300ms' }}>
             <rect x={-w / 2} y={-h / 2} width={w} height={h} rx={8} fill={C.card} stroke={color} strokeWidth={2} />
             {icon && <g transform={`translate(${-w / 2 + 14} 0)`}>{icon}</g>}
+            {swatch && <rect x={w / 2 - 22} y={-12} width={14} height={24} rx={3} fill={swatch} stroke={C.text} strokeWidth={1} style={{ transition: 'fill 300ms' }} />}
             <text x={icon ? 8 : 0} y={sub ? -2 : 5} textAnchor="middle" fontSize={14} fontWeight={600} fill={C.text}>
                 {label}
             </text>
