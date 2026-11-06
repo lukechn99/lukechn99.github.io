@@ -42,6 +42,7 @@ const zh: Resources = {
         gameNightBlurb: '用各自的手机一起玩的聚会游戏。一个人开房间，其他人输入五位房间码加入，浏览器之间通过 WebRTC 直接连接，中间没有游戏服务器。《Spyfall》现已上线，《Secret Hitler》《Codenames》和《Betrayal》即将推出。',
         gameNightPlay: '开始 Game Night',
         gameNightSource: '源代码',
+        gameNightHow: '工作原理',
         gameNightNote: '最适合 3 人以上在同一房间、各用一部手机游玩。',
     },
     contact: {

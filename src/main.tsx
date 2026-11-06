@@ -1,4 +1,4 @@
-import { StrictMode } from 'react'
+import { StrictMode, Suspense, lazy } from 'react'
 import { createRoot } from 'react-dom/client'
 import { HashRouter, Routes, Route } from 'react-router-dom'
 import './styles/global.css'
@@ -11,6 +11,8 @@ import Contact from './Contact.tsx'
 import ErrorBoundary from './components/ErrorBoundary.tsx'
 import SiteHeader from './components/SiteHeader.tsx'
 
+const WebRTCPage = lazy(() => import('./webrtc/WebRTCPage.tsx'))
+
 createRoot(document.getElementById('root') as HTMLElement).render(
   <StrictMode>
     <ErrorBoundary>
@@ -22,6 +24,7 @@ createRoot(document.getElementById('root') as HTMLElement).render(
             <Route path="/works" element={<Works />} />
             <Route path="/works/:tab" element={<Works />} />
             <Route path="/contact" element={<Contact />} />
+            <Route path="/works/games/how-it-works" element={<Suspense fallback={null}><WebRTCPage /></Suspense>} />
           </Routes>
         </HashRouter>
       </MantineProvider>

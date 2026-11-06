@@ -1,0 +1,186 @@
+/** English copy for the WebRTC explainer. Other languages copy this shape. */
+const en = {
+    pageTitle: 'How Game Night works without a game server',
+    back: 'Back to Games',
+    hero: {
+        title: 'Game Night, without a game server',
+        lede: 'When you play Spyfall or Secret Hitler on Game Night, there’s no company computer in the middle running the game. Your phones play directly with each other, using a technology built into every modern browser called WebRTC. Here’s how that works, and why it’s such a neat trick.',
+        play: 'Play Game Night',
+        source: 'Read the code',
+        caption: 'One phone is the host. Every move goes to the host, and the host tells everyone what happened.',
+    },
+    names: { you: 'You', ana: 'Ana', ben: 'Ben', cal: 'Cal', dee: 'Dee', host: 'Host' },
+    server: {
+        title: 'The usual way: a server in the middle',
+        body: [
+            'Most online games and apps work like a phone call through an operator. Every phone connects to a server, a computer in a data center that the company rents and runs around the clock. When you make a move, it travels to the server, the server checks it, and then sends the result back out to everyone.',
+            'It works well, but someone has to pay for that server every month, it has to be kept running and secure, and all your game traffic makes a round trip to wherever the data center happens to be.',
+        ],
+        tryIt: 'Tap a phone to make a move.',
+        serverLabel: 'Game server',
+        serverSub: 'in a data center',
+        far: 'far away',
+        down: 'Turn the server off',
+        downNote: 'The server is down, so nobody can play, even though everyone is sitting at the same table.',
+        trips: (n: number) => `Moves sent through the server: ${n}`,
+        bill: (kb: string) => `Data the company pays to move: ${kb} KB`,
+        nerd: {
+            title: 'For the technically curious',
+            body: [
+                'This is the client–server model. Phones usually hold a WebSocket or HTTP connection open to the server, which is the single source of truth for the game state. It’s simple to reason about and easy to protect from cheaters, which is why most games use it.',
+                'The costs scale with players: every update is uploaded once and downloaded once per player, all through infrastructure you pay for. Latency is at least the round trip to the data center, even for two people in the same room.',
+            ],
+        },
+    },
+    host: {
+        title: 'Our way: the phones talk to each other',
+        body: [
+            'On Game Night, whoever creates the room becomes the host. Their phone quietly takes on the server’s job: it holds the game, checks every move against the rules, and sends each player an update.',
+            'Everyone else connects straight to the host’s phone. Nobody runs a game server, nobody pays for one, and the moves travel across the room instead of across the country.',
+        ],
+        tryIt: 'Tap a player to make a move. Watch the host check it and update everyone.',
+        secret: 'Secret roles',
+        secretNote: 'The host’s phone holds the whole game, but each phone, the host’s own screen included, only gets what that player is allowed to see. The spy’s update has no location in it at all, so there’s nothing to peek at.',
+        cheat: 'Try to cheat',
+        cheatNote: 'The host checks the rules, so an illegal move is turned down and nobody else even hears about it.',
+        leave: 'Host closes the app',
+        back: 'Host comes back',
+        awayNote: 'The host’s phone saved the game. Everyone waits, and when the host returns, they reconnect and pick up right where they left off.',
+        location: 'Beach',
+        spy: 'Spy',
+        broker: 'Introductions',
+        brokerSub: 'free, only at the start',
+        nerd: {
+            title: 'For the technically curious',
+            body: [
+                'Each player opens a WebRTC data channel to the host: a direct, encrypted (DTLS) connection that carries messages much like a WebSocket would, but browser to browser. The host runs the rules as pure functions: (state, move) → new state, or an error.',
+                'After every change, the host builds a personalised snapshot for each player, with hidden information removed, and sends it down that player’s channel. Snapshots carry a version number, so a phone that reconnects just asks for the latest one. The host saves the room to its browser’s storage, so even a refresh doesn’t lose the game.',
+                'To find each other, phones use a free public matchmaking service (PeerJS) only to swap connection details. The room code is literally the host’s address on that service. After the handshake, the matchmaker is out of the picture.',
+            ],
+        },
+    },
+    topo: {
+        title: 'One to many, and many to many',
+        body: [
+            'The game uses a star: everyone connects to the host, and the host fans each update out. That keeps the number of connections small, and one phone stays in charge of the truth.',
+            'The video call is different. Video can’t be routed through the host’s phone without overloading it, so in a call every phone connects to every other phone, called a mesh. Drag the slider to see how quickly that grows.',
+        ],
+        players: (n: number) => `${n} players`,
+        star: 'Game (star)',
+        mesh: 'Video call (mesh)',
+        stats: {
+            links: 'Connections in total',
+            perPhone: 'Connections per phone',
+        },
+        hostOnly: (n: number) => `host: ${n}, others: 1`,
+        meshNote: 'That’s why Game Night allows four cameras at once: with four, each phone already uploads three video streams. Anyone else joins on audio, which is tiny.',
+        nerd: {
+            title: 'For the technically curious',
+            body: [
+                'A star needs n − 1 connections and a mesh needs n(n − 1)/2. Game messages are small, a few hundred bytes, so the host can easily fan out to ten players. A 320×240 video stream is a few hundred kilobits per second, and in a mesh each phone encodes and uploads one per viewer.',
+                'Big video apps solve this with an SFU (selective forwarding unit): each phone uploads one stream to a server that copies it to everyone. That’s back to a server in the middle, and back to a bandwidth bill.',
+            ],
+        },
+    },
+    stun: {
+        title: 'Finding each other: STUN',
+        body: [
+            'There’s a catch. Your phone doesn’t have a public address on the internet. It sits behind your Wi-Fi router, which hands out private addresses, like apartment numbers inside a building. Someone outside can’t knock on apartment 23; they only see the building’s street address.',
+            'So before two phones can talk, each one asks a STUN server a simple question: “What address do you see me coming from?” Then they swap those answers and knock at the same moment, which tricks both routers into opening the door.',
+        ],
+        steps: [
+            'Each phone only knows its private, inside-the-building address.',
+            'Each asks a STUN server: “What’s my address from the outside?” The server just reads it off the envelope and replies.',
+            'The phones swap those outside addresses through the matchmaker.',
+            'Both send a message to each other at the same moment. Each router sees an outgoing message and lets the reply in. This is called hole punching.',
+            'They’re connected directly. From now on, game moves go straight across, and the STUN server and matchmaker aren’t involved.',
+        ],
+        next: 'Next',
+        prev: 'Back',
+        restart: 'Start over',
+        step: (i: number, n: number) => `Step ${i} of ${n}`,
+        home: 'Home Wi-Fi',
+        router: 'Router',
+        stunLabel: 'STUN server',
+        stunSub: 'tells you your address',
+        broker: 'Matchmaker',
+        nerd: {
+            title: 'For the technically curious',
+            body: [
+                'Routers do NAT (network address translation): they rewrite your private address and port to their public ones and remember the mapping so replies find their way back. STUN (RFC 8489) lets a phone discover that public mapping, called a server-reflexive candidate.',
+                'WebRTC’s ICE process gathers every candidate (local, server-reflexive and relay), swaps them through the signalling channel in the SDP offer and answer, then tests pairs and keeps the best one that works. STUN servers are cheap to run because they answer one tiny question and never carry your traffic. Google and Cloudflare offer them for free.',
+            ],
+        },
+    },
+    turn: {
+        title: 'When the door won’t open: TURN',
+        body: [
+            'Hole punching works on most home Wi-Fi. But some networks are stricter. Many cellular carriers and office networks give each new destination a different outside address, so the address you learned from STUN is useless to anyone else. The knock never gets through.',
+            'For those cases there’s TURN: a relay server that both phones can reach. Each phone sends to the relay, and the relay passes it along. It’s a server in the middle again, but only for the connections that truly need it.',
+        ],
+        network: 'Second phone is on',
+        open: 'Home Wi-Fi',
+        strict: 'A strict network',
+        connect: 'Connect the phones',
+        trying: 'Trying the direct route…',
+        directOk: 'Direct connection. No relay needed.',
+        blocked: 'Blocked. This network won’t let the knock in.',
+        relayOk: 'Connected through the relay instead.',
+        relayLabel: 'TURN relay',
+        relaySub: 'Cloudflare',
+        encrypted: 'The relay passes on scrambled data it can’t read: WebRTC encrypts everything from phone to phone.',
+        nerd: {
+            title: 'For the technically curious',
+            body: [
+                'The troublemaker is symmetric NAT (and the carrier-grade NAT common on mobile networks): the router picks a new public port for every destination, so the mapping STUN reported only works for talking to STUN. TURN (RFC 8656) gives the phone a relayed address on the TURN server, which becomes one more ICE candidate.',
+                'ICE prefers direct paths, so the relay is only used when nothing else works. Game Night offers TURN over UDP, TCP and TLS on port 443, which looks like ordinary HTTPS and gets through the strictest firewalls. Media and data are encrypted end to end with DTLS-SRTP and DTLS, so the relay only ever sees ciphertext.',
+            ],
+        },
+    },
+    guard: {
+        title: 'Keeping the relay for players, not bots',
+        body: [
+            'A relay is the one part that costs real money: it carries every byte of the conversations that use it. Cloudflare gives a generous free allowance, but a relay with a public password could be borrowed by anyone’s app.',
+            'So Game Night never ships a password. When you open the page, it passes an invisible bot check, and a small Cloudflare Worker checks how much relay data has been used before handing out a password that expires in three hours.',
+        ],
+        visitor: 'Visitor',
+        check: 'Bot check',
+        checkSub: 'Turnstile',
+        worker: 'Our Worker',
+        workerSub: 'checks the budget',
+        relay: 'TURN relay',
+        relaySub: 'issues a pass',
+        player: 'A player opens Game Night',
+        bot: 'A script asks directly',
+        capped: 'Budget used up',
+        okNote: 'Relay ready: a 3-hour pass is waiting in case this phone needs it.',
+        botNote: 'Stopped. Without a fresh pass from a real browser, the Worker hands out nothing.',
+        capNote: 'No relay today, so the Worker stops handing out passes. The game still connects directly for almost everyone.',
+        nerd: {
+            title: 'For the technically curious',
+            body: [
+                'The page runs Cloudflare Turnstile in invisible mode and sends the one-time token to the Worker, which verifies it with Cloudflare (siteverify) and checks that it was issued to this site. The Worker then reads this key’s relay usage from Cloudflare’s GraphQL analytics, caching it for five minutes.',
+                'Under the caps (900 GB per 30 days, 50 GB per day), it asks Cloudflare for short-lived TURN credentials, valid for 3 hours, and returns them. The secret API key never leaves the Worker. When credentials expire, the relay stops serving them, so a capped Worker shuts the relay off within hours, not at the end of the month.',
+            ],
+        },
+    },
+    why: {
+        title: 'Why it’s cool',
+        points: [
+            ['It costs almost nothing.', 'No game servers to rent. The only paid piece is a relay that most games never touch, and it’s capped.'],
+            ['It’s fast.', 'Moves go across the room, not to a data center and back.'],
+            ['It’s private.', 'Your game never sits on someone else’s computer. Calls and moves are encrypted from phone to phone.'],
+            ['It scales itself.', 'Every group brings its own “server”: the host’s phone. A thousand games at once cost the same as one.'],
+        ],
+        tradeoffs: 'The trade-offs',
+        tradeoffList: [
+            'The host’s page has to stay open. If it closes, the game pauses until the host comes back.',
+            'Group video tops out around four cameras before phones start to struggle.',
+            'The host has the final say, so a determined host could cheat. Among friends, that’s fine.',
+        ],
+        outro: 'Want to see it for yourself? Start a room, then open it on a second phone.',
+    },
+}
+
+export type Copy = typeof en
+export default en

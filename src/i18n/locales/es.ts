@@ -42,6 +42,7 @@ const es: Resources = {
         gameNightBlurb: 'Juegos de fiesta que se juegan juntos, cada uno desde su propio teléfono. Una persona abre una sala, los demás entran con un código de cinco letras y los navegadores se conectan directamente entre sí por WebRTC, sin servidor de juego de por medio. Spyfall ya está disponible; Secret Hitler, Codenames y Betrayal vienen en camino.',
         gameNightPlay: 'Jugar Game Night',
         gameNightSource: 'Código fuente',
+        gameNightHow: 'Cómo funciona',
         gameNightNote: 'Mejor con 3 o más personas en la misma habitación, cada una con su teléfono.',
     },
     contact: {

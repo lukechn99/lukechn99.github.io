@@ -1,5 +1,6 @@
 import { Anchor, Card, Group, Image, Stack, Text, Title } from "@mantine/core"
 import classes from './GamesTab.module.css'
+import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 
 const BULWARK_URL = "https://lukechn99.github.io/bulwark/"
@@ -36,6 +37,7 @@ export default function GamesTab() {
                 <Text size="sm" c="dimmed">{t('games.gameNightNote')}</Text>
                 <Group gap="lg" justify="center">
                     <Anchor href={GAME_NIGHT_URL} target="_blank" rel="noopener noreferrer" fw={600}>{t('games.gameNightPlay')}</Anchor>
+                    <Anchor component={Link} to="/works/games/how-it-works">{t('games.gameNightHow')}</Anchor>
                     <Anchor href={GAME_NIGHT_SOURCE} target="_blank" rel="noopener noreferrer">{t('games.gameNightSource')}</Anchor>
                 </Group>
             </Stack>

@@ -40,6 +40,7 @@ const en = {
         gameNightBlurb: 'Party games you play together from your own phones. One person opens a room, everyone joins with a five-letter code, and the browsers connect to each other directly over WebRTC, with no game server in between. Spyfall is live; Secret Hitler, Codenames and Betrayal are on the way.',
         gameNightPlay: 'Play Game Night',
         gameNightSource: 'Source code',
+        gameNightHow: 'How it works',
         gameNightNote: 'Best with 3 or more people in the same room, each on their own phone.',
     },
     contact: {

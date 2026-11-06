@@ -1,0 +1,186 @@
+import type { Copy } from './en.ts'
+
+const vi: Copy = {
+    pageTitle: 'Game Night hoạt động thế nào mà không cần máy chủ trò chơi',
+    back: 'Quay lại Trò chơi',
+    hero: {
+        title: 'Game Night, không cần máy chủ trò chơi',
+        lede: 'Khi bạn chơi Spyfall hay Secret Hitler trên Game Night, không có máy tính nào của công ty ở giữa để chạy trò chơi. Các điện thoại chơi trực tiếp với nhau, nhờ một công nghệ có sẵn trong mọi trình duyệt hiện đại tên là WebRTC. Đây là cách nó hoạt động, và vì sao đó là một mẹo rất hay.',
+        play: 'Chơi Game Night',
+        source: 'Xem mã nguồn',
+        caption: 'Một điện thoại làm chủ phòng. Mọi nước đi đều gửi đến chủ phòng, và chủ phòng báo cho mọi người biết chuyện gì đã xảy ra.',
+    },
+    names: { you: 'Bạn', ana: 'Ana', ben: 'Ben', cal: 'Cal', dee: 'Dee', host: 'Chủ phòng' },
+    server: {
+        title: 'Cách thông thường: một máy chủ ở giữa',
+        body: [
+            'Hầu hết trò chơi và ứng dụng trực tuyến hoạt động như một cuộc gọi qua tổng đài. Mỗi điện thoại kết nối đến một máy chủ, tức là một máy tính trong trung tâm dữ liệu mà công ty thuê và chạy suốt ngày đêm. Khi bạn đi một nước, nó đi đến máy chủ, máy chủ kiểm tra rồi gửi kết quả lại cho mọi người.',
+            'Cách này chạy tốt, nhưng ai đó phải trả tiền máy chủ mỗi tháng, phải giữ nó chạy ổn định và an toàn, và mọi dữ liệu trò chơi đều phải đi một vòng đến nơi đặt trung tâm dữ liệu rồi quay về.',
+        ],
+        tryIt: 'Chạm vào một điện thoại để đi một nước.',
+        serverLabel: 'Máy chủ trò chơi',
+        serverSub: 'trong trung tâm dữ liệu',
+        far: 'ở rất xa',
+        down: 'Tắt máy chủ',
+        downNote: 'Máy chủ bị sập nên không ai chơi được, dù mọi người đang ngồi cùng một bàn.',
+        trips: (n: number) => `Số nước đi qua máy chủ: ${n}`,
+        bill: (kb: string) => `Dữ liệu công ty phải trả tiền: ${kb} KB`,
+        nerd: {
+            title: 'Dành cho người tò mò về kỹ thuật',
+            body: [
+                'Đây là mô hình máy khách – máy chủ. Điện thoại thường giữ một kết nối WebSocket hoặc HTTP mở đến máy chủ, nơi duy nhất nắm trạng thái thật của trò chơi. Mô hình này dễ hiểu và dễ chống gian lận, nên hầu hết trò chơi đều dùng nó.',
+                'Chi phí tăng theo số người chơi: mỗi lần cập nhật được tải lên một lần và tải xuống một lần cho mỗi người, tất cả qua hạ tầng bạn phải trả tiền. Độ trễ ít nhất bằng một vòng đi về trung tâm dữ liệu, kể cả khi hai người ngồi chung một phòng.',
+            ],
+        },
+    },
+    host: {
+        title: 'Cách của chúng tôi: các điện thoại nói chuyện với nhau',
+        body: [
+            'Trên Game Night, ai tạo phòng sẽ là chủ phòng. Điện thoại của họ lặng lẽ đảm nhận việc của máy chủ: giữ trò chơi, kiểm tra từng nước đi theo luật, và gửi cập nhật cho từng người chơi.',
+            'Những người khác kết nối thẳng đến điện thoại của chủ phòng. Không ai phải chạy máy chủ trò chơi, không ai phải trả tiền cho nó, và các nước đi chỉ băng qua căn phòng thay vì băng qua cả đất nước.',
+        ],
+        tryIt: 'Chạm vào một người chơi để đi một nước. Xem chủ phòng kiểm tra rồi cập nhật cho mọi người.',
+        secret: 'Vai trò bí mật',
+        secretNote: 'Điện thoại của chủ phòng giữ toàn bộ trò chơi, nhưng mỗi điện thoại, kể cả màn hình của chính chủ phòng, chỉ nhận những gì người chơi đó được phép thấy. Bản cập nhật của gián điệp hoàn toàn không có địa điểm, nên chẳng có gì để nhìn trộm.',
+        cheat: 'Thử gian lận',
+        cheatNote: 'Chủ phòng kiểm tra luật, nên một nước đi sai luật sẽ bị từ chối và những người khác thậm chí không hề hay biết.',
+        leave: 'Chủ phòng đóng ứng dụng',
+        back: 'Chủ phòng quay lại',
+        awayNote: 'Điện thoại của chủ phòng đã lưu ván chơi. Mọi người chờ, và khi chủ phòng quay lại, họ kết nối lại và chơi tiếp đúng chỗ đang dừng.',
+        location: 'Bãi biển',
+        spy: 'Gián điệp',
+        broker: 'Giới thiệu',
+        brokerSub: 'miễn phí, chỉ lúc đầu',
+        nerd: {
+            title: 'Dành cho người tò mò về kỹ thuật',
+            body: [
+                'Mỗi người chơi mở một kênh dữ liệu WebRTC đến chủ phòng: một kết nối trực tiếp, được mã hóa (DTLS), truyền tin nhắn gần giống WebSocket nhưng từ trình duyệt đến trình duyệt. Chủ phòng chạy luật chơi dưới dạng hàm thuần: (trạng thái, nước đi) → trạng thái mới, hoặc một lỗi.',
+                'Sau mỗi thay đổi, chủ phòng tạo một bản chụp riêng cho từng người chơi, đã bỏ đi thông tin ẩn, rồi gửi qua kênh của người đó. Mỗi bản chụp có số phiên bản, nên điện thoại nào kết nối lại chỉ cần xin bản mới nhất. Chủ phòng lưu phòng chơi vào bộ nhớ của trình duyệt, nên tải lại trang cũng không mất ván.',
+                'Để tìm nhau, các điện thoại dùng một dịch vụ ghép nối công cộng miễn phí (PeerJS) chỉ để trao đổi thông tin kết nối. Mã phòng chính là địa chỉ của chủ phòng trên dịch vụ đó. Sau khi bắt tay xong, dịch vụ ghép nối không còn tham gia nữa.',
+            ],
+        },
+    },
+    topo: {
+        title: 'Một đến nhiều, và nhiều đến nhiều',
+        body: [
+            'Trò chơi dùng hình ngôi sao: mọi người kết nối đến chủ phòng, và chủ phòng phát mỗi bản cập nhật ra cho tất cả. Như vậy số kết nối ít, và chỉ một điện thoại nắm sự thật.',
+            'Cuộc gọi video thì khác. Video không thể đi qua điện thoại của chủ phòng mà không làm nó quá tải, nên trong cuộc gọi, mỗi điện thoại kết nối với mọi điện thoại khác, gọi là mạng lưới. Kéo thanh trượt để thấy nó tăng nhanh thế nào.',
+        ],
+        players: (n: number) => `${n} người chơi`,
+        star: 'Trò chơi (ngôi sao)',
+        mesh: 'Gọi video (mạng lưới)',
+        stats: {
+            links: 'Tổng số kết nối',
+            perPhone: 'Kết nối mỗi điện thoại',
+        },
+        hostOnly: (n: number) => `chủ phòng: ${n}, người khác: 1`,
+        meshNote: 'Đó là lý do Game Night chỉ cho bốn camera cùng lúc: với bốn camera, mỗi điện thoại đã phải tải lên ba luồng video. Những người khác tham gia bằng âm thanh, vốn rất nhẹ.',
+        nerd: {
+            title: 'Dành cho người tò mò về kỹ thuật',
+            body: [
+                'Hình ngôi sao cần n − 1 kết nối, còn mạng lưới cần n(n − 1)/2. Tin nhắn trò chơi rất nhỏ, vài trăm byte, nên chủ phòng dễ dàng gửi cho mười người chơi. Một luồng video 320×240 cần vài trăm kilobit mỗi giây, và trong mạng lưới, mỗi điện thoại phải mã hóa và tải lên một luồng cho mỗi người xem.',
+                'Các ứng dụng video lớn giải quyết bằng SFU (bộ chuyển tiếp chọn lọc): mỗi điện thoại tải một luồng lên máy chủ, máy chủ sao chép cho mọi người. Như vậy lại quay về một máy chủ ở giữa, và lại có hóa đơn băng thông.',
+            ],
+        },
+    },
+    stun: {
+        title: 'Tìm thấy nhau: STUN',
+        body: [
+            'Có một vấn đề. Điện thoại của bạn không có địa chỉ công khai trên internet. Nó nằm sau bộ định tuyến Wi-Fi, thiết bị cấp các địa chỉ riêng, giống như số căn hộ trong một tòa nhà. Người bên ngoài không thể gõ cửa căn hộ số 23; họ chỉ thấy địa chỉ của tòa nhà.',
+            'Vì vậy, trước khi hai điện thoại nói chuyện được, mỗi máy hỏi một máy chủ STUN một câu đơn giản: “Bạn thấy tôi đến từ địa chỉ nào?”. Sau đó chúng trao đổi câu trả lời và cùng gõ cửa một lúc, khiến cả hai bộ định tuyến mở cửa.',
+        ],
+        steps: [
+            'Mỗi điện thoại chỉ biết địa chỉ riêng của nó, địa chỉ bên trong tòa nhà.',
+            'Mỗi máy hỏi máy chủ STUN: “Từ bên ngoài, địa chỉ của tôi là gì?”. Máy chủ chỉ đọc nó trên phong bì rồi trả lời.',
+            'Hai điện thoại trao đổi các địa chỉ bên ngoài đó qua dịch vụ ghép nối.',
+            'Cả hai gửi tin nhắn cho nhau cùng lúc. Mỗi bộ định tuyến thấy một tin nhắn đi ra nên cho câu trả lời đi vào. Kỹ thuật này gọi là đục lỗ (hole punching).',
+            'Chúng đã kết nối trực tiếp. Từ giờ, các nước đi đi thẳng qua lại, và máy chủ STUN lẫn dịch vụ ghép nối không còn tham gia.',
+        ],
+        next: 'Tiếp',
+        prev: 'Lùi',
+        restart: 'Làm lại',
+        step: (i: number, n: number) => `Bước ${i} / ${n}`,
+        home: 'Wi-Fi nhà',
+        router: 'Router',
+        stunLabel: 'Máy chủ STUN',
+        stunSub: 'cho bạn biết địa chỉ',
+        broker: 'Ghép nối',
+        nerd: {
+            title: 'Dành cho người tò mò về kỹ thuật',
+            body: [
+                'Bộ định tuyến thực hiện NAT (biên dịch địa chỉ mạng): nó đổi địa chỉ và cổng riêng của bạn thành địa chỉ công khai của nó, rồi ghi nhớ ánh xạ để câu trả lời tìm được đường về. STUN (RFC 8489) giúp điện thoại khám phá ánh xạ công khai đó, gọi là ứng viên phản xạ máy chủ.',
+                'Quá trình ICE của WebRTC thu thập mọi ứng viên (cục bộ, phản xạ máy chủ và chuyển tiếp), trao đổi chúng qua kênh báo hiệu trong lời mời và lời đáp SDP, rồi thử từng cặp và giữ cặp tốt nhất chạy được. Máy chủ STUN rẻ vì chỉ trả lời một câu hỏi nhỏ và không bao giờ truyền dữ liệu của bạn. Google và Cloudflare cung cấp miễn phí.',
+            ],
+        },
+    },
+    turn: {
+        title: 'Khi cửa không chịu mở: TURN',
+        body: [
+            'Đục lỗ hoạt động với hầu hết mạng Wi-Fi gia đình. Nhưng có những mạng chặt hơn. Nhiều nhà mạng di động và mạng văn phòng cấp một địa chỉ bên ngoài khác cho mỗi nơi đến mới, nên địa chỉ bạn biết được từ STUN vô dụng với người khác. Tiếng gõ cửa không bao giờ lọt vào.',
+            'Cho những trường hợp đó có TURN: một máy chủ chuyển tiếp mà cả hai điện thoại đều với tới được. Mỗi điện thoại gửi đến trạm chuyển tiếp, và trạm chuyển tiếp chuyển tiếp đi. Lại là một máy chủ ở giữa, nhưng chỉ cho những kết nối thật sự cần.',
+        ],
+        network: 'Điện thoại thứ hai đang dùng',
+        open: 'Wi-Fi nhà',
+        strict: 'Một mạng nghiêm ngặt',
+        connect: 'Kết nối hai điện thoại',
+        trying: 'Đang thử đường trực tiếp…',
+        directOk: 'Kết nối trực tiếp. Không cần trạm chuyển tiếp.',
+        blocked: 'Bị chặn. Mạng này không cho tiếng gõ cửa đi vào.',
+        relayOk: 'Đã kết nối qua trạm chuyển tiếp.',
+        relayLabel: 'Trạm TURN',
+        relaySub: 'Cloudflare',
+        encrypted: 'Trạm chuyển tiếp chỉ chuyển dữ liệu đã mã hóa mà nó không đọc được: WebRTC mã hóa mọi thứ từ điện thoại đến điện thoại.',
+        nerd: {
+            title: 'Dành cho người tò mò về kỹ thuật',
+            body: [
+                'Thủ phạm là NAT đối xứng (và NAT cấp nhà mạng, phổ biến trên mạng di động): bộ định tuyến chọn một cổng công khai mới cho mỗi nơi đến, nên ánh xạ mà STUN báo về chỉ dùng được để nói chuyện với STUN. TURN (RFC 8656) cấp cho điện thoại một địa chỉ chuyển tiếp trên máy chủ TURN, trở thành thêm một ứng viên ICE.',
+                'ICE ưu tiên đường trực tiếp, nên trạm chuyển tiếp chỉ được dùng khi không còn cách nào khác. Game Night cung cấp TURN qua UDP, TCP và TLS trên cổng 443, trông giống HTTPS bình thường và vượt qua được các tường lửa chặt nhất. Âm thanh, video và dữ liệu được mã hóa đầu cuối bằng DTLS-SRTP và DTLS, nên trạm chuyển tiếp chỉ thấy dữ liệu đã mã hóa.',
+            ],
+        },
+    },
+    guard: {
+        title: 'Giữ trạm chuyển tiếp cho người chơi, không cho bot',
+        body: [
+            'Trạm chuyển tiếp là phần duy nhất tốn tiền thật: nó truyền từng byte của những cuộc trò chuyện dùng nó. Cloudflare cho một hạn mức miễn phí rộng rãi, nhưng nếu mật khẩu trạm công khai thì ứng dụng của bất kỳ ai cũng có thể mượn dùng.',
+            'Vì vậy Game Night không bao giờ để lộ mật khẩu. Khi bạn mở trang, nó vượt qua một bước kiểm tra bot vô hình, và một Cloudflare Worker nhỏ kiểm tra lượng dữ liệu chuyển tiếp đã dùng trước khi cấp một mật khẩu hết hạn sau ba giờ.',
+        ],
+        visitor: 'Người truy cập',
+        check: 'Kiểm tra bot',
+        checkSub: 'Turnstile',
+        worker: 'Worker của chúng tôi',
+        workerSub: 'kiểm tra ngân sách',
+        relay: 'Trạm TURN',
+        relaySub: 'cấp thẻ qua cửa',
+        player: 'Người chơi mở Game Night',
+        bot: 'Một script hỏi trực tiếp',
+        capped: 'Hết ngân sách',
+        okNote: 'Trạm chuyển tiếp đã sẵn sàng: một thẻ 3 giờ đang chờ phòng khi điện thoại này cần.',
+        botNote: 'Bị chặn. Không có thẻ mới từ một trình duyệt thật thì Worker không cấp gì cả.',
+        capNote: 'Hôm nay không có trạm chuyển tiếp, nên Worker ngừng cấp thẻ. Trò chơi vẫn kết nối trực tiếp cho hầu hết mọi người.',
+        nerd: {
+            title: 'Dành cho người tò mò về kỹ thuật',
+            body: [
+                'Trang chạy Cloudflare Turnstile ở chế độ vô hình và gửi mã dùng một lần đến Worker. Worker xác minh nó với Cloudflare (siteverify) và kiểm tra rằng mã được cấp cho trang này. Sau đó Worker đọc mức dùng trạm chuyển tiếp của khóa này từ dữ liệu phân tích GraphQL của Cloudflare, lưu đệm trong năm phút.',
+                'Khi chưa chạm giới hạn (900 GB mỗi 30 ngày, 50 GB mỗi ngày), nó xin Cloudflare thông tin đăng nhập TURN ngắn hạn, có hiệu lực 3 giờ, rồi trả về. Khóa API bí mật không bao giờ rời khỏi Worker. Khi thông tin đăng nhập hết hạn, trạm ngừng phục vụ chúng, nên Worker chạm giới hạn sẽ tắt trạm chuyển tiếp trong vài giờ, không phải đợi đến cuối tháng.',
+            ],
+        },
+    },
+    why: {
+        title: 'Vì sao nó hay',
+        points: [
+            ['Gần như không tốn tiền.', 'Không phải thuê máy chủ trò chơi. Phần duy nhất có phí là trạm chuyển tiếp mà hầu hết ván chơi không bao giờ đụng tới, và nó có giới hạn.'],
+            ['Nó nhanh.', 'Các nước đi chỉ băng qua căn phòng, không phải đến trung tâm dữ liệu rồi quay về.'],
+            ['Nó riêng tư.', 'Ván chơi của bạn không bao giờ nằm trên máy tính của người khác. Cuộc gọi và nước đi được mã hóa từ điện thoại đến điện thoại.'],
+            ['Nó tự mở rộng.', 'Mỗi nhóm tự mang theo “máy chủ” của mình: điện thoại của chủ phòng. Một nghìn ván cùng lúc tốn chi phí như một ván.'],
+        ],
+        tradeoffs: 'Những đánh đổi',
+        tradeoffList: [
+            'Trang của chủ phòng phải luôn mở. Nếu đóng lại, ván chơi tạm dừng cho đến khi chủ phòng quay lại.',
+            'Gọi video nhóm chỉ ổn với khoảng bốn camera trước khi điện thoại bắt đầu đuối.',
+            'Chủ phòng có tiếng nói cuối cùng, nên một chủ phòng quyết tâm có thể gian lận. Giữa bạn bè với nhau thì không sao.',
+        ],
+        outro: 'Muốn tự mình xem thử? Hãy tạo một phòng rồi mở nó trên một điện thoại thứ hai.',
+    },
+}
+
+export default vi

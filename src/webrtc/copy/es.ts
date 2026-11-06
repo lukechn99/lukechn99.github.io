@@ -1,0 +1,186 @@
+import type { Copy } from './en.ts'
+
+const es: Copy = {
+    pageTitle: 'Cómo funciona Game Night sin un servidor de juego',
+    back: 'Volver a Juegos',
+    hero: {
+        title: 'Game Night, sin servidor de juego',
+        lede: 'Cuando juegas Spyfall o Secret Hitler en Game Night, no hay ninguna computadora de una empresa en medio ejecutando el juego. Tus teléfonos juegan directamente entre sí, con una tecnología incluida en todos los navegadores modernos llamada WebRTC. Así es como funciona, y por qué es un truco tan ingenioso.',
+        play: 'Jugar Game Night',
+        source: 'Ver el código',
+        caption: 'Un teléfono es el anfitrión. Cada jugada va al anfitrión, y el anfitrión les cuenta a todos lo que pasó.',
+    },
+    names: { you: 'Tú', ana: 'Ana', ben: 'Ben', cal: 'Cal', dee: 'Dee', host: 'Anfitrión' },
+    server: {
+        title: 'La forma habitual: un servidor en medio',
+        body: [
+            'La mayoría de los juegos y aplicaciones en línea funcionan como una llamada a través de una operadora. Cada teléfono se conecta a un servidor, una computadora en un centro de datos que la empresa alquila y mantiene encendida día y noche. Cuando haces una jugada, viaja al servidor, el servidor la revisa y luego envía el resultado a todos.',
+            'Funciona bien, pero alguien tiene que pagar ese servidor cada mes, mantenerlo en marcha y seguro, y todo el tráfico del juego hace un viaje de ida y vuelta hasta donde esté el centro de datos.',
+        ],
+        tryIt: 'Toca un teléfono para hacer una jugada.',
+        serverLabel: 'Servidor del juego',
+        serverSub: 'en un centro de datos',
+        far: 'muy lejos',
+        down: 'Apagar el servidor',
+        downNote: 'El servidor está caído, así que nadie puede jugar, aunque todos estén sentados en la misma mesa.',
+        trips: (n: number) => `Jugadas enviadas por el servidor: ${n}`,
+        bill: (kb: string) => `Datos que la empresa paga por mover: ${kb} KB`,
+        nerd: {
+            title: 'Para los curiosos de la técnica',
+            body: [
+                'Este es el modelo cliente-servidor. Los teléfonos suelen mantener abierta una conexión WebSocket o HTTP con el servidor, que es la única fuente de verdad del estado del juego. Es fácil de entender y de proteger contra trampas, por eso la mayoría de los juegos lo usan.',
+                'Los costos crecen con los jugadores: cada actualización se sube una vez y se descarga una vez por jugador, todo a través de infraestructura que tú pagas. La latencia es como mínimo el viaje de ida y vuelta al centro de datos, incluso para dos personas en la misma habitación.',
+            ],
+        },
+    },
+    host: {
+        title: 'Nuestra forma: los teléfonos hablan entre sí',
+        body: [
+            'En Game Night, quien crea la sala se convierte en el anfitrión. Su teléfono asume en silencio el trabajo del servidor: guarda el juego, revisa cada jugada según las reglas y envía a cada jugador una actualización.',
+            'Todos los demás se conectan directamente al teléfono del anfitrión. Nadie ejecuta un servidor de juego, nadie paga por uno, y las jugadas cruzan la habitación en lugar de cruzar el país.',
+        ],
+        tryIt: 'Toca a un jugador para hacer una jugada. Mira cómo el anfitrión la revisa y actualiza a todos.',
+        secret: 'Roles secretos',
+        secretNote: 'El teléfono del anfitrión guarda todo el juego, pero cada teléfono, incluida la pantalla del propio anfitrión, solo recibe lo que ese jugador puede ver. La actualización del espía no trae el lugar en absoluto, así que no hay nada que espiar.',
+        cheat: 'Intentar hacer trampa',
+        cheatNote: 'El anfitrión revisa las reglas, así que una jugada ilegal se rechaza y nadie más se entera.',
+        leave: 'El anfitrión cierra la app',
+        back: 'El anfitrión vuelve',
+        awayNote: 'El teléfono del anfitrión guardó la partida. Todos esperan, y cuando el anfitrión regresa, se reconectan y siguen justo donde se quedaron.',
+        location: 'Playa',
+        spy: 'Espía',
+        broker: 'Presentaciones',
+        brokerSub: 'gratis, solo al inicio',
+        nerd: {
+            title: 'Para los curiosos de la técnica',
+            body: [
+                'Cada jugador abre un canal de datos WebRTC con el anfitrión: una conexión directa y cifrada (DTLS) que transporta mensajes de forma parecida a un WebSocket, pero de navegador a navegador. El anfitrión ejecuta las reglas como funciones puras: (estado, jugada) → nuevo estado, o un error.',
+                'Después de cada cambio, el anfitrión crea una instantánea personalizada para cada jugador, sin la información oculta, y la envía por el canal de ese jugador. Las instantáneas llevan un número de versión, así que un teléfono que se reconecta solo pide la más reciente. El anfitrión guarda la sala en el almacenamiento de su navegador, así que ni siquiera una recarga pierde la partida.',
+                'Para encontrarse, los teléfonos usan un servicio público y gratuito de emparejamiento (PeerJS) solo para intercambiar los datos de conexión. El código de la sala es literalmente la dirección del anfitrión en ese servicio. Después del saludo inicial, el emparejador ya no participa.',
+            ],
+        },
+    },
+    topo: {
+        title: 'De uno a muchos, y de muchos a muchos',
+        body: [
+            'El juego usa una estrella: todos se conectan al anfitrión, y el anfitrión reparte cada actualización. Así hay pocas conexiones, y un solo teléfono está a cargo de la verdad.',
+            'La videollamada es distinta. El video no puede pasar por el teléfono del anfitrión sin sobrecargarlo, así que en una llamada cada teléfono se conecta con todos los demás; eso se llama malla. Mueve el control para ver lo rápido que crece.',
+        ],
+        players: (n: number) => `${n} jugadores`,
+        star: 'Juego (estrella)',
+        mesh: 'Videollamada (malla)',
+        stats: {
+            links: 'Conexiones en total',
+            perPhone: 'Conexiones por teléfono',
+        },
+        hostOnly: (n: number) => `anfitrión: ${n}, demás: 1`,
+        meshNote: 'Por eso Game Night permite cuatro cámaras a la vez: con cuatro, cada teléfono ya sube tres transmisiones de video. Los demás se unen solo con audio, que es mínimo.',
+        nerd: {
+            title: 'Para los curiosos de la técnica',
+            body: [
+                'Una estrella necesita n − 1 conexiones y una malla n(n − 1)/2. Los mensajes del juego son pequeños, unos cientos de bytes, así que el anfitrión puede repartirlos fácilmente a diez jugadores. Una transmisión de video de 320×240 ocupa unos cientos de kilobits por segundo, y en una malla cada teléfono codifica y sube una por cada espectador.',
+                'Las grandes apps de video lo resuelven con una SFU (unidad de reenvío selectivo): cada teléfono sube una sola transmisión a un servidor que la copia para todos. Eso vuelve a poner un servidor en medio, y vuelve la factura del ancho de banda.',
+            ],
+        },
+    },
+    stun: {
+        title: 'Encontrarse: STUN',
+        body: [
+            'Hay un problema. Tu teléfono no tiene una dirección pública en internet. Está detrás de tu router wifi, que reparte direcciones privadas, como números de departamento dentro de un edificio. Alguien de afuera no puede tocar la puerta del departamento 23; solo ve la dirección del edificio.',
+            'Así que, antes de que dos teléfonos puedan hablar, cada uno le hace una pregunta sencilla a un servidor STUN: “¿Desde qué dirección me ves llegar?”. Luego intercambian esas respuestas y tocan al mismo tiempo, lo que engaña a ambos routers para que abran la puerta.',
+        ],
+        steps: [
+            'Cada teléfono solo conoce su dirección privada, la de dentro del edificio.',
+            'Cada uno le pregunta a un servidor STUN: “¿Cuál es mi dirección vista desde afuera?”. El servidor solo la lee del sobre y responde.',
+            'Los teléfonos intercambian esas direcciones externas a través del emparejador.',
+            'Ambos se envían un mensaje al mismo tiempo. Cada router ve un mensaje saliente y deja entrar la respuesta. Esto se llama perforación de NAT (hole punching).',
+            'Están conectados directamente. A partir de ahora, las jugadas van directo de uno a otro, y ni el servidor STUN ni el emparejador participan.',
+        ],
+        next: 'Siguiente',
+        prev: 'Atrás',
+        restart: 'Empezar de nuevo',
+        step: (i: number, n: number) => `Paso ${i} de ${n}`,
+        home: 'Wifi de casa',
+        router: 'Router',
+        stunLabel: 'Servidor STUN',
+        stunSub: 'te dice tu dirección',
+        broker: 'Emparejador',
+        nerd: {
+            title: 'Para los curiosos de la técnica',
+            body: [
+                'Los routers hacen NAT (traducción de direcciones de red): reescriben tu dirección y puerto privados por los públicos y recuerdan la correspondencia para que las respuestas encuentren el camino de vuelta. STUN (RFC 8489) permite que un teléfono descubra esa correspondencia pública, llamada candidato reflexivo del servidor.',
+                'El proceso ICE de WebRTC reúne todos los candidatos (locales, reflexivos y de retransmisión), los intercambia por el canal de señalización en la oferta y respuesta SDP, luego prueba pares y se queda con el mejor que funcione. Los servidores STUN son baratos de operar porque responden una pregunta diminuta y nunca transportan tu tráfico. Google y Cloudflare los ofrecen gratis.',
+            ],
+        },
+    },
+    turn: {
+        title: 'Cuando la puerta no se abre: TURN',
+        body: [
+            'La perforación funciona en la mayoría de las redes wifi de casa. Pero algunas redes son más estrictas. Muchas operadoras móviles y redes de oficina dan una dirección externa distinta para cada destino nuevo, así que la dirección que obtuviste de STUN no le sirve a nadie más. El toque nunca llega.',
+            'Para esos casos existe TURN: un servidor de retransmisión al que ambos teléfonos pueden llegar. Cada teléfono envía al relé, y el relé lo pasa al otro. Es otra vez un servidor en medio, pero solo para las conexiones que de verdad lo necesitan.',
+        ],
+        network: 'El segundo teléfono está en',
+        open: 'Wifi de casa',
+        strict: 'Una red estricta',
+        connect: 'Conectar los teléfonos',
+        trying: 'Probando la ruta directa…',
+        directOk: 'Conexión directa. No hace falta relé.',
+        blocked: 'Bloqueado. Esta red no deja pasar el toque.',
+        relayOk: 'Conectados a través del relé.',
+        relayLabel: 'Relé TURN',
+        relaySub: 'Cloudflare',
+        encrypted: 'El relé pasa datos cifrados que no puede leer: WebRTC cifra todo de teléfono a teléfono.',
+        nerd: {
+            title: 'Para los curiosos de la técnica',
+            body: [
+                'El culpable es el NAT simétrico (y el NAT de operadora, común en redes móviles): el router elige un puerto público nuevo para cada destino, así que la correspondencia que informó STUN solo sirve para hablar con STUN. TURN (RFC 8656) le da al teléfono una dirección retransmitida en el servidor TURN, que se convierte en un candidato ICE más.',
+                'ICE prefiere las rutas directas, así que el relé solo se usa cuando nada más funciona. Game Night ofrece TURN por UDP, TCP y TLS en el puerto 443, que parece HTTPS normal y atraviesa los cortafuegos más estrictos. El audio, el video y los datos van cifrados de extremo a extremo con DTLS-SRTP y DTLS, así que el relé solo ve texto cifrado.',
+            ],
+        },
+    },
+    guard: {
+        title: 'El relé, para jugadores y no para bots',
+        body: [
+            'El relé es la única parte que cuesta dinero de verdad: transporta cada byte de las conversaciones que lo usan. Cloudflare da una cuota gratuita generosa, pero un relé con una contraseña pública podría usarlo la app de cualquiera.',
+            'Por eso Game Night nunca incluye una contraseña. Al abrir la página, se pasa una verificación invisible contra bots, y un pequeño Cloudflare Worker revisa cuántos datos del relé se han usado antes de entregar una contraseña que caduca en tres horas.',
+        ],
+        visitor: 'Visitante',
+        check: 'Verificación anti-bots',
+        checkSub: 'Turnstile',
+        worker: 'Nuestro Worker',
+        workerSub: 'revisa el presupuesto',
+        relay: 'Relé TURN',
+        relaySub: 'emite un pase',
+        player: 'Un jugador abre Game Night',
+        bot: 'Un script lo pide directo',
+        capped: 'Presupuesto agotado',
+        okNote: 'Relé listo: un pase de 3 horas espera por si este teléfono lo necesita.',
+        botNote: 'Detenido. Sin un pase reciente de un navegador real, el Worker no entrega nada.',
+        capNote: 'Hoy no hay relé, así que el Worker deja de entregar pases. El juego sigue conectándose directamente para casi todos.',
+        nerd: {
+            title: 'Para los curiosos de la técnica',
+            body: [
+                'La página ejecuta Cloudflare Turnstile en modo invisible y envía el token de un solo uso al Worker, que lo verifica con Cloudflare (siteverify) y comprueba que se emitió para este sitio. Luego el Worker lee el uso del relé de esta clave en las analíticas GraphQL de Cloudflare, guardándolo cinco minutos en caché.',
+                'Por debajo de los límites (900 GB cada 30 días, 50 GB al día), pide a Cloudflare credenciales TURN de corta duración, válidas por 3 horas, y las devuelve. La clave secreta de la API nunca sale del Worker. Cuando las credenciales caducan, el relé deja de aceptarlas, así que un Worker en el límite apaga el relé en cuestión de horas, no a fin de mes.',
+            ],
+        },
+    },
+    why: {
+        title: 'Por qué es genial',
+        points: [
+            ['Casi no cuesta nada.', 'No hay servidores de juego que alquilar. Lo único de pago es un relé que la mayoría de las partidas nunca usan, y tiene límite.'],
+            ['Es rápido.', 'Las jugadas cruzan la habitación, no van a un centro de datos y vuelven.'],
+            ['Es privado.', 'Tu partida nunca queda en la computadora de otra persona. Las llamadas y las jugadas van cifradas de teléfono a teléfono.'],
+            ['Escala solo.', 'Cada grupo trae su propio “servidor”: el teléfono del anfitrión. Mil partidas a la vez cuestan lo mismo que una.'],
+        ],
+        tradeoffs: 'Las desventajas',
+        tradeoffList: [
+            'La página del anfitrión tiene que seguir abierta. Si se cierra, la partida se pausa hasta que vuelva.',
+            'El video en grupo llega a unas cuatro cámaras antes de que los teléfonos empiecen a sufrir.',
+            'El anfitrión tiene la última palabra, así que un anfitrión decidido podría hacer trampa. Entre amigos, no pasa nada.',
+        ],
+        outro: '¿Quieres verlo por ti mismo? Crea una sala y ábrela en un segundo teléfono.',
+    },
+}
+
+export default es
