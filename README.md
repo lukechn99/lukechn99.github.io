@@ -64,3 +64,15 @@ npm run build:peoples
 
 ### General
 - [ ] Add more content to the Works page tabs (Micro-frontends, AWS)
+
+## Games showcase
+
+The Games tab (`/#/works/games`) features only Game Night, the P2P games
+collection, with links to play, source, and the WebRTC explainer.
+
+Bulwark is unlisted, not deleted. Its feature card is retained in
+`src/archived/BulwarkCard.tsx`, its screenshot in `public/game-art/bulwark.jpg`,
+and its translations in `src/i18n/locales/`. To feature it again, import and
+render `BulwarkCard` in `src/GamesTab.tsx`. Its independent
+[repository](https://github.com/lukechn99/bulwark) and deployment remain intact;
+it has not been moved into the P2P games repo.
