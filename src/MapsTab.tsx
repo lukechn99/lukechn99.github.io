@@ -18,7 +18,7 @@ import {
 import { CSS } from "@dnd-kit/utilities"
 import { useTranslation } from "react-i18next"
 import type { Map as LeafletMap } from "leaflet"
-import type { MaptilerLayer as MaptilerLayerType } from "@maptiler/leaflet-maptilersdk"
+import type { MaptilerLayer as MaptilerLayerConstructor } from "@maptiler/leaflet-maptilersdk"
 import type { ItineraryItem, ItineraryMeta, NominatimResult } from "./travel/types.ts"
 import { isHotelLocation } from "./travel/types.ts"
 import {
@@ -94,7 +94,7 @@ function SortableItem({ item, index, isDragMode, onUpdate, onRemove, onFocus }: 
                 onRemove={onRemove}
                 onFocus={onFocus}
                 isDragMode={isDragMode}
-                dragHandleProps={isDragMode ? { ...attributes, ...listeners } : undefined}
+                {...(isDragMode ? { dragHandleProps: { ...attributes, ...listeners } } : {})}
             />
         </div>
     )
@@ -110,7 +110,7 @@ export default function MapsTab() {
     darkRef.current = isDark
     const langRef = useRef(i18n.resolvedLanguage ?? 'en')
     langRef.current = i18n.resolvedLanguage ?? 'en'
-    const mtLayerRef = useRef<MaptilerLayerType | null>(null)
+    const mtLayerRef = useRef<InstanceType<typeof MaptilerLayerConstructor> | null>(null)
     const mtLanguageRef = useRef<((code: string) => unknown) | null>(null)
     const mapContainer = useRef<HTMLDivElement>(null)
     const mapInstance = useRef<LeafletMap | null>(null)

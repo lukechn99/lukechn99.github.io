@@ -6,7 +6,8 @@
   "homepage": "https://lukechn99.github.io",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "typecheck": "tsc --noEmit",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
     "predeploy": "npm install && npm run build",
     "deploy": "gh-pages -d dist --add",

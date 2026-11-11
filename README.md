@@ -76,3 +76,10 @@ and its translations in `src/i18n/locales/`. To feature it again, import and
 render `BulwarkCard` in `src/GamesTab.tsx`. Its independent
 [repository](https://github.com/lukechn99/bulwark) and deployment remain intact;
 it has not been moved into the P2P games repo.
+
+## Type checking
+
+Run `npm run typecheck` for the strict TypeScript check. `npm run build` runs
+it before bundling, so the normal deployment build also catches type errors.
+Vite browser globals come from `vite/client` in `tsconfig.json`; optional props
+must be omitted when absent (`exactOptionalPropertyTypes` remains enabled).
